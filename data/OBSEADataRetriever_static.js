@@ -20,7 +20,7 @@ export class OBSEADataRetriever{
     this.callbackSetParameters = callbackSetParameters;
 
     // Get static data
-    fetch('/OBSEA/data/obsea_2021.csv')
+    fetch('/CasablancaBuoy/data/obsea_2021.csv')
     .then(res => res.text())
     .then(rawSS => {
       let rowsSS = rawSS.split("\r\n");

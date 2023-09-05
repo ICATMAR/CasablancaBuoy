@@ -14,7 +14,7 @@ class OBSEACrawlerEntity {
   constructor(scene){
     const gltfLoader = new GLTFLoader();
     const texLoader = new THREE.TextureLoader();
-    gltfLoader.load('/OBSEA/Assets/OBSEACrawler/Crawler.glb', (gltf) => {
+    gltfLoader.load('/CasablancaBuoy/Assets/OBSEACrawler/Crawler.glb', (gltf) => {
       // GLTF scene
       const root = gltf.scene;
       this.root = root;
@@ -37,13 +37,13 @@ class OBSEACrawlerEntity {
       aoBottom.material.transparent = true;
       aoBottom.material.metalness = 1;
       aoBottom.material.roughness = 1;
-      aoBottom.material.map = texLoader.load('/OBSEA/Assets/OBSEACrawler/crawler_floor_ao_alpha.png');
+      aoBottom.material.map = texLoader.load('/CasablancaBuoy/Assets/OBSEACrawler/crawler_floor_ao_alpha.png');
       aoBottom.renderOrder = 1;
 
 
       // Camera glass
       let cameraGlass = root.getObjectByName('FrontSphere');
-      cameraGlass.material.map = texLoader.load('/OBSEA/Assets/OBSEACrawler/HDRI_transparent.png');
+      cameraGlass.material.map = texLoader.load('/CasablancaBuoy/Assets/OBSEACrawler/HDRI_transparent.png');
       cameraGlass.material.transparent = true;
       cameraGlass.material.opacity = 1;
       cameraGlass.renderOrder = 1;
@@ -63,7 +63,7 @@ class OBSEACrawlerEntity {
         let obj = root.getObjectByName(objectsAO[i]);
         obj.material.color.setRGB(0.82, 0.75, 0.5);
         // Loading the ambient occlusion manually does not work. The gltf export contains the ao texture
-        //obj.material.map = texLoader.load('/OBSEA/Assets/OBSEACrawler/crawler_ao.png');
+        //obj.material.map = texLoader.load('/CasablancaBuoy/Assets/OBSEACrawler/crawler_ao.png');
         //obj.material.map.flipY = false;
       }
 
@@ -215,7 +215,7 @@ export { OBSEACrawlerEntity }
 // Script to create alpha from a white-black ambient occlusion
 
 let img = new Image();
-img.src = '/OBSEA/Assets/OBSEACrawler/crawler_floor_ao.png';
+img.src = '/CasablancaBuoy/Assets/OBSEACrawler/crawler_floor_ao.png';
 
 img.onload = () => {
   let cnv = document.createElement('canvas');

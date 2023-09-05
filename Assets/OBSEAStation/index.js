@@ -3,7 +3,7 @@ import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitCo
 //import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js';
 import { GLTFLoader } from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'https://threejs.org/examples/jsm/loaders/FBXLoader.js'
-import { RosaVentsEntity } from '/OBSEA/Assets/Orientation/RosaVentsEntity.js';
+import { RosaVentsEntity } from '/CasablancaBuoy/Assets/Orientation/RosaVentsEntity.js';
 // import { GUI } from 'https://threejs.org/examples/jsm/libs/lil-gui.module.min.js';
 
 

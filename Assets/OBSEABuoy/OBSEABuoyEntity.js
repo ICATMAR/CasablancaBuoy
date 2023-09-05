@@ -8,7 +8,7 @@ class OBSEABuoyEntity {
   constructor(scene){
     // https://www.youtube.com/watch?v=6LA8vEB47Nk&ab_channel=DirkTeucher
     const gltfLoader = new GLTFLoader();
-    gltfLoader.load('/OBSEA/Assets/OBSEABuoy/OBSEABuoy.glb', (gltf) => {
+    gltfLoader.load('/CasablancaBuoy/Assets/OBSEABuoy/OBSEABuoy.glb', (gltf) => {
       // GLTF scene
       const root = gltf.scene;
       // Fix frustrum culling

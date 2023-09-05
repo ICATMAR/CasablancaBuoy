@@ -11,14 +11,14 @@ class OBSEABiotopEntity {
     // Load mesh
     let gltfLoader = new GLTFLoader();
 
-    gltfLoader.load('/OBSEA/Assets/OBSEABiotop/biotop.glb', (gltf) => {
+    gltfLoader.load('/CasablancaBuoy/Assets/OBSEABiotop/biotop.glb', (gltf) => {
 
 
       let biotop = gltf.scene.children[0];
 
       // Biotop AO texture
       const loader = new THREE.TextureLoader();
-      biotop.material.aoMap = loader.load('/OBSEA/Assets/OBSEABiotop/Textures/BiotopAmbientOcclusion.jpeg');
+      biotop.material.aoMap = loader.load('/CasablancaBuoy/Assets/OBSEABiotop/Textures/BiotopAmbientOcclusion.jpeg');
       biotop.material.aoMapIntensity = 1;
       biotop.material.metalnessMap = null;
       biotop.material.color.multiplyScalar(0.8);

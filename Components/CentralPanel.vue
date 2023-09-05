@@ -24,9 +24,9 @@
 
 
 <script>
-import InfoPanel from '/OBSEA/Components//Panels/InfoPanel.vue';
-import SeaPanel from "/OBSEA/Components/Panels/SeaPanel.vue"
-import WindPanel from "/OBSEA/Components/Panels/WindPanel.vue"
+import InfoPanel from '/CasablancaBuoy/Components//Panels/InfoPanel.vue';
+import SeaPanel from "/CasablancaBuoy/Components/Panels/SeaPanel.vue"
+import WindPanel from "/CasablancaBuoy/Components/Panels/WindPanel.vue"
 
 export default {
   name: "CentralPanel",

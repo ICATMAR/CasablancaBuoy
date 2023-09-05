@@ -4,22 +4,22 @@ import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitCo
 import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js';
 import { GLTFLoader } from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'https://threejs.org/examples/jsm/loaders/FBXLoader.js'
-import { RosaVentsEntity } from '/OBSEA/Assets/Orientation/RosaVentsEntity.js';
-import { SandEntity } from '/OBSEA/Assets/Terrain/SandEntity.js';
-import { SkyboxEntity } from '/OBSEA/Assets/Skybox/SkyboxEntity.js';
+import { RosaVentsEntity } from '/CasablancaBuoy/Assets/Orientation/RosaVentsEntity.js';
+import { SandEntity } from '/CasablancaBuoy/Assets/Terrain/SandEntity.js';
+import { SkyboxEntity } from '/CasablancaBuoy/Assets/Skybox/SkyboxEntity.js';
 
-import * as FogShader from '/OBSEA/Assets/Terrain/FogShader.js'
-import { OceanEntity } from '/OBSEA/Assets/Ocean/OceanEntity.js';
-import { OBSEABuoyEntity } from '/OBSEA/Assets/OBSEABuoy/OBSEABuoyEntity.js';
-import { OBSEAStationEntity } from '/OBSEA/Assets/OBSEAStation/ObseaStationEntity.js';
-import { OBSEABiotopEntity } from '/OBSEA/Assets/OBSEABiotop/OBSEABiotopEntity.js'
-import { OBSEACrawlerEntity } from '/OBSEA/Assets/OBSEACrawler/CrawlerEntity.js';
-//import { WindsockEntity } from '/OBSEA/Assets/Windsock/WindsockEntity.js';
-import { FlagEntity } from '/OBSEA/Assets/Flag/FlagEntity.js';
-import { CurrentEntity } from '/OBSEA/Assets/Current/CurrentEntity.js';
-import { TextMeshEntity } from '/OBSEA/Assets/TextMesh/TextMeshEntity.js';
+import * as FogShader from '/CasablancaBuoy/Assets/Terrain/FogShader.js'
+import { OceanEntity } from '/CasablancaBuoy/Assets/Ocean/OceanEntity.js';
+import { OBSEABuoyEntity } from '/CasablancaBuoy/Assets/OBSEABuoy/OBSEABuoyEntity.js';
+import { OBSEAStationEntity } from '/CasablancaBuoy/Assets/OBSEAStation/ObseaStationEntity.js';
+import { OBSEABiotopEntity } from '/CasablancaBuoy/Assets/OBSEABiotop/OBSEABiotopEntity.js'
+import { OBSEACrawlerEntity } from '/CasablancaBuoy/Assets/OBSEACrawler/CrawlerEntity.js';
+//import { WindsockEntity } from '/CasablancaBuoy/Assets/Windsock/WindsockEntity.js';
+import { FlagEntity } from '/CasablancaBuoy/Assets/Flag/FlagEntity.js';
+import { CurrentEntity } from '/CasablancaBuoy/Assets/Current/CurrentEntity.js';
+import { TextMeshEntity } from '/CasablancaBuoy/Assets/TextMesh/TextMeshEntity.js';
 
-import { OBSEADataRetriever } from '/OBSEA/data/OBSEADataRetriever.js'
+import { OBSEADataRetriever } from '/CasablancaBuoy/data/OBSEADataRetriever.js'
 
 
 
@@ -218,7 +218,7 @@ class SceneManager{
 
     // Create image logo
     let expObseaImg = document.createElement("img");
-    expObseaImg.src = "/OBSEA/Assets/OBSEABanner.png";
+    expObseaImg.src = "/CasablancaBuoy/Assets/Logos/icatmar-mini-logo.svg";
     expObseaImg.style['max-width'] = '40vw';
     expObseaImg.style['max-height'] = '130px';//'18%';
 
@@ -242,7 +242,7 @@ class SceneManager{
 
     // Create sponsors logos
     let sponsorsImg = document.createElement("img");
-    sponsorsImg.src = "/OBSEA/img/Logos.png";
+    sponsorsImg.src = "/CasablancaBuoy/img/Logos.png";
     sponsorsImg.style['max-width'] = '100%';
     sponsorsImg.style['max-height'] = '20%';
     sponsorsImg.style.bottom = '10px';

@@ -1,4 +1,4 @@
-import preLoadedDataTypes from "/OBSEA/data/WMSDataTypes.js";
+import preLoadedDataTypes from "/CasablancaBuoy/data/WMSDataTypes.js";
 
 // Scripts that obtain data from the CMEMS WMS API
 export default class WMSDataRetriever{

@@ -4,7 +4,7 @@ import { GLTFLoader } from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.
 class OBSEAStationEntity {
   constructor(scene){
     const gltfLoader = new GLTFLoader();
-    gltfLoader.load('/OBSEA/Assets/OBSEAStation/OBSEAStation.glb', (gltf) => {
+    gltfLoader.load('/CasablancaBuoy/Assets/OBSEAStation/OBSEAStation.glb', (gltf) => {
       // GLTF scene
       const root = gltf.scene;
       // Fix frustrum culling

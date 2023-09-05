@@ -27,7 +27,7 @@ class CurrentEntity {
   constructor(scene) {
       const objLoader = new OBJLoader();
       // objLoader.load('https://threejs.org/manual/examples/resources/models/windmill/windmill.obj', (root) => {
-      objLoader.load('/OBSEA/Assets/Orientation/ArrowX.obj', (root) => {
+      objLoader.load('/CasablancaBuoy/Assets/Orientation/ArrowX.obj', (root) => {
 
         // Add material
         const arrowMaterial = new THREE.MeshPhongMaterial({
