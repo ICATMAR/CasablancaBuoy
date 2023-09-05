@@ -29,7 +29,15 @@ class FlagEntity {
       this.flagObj.frustumCulled = false; // Flag
       this.poleObj.frustumCulled = false; // Pole
 
-      this.root.scale.addScalar(2);
+      this.root.scale.addScalar(1);
+
+      // Set flag texture
+      const loader = new THREE.TextureLoader();
+      let texture = loader.load('/CasablancaBuoy/Assets/Flag/CasablancaFlag.png');
+      texture.encoding = THREE.sRGBEncoding;
+      texture.magFilter = THREE.LinearFilter; //THREE.NearestFilter;
+      texture.flipY = false;
+      this.flagObj.children[0].material.map = texture;
 
       // Create Flag Behavior
       this.flagBehavior = new FlagBehavior(this.flagObj, scene);
@@ -54,7 +62,7 @@ class FlagEntity {
   setWindParameters(paramName, value){
     if (paramName == 'windSpeed'){
       this.windIntensity = value;
-      this.setFlagBeaufortColor(this.windIntensity);
+      // this.setFlagBeaufortColor(this.windIntensity);
     } else if (paramName == 'windDirection')
       this.windDirection = value + 180;
   }
@@ -73,7 +81,7 @@ class FlagEntity {
     this.root.visible = params.WSPD == undefined ? false : true;
 
     this.windIntensity = params.WSPD * 3.6 || this.windIntensity; // From m/s to km/h
-    this.setFlagBeaufortColor(this.windIntensity);
+    // this.setFlagBeaufortColor(this.windIntensity);
     this.windDirection = params.WDIR || this.windDirection;
   }
 

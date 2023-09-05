@@ -126,14 +126,13 @@ class SceneManager{
 
     // Flag
     this.flag = new FlagEntity(scene, () => {
-      this.flag.root.position.y = 2;
-      this.flag.root.scale.set(1,1,1);
+      this.flag.root.position.y = 0;
     });
     
 
     // Rosa dels vents
-    this.rosaVents = new RosaVentsEntity(scene);
-    this.rosaVents.root.position.y = 3;
+    //his.rosaVents = new RosaVentsEntity(scene);
+    //this.rosaVents.root.position.y = 3.5;
     
     // Sea velocity, currents
     this.currents = new CurrentEntity(scene);
@@ -143,9 +142,9 @@ class SceneManager{
     // SCENE TEXT
     // SURFACE
     // Wind text mesh
-    this.windText = new TextMeshEntity(scene, "", 0.25, 0x000000, () => {
-      this.windText.textObj.position.y = 3;
-    });
+    // this.windText = new TextMeshEntity(scene, "", 0.25, 0x000000, () => {
+    //   this.windText.textObj.position.y = 3;
+    // });
     // Orientation text meshes
     this.Ntext = new TextMeshEntity(scene, "N", 0.5, 0xff0000, () => {
       this.Ntext.textObj.rotation.x = -Math.PI / 2;
