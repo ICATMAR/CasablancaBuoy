@@ -76,13 +76,13 @@ class CurrentEntity {
   }
 
   hideCurrents(){
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < this.roots.length; i++) {
       let arr = this.roots[i];
       arr.visible = false;
     }
   }
   showCurrents(){
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < this.roots.length; i++) {
       let arr = this.roots[i];
       arr.visible = true;
     }
