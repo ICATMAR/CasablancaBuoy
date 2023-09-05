@@ -265,6 +265,8 @@ class SceneManager{
         setTimeout(() => document.body.removeChild(loadDiv), 1300);
         
       }
+      // Emit event
+      window.eventBus.emit('SceneManager_LoadingComplete');
       // TODO: Twice OceanSurfaceMR
       // TODO: For some reason the files appear to be loaded twice?
     };

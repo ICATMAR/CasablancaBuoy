@@ -99,7 +99,7 @@ export default {
       if (this.sceneManager.currents && dataInTimestamp['UCUR_0m']){
         this.sceneManager.currents.showCurrents();
         this.sceneManager.currents.setCurrentParameters(dataInTimestamp);
-      } else {
+      } else if (this.sceneManager.currents) {
         this.sceneManager.currents.hideCurrents();
       }
 
@@ -169,6 +169,19 @@ export default {
         this.sceneManager.flag.setWindParameters('windDirection', direction);
     });
 
+
+
+    // ****** LOADING SCREEN  - INITIAL PARAMETERS *****
+    window.eventBus.on('SceneManager_LoadingComplete', () => {
+        let params = {
+        'Hm0': 0.3,
+        'Mdir': 97,
+        'Spr1': 150,
+        'WSPD': 6,
+        'WDIR': 180,
+      }
+      updateData(params);
+    });
 
     
 
