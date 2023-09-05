@@ -2,7 +2,7 @@
 
   <div class="language-dropdown-container">
     <div class="language-button-container">
-      <button id="language-button" @click="dropdownClick" class="icon-str">
+      <button id="language-button" @click="dropdownClick" class="icon-str" :title="$i18n.t('languageButton')">
 
         <img class="lang-icon" src="/CasablancaBuoy/lang/en-200.png" v-show="$i18n.locale.includes('en')">
         <img class="lang-icon" src="/CasablancaBuoy/lang/es-200.png" v-show="$i18n.locale.includes('es')">

@@ -5,6 +5,10 @@ export default es = {
   "buoyButtonTitle": "Centra la cámara en la boya de superfície",
   "baseButtonTitle": "Centra la cámara en el observatorio submarino",
 
+  "information": "Información",
+  "githubButton": "Repositorio del código abierto",
+  "languageButton": "Cambia de idioma",
+
   "waveButtonTitle": "Configura el oleaje",
   "windButtonTitle": "Modifica el viento",
 

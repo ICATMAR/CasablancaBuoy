@@ -5,6 +5,10 @@ export default ca = {
   "buoyButtonTitle": "Centra la càmara a la boia de superficie",
   "baseButtonTitle": "Centra la càmara a l'observatori submarí",
 
+  "information": "Informació",
+  "githubButton": "Repositori del codi obert",
+  "languageButton": "Canvia de llengua",
+
   "waveButtonTitle": "Configura l'onatge",
   "windButtonTitle": "Modifica el vent",
 

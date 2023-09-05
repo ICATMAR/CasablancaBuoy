@@ -5,6 +5,10 @@ export default en = {
   "buoyButtonTitle": "Center the camera on the surface buoy",
   "baseButtonTitle": "Center the camera on the underwater observatory",
 
+  "information": "Information",
+  "githubButton": "Open source repository",
+  "languageButton": "Change the language",
+
   "waveButtonTitle": "Set the ocean swell",
   "windButtonTitle": "Set the wind",
 
