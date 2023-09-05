@@ -135,7 +135,6 @@ export default {
   position: absolute;
   top: 6px;
   right: 10px;
-  background: red;
 
   display: flex;
   flex-direction: row;

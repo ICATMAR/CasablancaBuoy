@@ -2,14 +2,6 @@
   <div id="top-right-nav">
 
     <div class="top-right vertical-container">
-
-      <!-- Information button -->
-      <button class="roundButton">
-        <div class="icon-svg infoDiv" @click="infoButtonClicked">info</div>
-      </button>
-
-      <!-- Language selector -->
-      <language-selector></language-selector>
     
       <!-- Compass button -->
       <button class="roundButton" @click="compassButtonClicked" :title="$i18n.t('compassButtonTitle')">
@@ -23,9 +15,6 @@
       </button>
 
 
-      
-    
-  
     </div>
   </div>
 </template>
@@ -35,8 +24,6 @@
 
 
 <script>
-import LanguageSelector from '/CasablancaBuoy/Components/TopRight/LanguageSelector.vue'
-
 
 export default {
   name: "TopRightNav",
@@ -68,14 +55,8 @@ export default {
     compassButtonClicked: function (e) {
       window.eventBus.emit('TopRightNav_compassButtonClicked');
     },
-    infoButtonClicked: function(e){
-      //window.eventBus.emit('TopRightNav_infoButtonClicked');
-      window.eventBus.emit('OpenCentralPanel', 'infoPanel');
-      //window.open('https://github.com/BlueNetCat/OBSEA', '_blank');
-    }
   },
   components: {
-    "language-selector": LanguageSelector
   }
 }
 </script>
@@ -119,11 +100,6 @@ export default {
     background-color: rgb(176, 176, 176);
   }
 
-  .infoDiv {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
   .icon-svg:hover{
     border-width: 2px;
