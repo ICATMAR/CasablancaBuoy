@@ -10,6 +10,9 @@ import { SkyboxEntity } from '/CasablancaBuoy/Assets/Skybox/SkyboxEntity.js';
 
 import * as FogShader from '/CasablancaBuoy/Assets/Terrain/FogShader.js'
 import { OceanEntity } from '/CasablancaBuoy/Assets/Ocean/OceanEntity.js';
+
+import { CasablancaBuoyEntity } from '/CasablancaBuoy/Assets/CasablancaBuoy/CasablancaBuoyEntity.js';
+
 import { OBSEABuoyEntity } from '/CasablancaBuoy/Assets/OBSEABuoy/OBSEABuoyEntity.js';
 import { OBSEAStationEntity } from '/CasablancaBuoy/Assets/OBSEAStation/ObseaStationEntity.js';
 import { OBSEABiotopEntity } from '/CasablancaBuoy/Assets/OBSEABiotop/OBSEABiotopEntity.js'
@@ -113,7 +116,7 @@ class SceneManager{
     // Ocean
     this.ocean = new OceanEntity(scene);
     // OBSEA Buoy
-    this.obseaBuoy = new OBSEABuoyEntity(scene);
+    this.casablancaBuoy = new CasablancaBuoyEntity(scene);
     // OBSEA Base
     this.obseaBase = new OBSEAStationEntity(scene);
     // OBSEA Biotop
@@ -374,8 +377,8 @@ class SceneManager{
         this.ocean.update(dt);
 
         // Change buoy position
-        if (this.obseaBuoy !== undefined) {
-          if (this.obseaBuoy.isLoaded) {
+        if (this.casablancaBuoy !== undefined) {
+          if (this.casablancaBuoy.isLoaded) {
             // Get y position and normal of the wave on that point
             let position = new THREE.Vector3();
             let normal = new THREE.Vector3();
@@ -386,17 +389,17 @@ class SceneManager{
             // dt from 16 to 40
             coef = 0.95 - 0.4 * (1 - dt / 16); // Dependent on frame rate
             
-            let obseaBuoy = this.obseaBuoy;
-            obseaBuoy.root.position.x = obseaBuoy.root.position.x * coef + (1 - coef) * position.x;
-            obseaBuoy.root.position.y = obseaBuoy.root.position.y * coef + (1 - coef) * position.y;
-            obseaBuoy.root.position.z = obseaBuoy.root.position.z * coef + (1 - coef) * position.z;
+            let casablancaBuoy = this.casablancaBuoy;
+            casablancaBuoy.root.position.x = casablancaBuoy.root.position.x * coef + (1 - coef) * position.x;
+            casablancaBuoy.root.position.y = casablancaBuoy.root.position.y * coef + (1 - coef) * position.y;
+            casablancaBuoy.root.position.z = casablancaBuoy.root.position.z * coef + (1 - coef) * position.z;
 
             // EMA for rotation
             normal.applyAxisAngle(new THREE.Vector3(1, 0, 0), 90 * Math.PI / 180)
             let tempQuat = new THREE.Quaternion();
             tempQuat.setFromUnitVectors(new THREE.Vector3(1, 0, 0), normal.normalize());
             tempQuat.normalize();
-            obseaBuoy.root.quaternion.slerp(tempQuat, 0.002);
+            casablancaBuoy.root.quaternion.slerp(tempQuat, 0.002);
           }
         }
       }
