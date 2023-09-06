@@ -443,6 +443,8 @@ dataTypes = {
 
   // Get url and parameters for a given data type and date
   getDataTypeURL = function(dataName, date, timeScale){
+    debugger;
+
     // Find data type with that name
     let dataType = undefined;
     Object.keys(this.dataTypes).forEach(dKey => {
@@ -569,9 +571,8 @@ dataTypes = {
   // Get data at a specific point
   getDataAtPoint = async function(dataName, date, lat, long, timeScale, direction){
     
-
-    let dataInfo = getDataTypeURL(dataName, date, timeScale);
-
+    let dataInfo = this.getDataTypeURL(dataName, date, timeScale);
+    debugger;
     // Input variables
     // var dataName = "Sea temperature";
     // var lat = 41;
