@@ -38,40 +38,51 @@
     },
     data (){
       return {
-        dataTypes: ['Wave Significant Height', 'Wind'],
+        // Icons
         // https://origin.fontawesome.com/search?o=r&m=free&f=classic
-        selClimaLayer: '',
-        isClimaLayerVisible: false,
-        climaOpacity: 1,
+        isWidgetVisible: false,
         // Defaults
-        sourceDoi: '',
+        sourceDoi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
       }
     },
     methods: {
       // USER INTERACTION
-      climaLayerClicked: function(cLayer){
-        this.selClimaLayer = cLayer;
-        // Update clima layer
-        this.updateClimaLayer();
-      },
+
 
 
       // PRIVATE METHODS
-      updateClimaLayer: function(){
-        if (this.selClimaLayer == undefined || this.selClimaLayer == '')
-          return
-        if (!this.isClimaLayerVisible)
+      fetchExternalData: function(){
+        if (!this.isWidgetVisible)
           return
         
         // Get date
-        let date = window.GUIManager.currentTmst;
-        if (date == undefined){
-          setTimeout(this.updateClimaLayer, 1000);
-          console.log("Current date not found. Trying to update clima layer in 1s.");
-          return;
-        }
+        let date = new Date();
+        let tmst = date.toISOString();
+        
+        // Fetch data (promises)
+        
+        // How to fetch direction also? Check in VISAP!
+
+        // Fetch data:
+        // Primary swell direction
+        // Primary swell Hm0
+        // Primary swell period
+
+        // Secondary swell (three params)
+
+        // Mdir
+        // Hm0
+        // Period?
+
+        // Wind wave height
+        // Wind wave dir
+        // Wind wave period
+
+        // 4x3 data points
+
+
         // Get clima URL
-        let infoWMS = this.dataRetriever.getDataTypeURL(this.selClimaLayer, date, 'h');
+        let infoWMS = this.dataRetriever.getDataTypeURL(this.selClimaLayer, tmst, 'h');
         this.sourceDoi = infoWMS == undefined ? 'https://resources.marine.copernicus.eu/products' : infoWMS.doi;
         // If source is not found, it will send undefined
         window.eventBus.emit('WidgetExternalData_ClimaLayerChange', infoWMS);
@@ -82,11 +93,10 @@
 
       // PUBLIC METHODS
       setVisible: function(isVisible){
-        this.isClimaLayerVisible = isVisible;
+        this.isWidgetVisible = isVisible;
         if (isVisible){
-          // Default clima layer if not defined
-          this.selClimaLayer = this.selClimaLayer == '' ? 'Sea Surface Temperature' : this.selClimaLayer;
-          this.updateClimaLayer();
+          // Update data
+          this.fetchExternalData();
         } else {
           window.eventBus.emit('widgetExternalData_ClimaLayerChange', undefined);
         }
