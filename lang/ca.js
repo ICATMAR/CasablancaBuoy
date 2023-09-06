@@ -12,6 +12,8 @@ export default ca = {
   "waveButtonTitle": "Configura l'onatge",
   "windButtonTitle": "Modifica el vent",
 
+  "externalDataButton": "Connecta amb dades externes",
+
   "externalLinkButton": "Ves a la font de dades",
   "measuresButton": "Obre/Tanca el panell de dades",
 

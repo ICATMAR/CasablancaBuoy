@@ -12,6 +12,8 @@ export default es = {
   "waveButtonTitle": "Configura el oleaje",
   "windButtonTitle": "Modifica el viento",
 
+  "externalDataButton": "Conectar con datos externos",
+
   "externalLinkButton": "Ve a la fuente de datos",
   "measuresButton": "Obre/Cierra el panel de datos",
 

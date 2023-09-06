@@ -11,6 +11,10 @@ window.SceneManager = SceneManager;
 import DataManager from "/CasablancaBuoy/data/DataManager.js"
 window.DataManager = DataManager;
 
+// WMS Data Retriever
+import WMSDataRetriever from '/CasablancaBuoy/data/WMSDataRetriever.js';
+window.WMSDataRetriever = WMSDataRetriever;
+
 // Declare translations
 const i18n = VueI18n.createI18n({
   // https://vue-i18n.intlify.dev/guide/essentials/fallback.html#explicit-fallback-with-one-locale

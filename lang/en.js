@@ -12,6 +12,8 @@ export default en = {
   "waveButtonTitle": "Set the ocean swell",
   "windButtonTitle": "Set the wind",
 
+  "externalDataButton": "Connect with external data",
+
   "externalLinkButton": "Go to the data source",
   "measuresButton": "Open/Close the data panel",
 

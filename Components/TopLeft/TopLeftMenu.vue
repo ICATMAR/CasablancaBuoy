@@ -35,8 +35,15 @@
     </div>
 
     
-    <!-- Copernicus wave data -->
-    
+    <!-- External Data Button -->
+    <div class="horizontal-container clickable widgetExternalData-container">
+      <onOffButton ref="externalDataOnOffButton" :checked="false" :inSize="'14px'" @change="externalDataOnOff($event)"></onOffButton>
+      <span @click="externalDataOnOff">{{$t('externalDataButton')}}</span>
+    </div>
+    <!-- External data widget -->
+    <Transition>
+      <widgetExternalData ref="widgetExternalData" v-show="isExternalDataMenuVisible"></widgetExternalData>
+    </Transition>
 
 
 
@@ -49,6 +56,9 @@
 
 <script>
 
+import OnOffButton from "../OnOffButton.vue";
+import WidgetExternalData from "./WidgetExternalData.vue"
+
 export default {
   name: "TopLeftMenu",
   created() {
@@ -60,7 +70,7 @@ export default {
   },
   data() {
     return {
-
+      isExternalDataMenuVisible: false,
     }
   },
   methods: {
@@ -75,8 +85,23 @@ export default {
       // Add information about which panel to open
       window.eventBus.emit('OpenCentralPanel', "windPanel");
     },
+    // External data on off
+    externalDataOnOff: function(e){
+      // OnOff Button was clicked
+      if (e.target.value != undefined){ 
+        this.isExternalDataMenuVisible = e.target.checked;
+        // Activate widget
+        this.$refs.widgetExternalData.setVisible(this.isExternalDataMenuVisible);
+      } 
+      // Text was clicked --> Invoke click on the element, which calls again this function
+      else {
+        this.$refs.externalDataOnOffButton.setChecked(!this.isExternalDataMenuVisible);
+      }
+    },
   },
   components: {
+    "onOffButton": OnOffButton,
+    "widgetExternalData": WidgetExternalData,
   }
 }
 </script>
@@ -106,7 +131,7 @@ export default {
   flex-direction: column;
   width: fit-content;
   padding: 0;
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .horizontal-container {
@@ -119,6 +144,13 @@ export default {
   justify-content: flex-start;
   width: 100%;
 }
+
+.widgetExternalData-container {
+  padding: 4px;
+}
+
+
+
 
 .roundButton {
   border-style: none;
@@ -147,6 +179,24 @@ svg {
   stroke: #1a1a1a;
   stroke-width: 20px;
   fill-rule: evenodd;
+}
+
+
+
+
+
+.v-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.v-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.v-enter-from,
+.v-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
 }
 
 
