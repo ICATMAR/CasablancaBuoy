@@ -11,9 +11,12 @@
     <!-- Bottom Bar -->
 
     <!-- Top right icons -->
-    <top-right-nav></top-right-nav>
+    <top-right-menu></top-right-menu>
 
-    <bottom-section></bottom-section>
+    <!-- Top left icons -->
+    <top-left-menu></top-left-menu>
+
+    <!-- <bottom-section></bottom-section> -->
 
 
     <!-- Central Panel -->
@@ -50,19 +53,13 @@
 
 
 <script>
-/*
-                                APP MANAGER
-              /            /          \            \             \
-    LEFT MENU        CANVAS       RIGHTTOPICONS    CURRENTDATA    LANGUAGE-SELECTOR
-        |
-    LEFT PANEL
 
-*/
 
 // Import components
 import Canvas3D from "./Canvas3D.vue"
 import InstrumentsMenu from "./Instruments/InstrumentsMenu.vue"
-import TopRightNav from "./TopRight/TopRightNav.vue"
+import TopRightMenu from "./TopRight/TopRightMenu.vue"
+import TopLeftMenu from "./TopLeft/TopLeftMenu.vue"
 import BottomSection from "./Bottom/BottomSection.vue"
 import CentralPanel from "./CentralPanel.vue"
 import LanguageSelector from "/CasablancaBuoy/Components/TopRight/LanguageSelector.vue"
@@ -94,7 +91,8 @@ export default {
   components: {
     "canvas3D": Canvas3D,
     "instruments-menu": InstrumentsMenu,
-    "top-right-nav": TopRightNav,
+    "top-right-menu": TopRightMenu,
+    "top-left-menu": TopLeftMenu,
     "bottom-section": BottomSection,
     "central-panel": CentralPanel,
     "language-selector": LanguageSelector,

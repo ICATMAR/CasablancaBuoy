@@ -1,7 +1,7 @@
 <template>
-  <div id="top-right-nav">
+  <div id="top-left-menu" class="top-left vertical-container">
 
-    <div class="top-right vertical-container">
+
     
       <!-- Compass button -->
       <button class="roundButton icon-big icon-str clickable" @click="compassButtonClicked" :title="$i18n.t('compassButtonTitle')">
@@ -26,7 +26,7 @@
       </button>
 
 
-    </div>
+
   </div>
 </template>
 
@@ -37,23 +37,12 @@
 <script>
 
 export default {
-  name: "TopRightNav",
+  name: "TopLeftMenu",
   created() {
 
   },
   mounted() {
-    // Declare events
-    // Listen to the camera orientation
-    window.eventBus.on('Canvas3D_cameraChange', (sceneManager) => {
-      // Find orientation
-      let target = sceneManager.controls.target;
-      let camPos = sceneManager.camera.position;
-      let xDir = camPos.x - target.x;
-      let zDir = camPos.z - target.z;
-      let angle = Math.atan2(xDir, zDir) * 180 / Math.PI;
-      // Rotate compass in the opposite direction
-      this.$refs["compass-icon"].style.transform = "rotate(" + angle + "deg)";
-    })
+
 
   },
   data() {
@@ -63,12 +52,7 @@ export default {
   },
   methods: {
     // USER ACTIONS
-    compassButtonClicked: function (e) {
-      window.eventBus.emit('TopRightNav_compassButtonClicked');
-    },
-    buoyButtonClicked: function(e){
-      window.eventBus.emit('InstrumentsMenu_buoyButtonClicked');
-    },
+    
   },
   components: {
   }
@@ -88,11 +72,11 @@ export default {
 
 
 <style scoped>
-.top-right {
+.top-left {
     margin: 0;
     position: absolute;
-    top: 80px;
-    right: 10px;
+    top: calc(30px + clamp(70px, 7vw, 100px));;
+    left: 10px;
   }
 
   .vertical-container {
@@ -103,87 +87,6 @@ export default {
     align-items: flex-end;
   }
 
-  .roundButton {
-    border-style: none;
-    padding: 0;
-    margin-bottom: 10px;
-    border-radius:50%;
-  }
-
-  .roundButton:hover {
-    background-color: var(--blue);
-  }
 
 
-  .icon-svg:hover{
-    border-width: 2px;
-    border-color: black;
-    border-style: solid;
-    border-radius: 50%;
-  }
-
-
-  .north {
-    stroke: #1a1a1a;
-    stroke-width: 20px;
-    fill-rule: evenodd;
-    fill: #ed1c24;
-  }
-  .south {
-    stroke: #1a1a1a;
-    stroke-width: 20px;
-    fill-rule: evenodd;
-    fill: #ebebeb;
-  }
-  .center{
-    stroke: #1a1a1a;
-    stroke-width: 20px;
-    fill: #1a1a1a;
-  }
-
-
-
-
-  /* Buoy SVG style */
-.buoyLine, .seaLine {
-  fill: none;
-  stroke: #1a1a1a;
-  stroke-linecap: round;
-  stroke-linejoin: bevel;
-  stroke-width: 18px;
-  fill-rule: evenodd;
-}
-/* Sea line animation */
-.seaLine {
- animation: seaLine 4s alternate infinite ease-in-out; 
-}
-@keyframes seaLine {
-  0% {
-    transform: translatex(-20px);
-    
-  }
-  50% {
-    transform: translatex(20px);
-  }
-  100% {
-    transform: translatex(-20px);
-  }
-}
-
-/* Buoy animation */
-.buoyLine {
-  animation: buoyLine 4s alternate infinite ease-in-out;
-  transform-origin: 50% 50%;
-}
-@keyframes buoyLine {
-  0% {
-    transform: rotate(10deg);
-  }
-  50% {
-    transform: rotate(-10deg);
-  }
-  100% {
-    transform: rotate(10deg);
-  }
-}
 </style>

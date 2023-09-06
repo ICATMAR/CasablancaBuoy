@@ -188,7 +188,7 @@ export default {
 
 
     // Event emitters
-    // Listeners: TopRightNav, BottomSection
+    // Listeners: TopRightMenu, BottomSection
     this.sceneManager.controls.addEventListener('change', (e) => {
       window.eventBus.emit('Canvas3D_cameraChange', this.sceneManager);
 
