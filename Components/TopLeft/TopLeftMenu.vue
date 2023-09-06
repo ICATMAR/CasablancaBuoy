@@ -3,25 +3,24 @@
 
 
     
-      <!-- Compass button -->
-      <button class="roundButton icon-big icon-str clickable" @click="compassButtonClicked" :title="$i18n.t('compassButtonTitle')">
-        <svg ref="compass-icon" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-          <path id="South" class="south"
-            d="M332.782,253.277a25.947,25.947,0,0,1,0,15.446L261.812,461.8c-1.567,4.265-4.109,4.265-5.677,0l-70.97-193.073a25.947,25.947,0,0,1,0-15.446H332.782Z" />
-          <path id="North" class="north"
-            d="M261.812,52.2l70.97,193.073a25.947,25.947,0,0,1,0,15.446H185.165a25.947,25.947,0,0,1,0-15.446L256.135,52.2C257.7,47.939,260.245,47.939,261.812,52.2Z" />
-          <circle id="Center" class="center" cx="260" cy="257" r="10" />
+      <!-- Wave button -->
+      <button class="roundButton icon-big icon-str clickable" @click="waveButtonClicked" :title="$i18n.t('waveButtonTitle')">
+        <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+            <path id="Wave" class="svg-wavePath"
+              d="M91,345a148.964,148.964,0,0,0,39-34c18.237-22.738,21.847-41.833,31.9-66.57C180.68,198.242,210.248,167.907,225,159c24.989-15.088,68.213-28.479,112-10,45.368,19.146,74.013,67.228,65,79-10.978,14.338-66.772-22.893-88-2-16.914,16.647-8.635,64.768,21,90,17.036,14.5,39.538,20.066,62,18" />
         </svg>
       </button>
 
 
-      <!-- Buoy button-->
-      <button @click="buoyButtonClicked" class="roundButton icon-big icon-str clickable" :title="$i18n.t('buoyButtonTitle')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 512 512">
-          <path id="Buoy" class="buoyLine"
-            d="M237,160c-4.781-7.974-18.144-13.452-23-33-3.366-13.548-1.7-27.055,15-40a39.736,39.736,0,0,1,50,1c14.183,12.3,17.286,32.33,11,46-5.926,12.889-17.827,18.351-21,25-3.9,8.181,40.372,107.418,41,125,0.493,13.813-35.64,91.562-46.12,137.363C257.718,448.292,255.352,444.976,250,445c-4.892.022-7.635,7.094-12.936-13.772C223,375.878,189.094,301.389,189,285,188.868,261.924,242.694,169.5,237,160Z" />
-          <path id="SeaSurface" class="seaLine"
-            d="M0,265c0.747,0.276,26.493,59.805,50,59,25.725-.881,62.869-58,63-58,0.545,0,46.559,56.567,77,55,29.011-1.493,69.42-57,67-57-2.288,0,46.3,63.112,76,62,28.266-1.058,68.314-61,67-61-0.867,0,41.493,57.342,68,57,24.727-.319,44.789-57.065,44-57" />
+      <!-- Wind button-->
+      <button @click="windButtonClicked" class="roundButton icon-big icon-str clickable" :title="$i18n.t('windButtonTitle')">
+        <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+          <path id="WindTop" class="svg-windPath"
+            d="M117,178c96.486,32.553,201.682,46.769,260,0,20.145-16.156,26.414-30.873,26-41-1.07-26.169-36.825-52.812-63-45-9.183,2.741-23.774,11.71-23,25,0.6,10.338,10.406,20.516,25,23" />
+          <path id="WindMiddle" class="svg-windPath"
+            d="M64.388,323.7c66.094,22.349,138.154,32.108,178.1,0,13.8-11.092,18.094-21.2,17.81-28.148-0.733-17.966-25.226-36.257-43.155-30.894-6.291,1.882-16.286,8.04-15.756,17.163,0.413,7.1,7.129,14.085,17.126,15.791" />
+          <path id="WindBottom" class="svg-windPath"
+            d="M149,391c96.486,32.553,201.682,46.769,260,0,20.145-16.156,26.414-30.873,26-41-1.07-26.169-36.825-52.812-63-45-9.183,2.741-23.774,11.71-23,25,0.6,10.338,10.406,20.516,25,23" />
         </svg>
       </button>
 
@@ -52,7 +51,16 @@ export default {
   },
   methods: {
     // USER ACTIONS
-    
+    waveButtonClicked: function() {
+      // Open central panel
+      // Add information about which panel to open
+      window.eventBus.emit('OpenCentralPanel', "seaPanel");
+    },
+    windButtonClicked: function () {
+      // Open central panel
+      // Add information about which panel to open
+      window.eventBus.emit('OpenCentralPanel', "windPanel");
+    },
   },
   components: {
   }
@@ -86,6 +94,24 @@ export default {
     padding: 0;
     align-items: flex-end;
   }
+
+
+
+  /* Wave SVG */
+.svg-wavePath {
+  fill: none;
+  stroke: #1a1a1a;
+  stroke-width: 20px;
+  fill-rule: evenodd;
+}
+
+/* Wind SVG */
+.svg-windPath {
+  fill: none;
+  stroke: #1a1a1a;
+  stroke-width: 20px;
+  fill-rule: evenodd;
+}
 
 
 
