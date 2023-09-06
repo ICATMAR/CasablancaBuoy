@@ -115,11 +115,9 @@ export default {
   }
 
 
-  .icon-svg:hover{
-    border-width: 2px;
-    border-color: black;
-    border-style: solid;
-    border-radius: 50%;
+  svg {
+    width: 35px;
+    height: 35px;
   }
 
 
