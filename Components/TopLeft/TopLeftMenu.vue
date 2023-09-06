@@ -6,7 +6,7 @@
     <div class="horizontal-container clickable" @click="waveButtonClicked" :title="$i18n.t('waveButtonTitle')">
       
       <!-- Wave button -->
-      <button class="roundButton icon-big icon-str clickable" @click="waveButtonClicked" :title="$i18n.t('waveButtonTitle')">
+      <button class="roundButton icon-big icon-str clickable" :title="$i18n.t('waveButtonTitle')">
         <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
             <path id="Wave" class="svg-wavePath"
               d="M91,345a148.964,148.964,0,0,0,39-34c18.237-22.738,21.847-41.833,31.9-66.57C180.68,198.242,210.248,167.907,225,159c24.989-15.088,68.213-28.479,112-10,45.368,19.146,74.013,67.228,65,79-10.978,14.338-66.772-22.893-88-2-16.914,16.647-8.635,64.768,21,90,17.036,14.5,39.538,20.066,62,18" />
@@ -20,7 +20,7 @@
     <!-- Wind -->
     <div class="horizontal-container clickable" @click="windButtonClicked" :title="$i18n.t('windButtonTitle')">
       <!-- Wind button-->
-      <button @click="windButtonClicked" class="roundButton icon-big icon-str clickable" :title="$i18n.t('windButtonTitle')">
+      <button class="roundButton icon-big icon-str clickable" :title="$i18n.t('windButtonTitle')">
         <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
           <path id="WindTop" class="svg-windPath"
             d="M117,178c96.486,32.553,201.682,46.769,260,0,20.145-16.156,26.414-30.873,26-41-1.07-26.169-36.825-52.812-63-45-9.183,2.741-23.774,11.71-23,25,0.6,10.338,10.406,20.516,25,23" />
