@@ -36,7 +36,22 @@ export default es = {
 
   "Wave height": "Altura de oleaje",
   "Swell direction": "Dirección del oleaje",
+  "Wave direction": "Dirección del oleaje",
   "Wave steepness": "Periodo",
+  "Wave period": "Periodo",
+  
+  "Swell composition": "Composición del oleaje",
+
+  "Wind wave direction": "Dirección de oleaje de viento",
+  "Wind wave significant height": "Oleaje de viento",
+  "Primary swell wave direction": "Dirección del mar de fondo",
+  "Primary swell wave significant height": "Mar de fondo",
+  "Secondary swell wave direction": "Dirección mar de fondo 2",
+  "Secondary swell wave significant height": "Mar de fondo 2",
+
+  "Sea current direction": "Dirección de la corriente",
+  "Sea surface velocity": "Corriente",
+  "Chlorophyll": "Clorofila",
 
   "Wind speed": "Velocidad del viento",
   "Wind direction": "Dirección del viento",
@@ -47,6 +62,8 @@ export default es = {
   "Sea bottom temperature": "Temperatura del fondo del mar",
   "Salinity": "Salinidad",
 
+
+  "swellCompositionSVG": "Amarillo: oleaje de viento; Azul: oleaje primario; Azul oscuro: oleaje secundario",
 
 
   infoPanel: {

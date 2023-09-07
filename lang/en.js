@@ -35,7 +35,22 @@ export default en = {
 
   "Wave height": "Wave height",
   "Swell direction": "Swell direction",
+  "Wave direction": "Mean wave direction",
   "Wave steepness": "Wave steepness",
+  "Wave period": "Wave period",
+
+  "Swell composition": "Swell composition",
+
+  "Wind wave direction": "Wind wave direction",
+  "Wind wave significant height": "Wind wave",
+  "Primary swell wave direction": "Primary swell direction",
+  "Primary swell wave significant height": "Primary swell",
+  "Secondary swell wave direction": "Secondary swell direction",
+  "Secondary swell wave significant height": "Secondary swell",
+
+  "Sea current direction": "Current direction",
+  "Sea surface velocity": "Current",
+  "Chlorophyll": "Chlorophyll",
 
   "Wind speed": "Wind speed",
   "Wind direction": "Wind direction",
@@ -45,6 +60,8 @@ export default en = {
   "Sea surface temperature": "Sea surface temperature",
   "Sea bottom temperature": "Sea bottom temperature",
   "Salinity": "Salinity",
+
+  "swellCompositionSVG": "Yellow: wind waves; Blue: primary swell; Dark blue: secondary swell",
 
 
   infoPanel: {

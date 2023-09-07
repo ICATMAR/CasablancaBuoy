@@ -35,7 +35,22 @@ export default ca = {
 
   "Wave height": "Altura d'onatge",
   "Swell direction": "Direcció de l'onatge",
+  "Wave direction": "Direcció de l'onatge",
   "Wave steepness": "Període",
+  "Wave period": "Període",
+
+  "Swell composition": "Composició de l'onatge",
+
+  "Wind wave direction": "Direcció de l'onatge de vent",
+  "Wind wave significant height": "Onatge de vent",
+  "Primary swell wave direction": "Direcció del mar de fons",
+  "Primary swell wave significant height": "Mar de fons",
+  "Secondary swell wave direction": "Direcció del mar de fons 2",
+  "Secondary swell wave significant height": "Mar de fons 2",
+
+  "Sea current direction": "Direcció del corrent",
+  "Sea surface velocity": "Corrent",
+  "Chlorophyll": "Clorofil·la",
 
   "Wind speed": "Velocitat del vent",
   "Wind direction": "Direcció del vent",
@@ -45,6 +60,9 @@ export default ca = {
   "Sea surface temperature": "Temperatura superficial del mar",
   "Sea bottom temperature": "Temperatura del fons del mar",
   "Salinity": "Salinitat",
+
+
+  "swellCompositionSVG": "Groc: onatge de vent; Blau: onatge primari; Blau fosc: onatge secondari",
 
 
   infoPanel: {
