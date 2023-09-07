@@ -4,7 +4,6 @@
 
 
     <div>
-      <h4>{{$t('Weather and sea conditions')}}</h4>
       <span>{{$t('Date')}}: {{currentDateHTML}}, {{$t('Latitude')}}: {{lat}} º, {{$t('Longitude')}}: {{long}} º</span>
     </div>
     
@@ -121,37 +120,10 @@
 
 
 
-        dataRows: [
-          // { // Wind icon
-          //   key: 'windicon',
-          //   imgURL: 'icons.png',
-          //   position: 0,
-          //   defURL: 'data/emptyPixel.png',
-          //   source: 'Wind',
-          //   signRange: [5,15],
-          //   color: '#6164ff',
-          // },
-          // { 
-          //   name: "Wind direction",
-          //   abbr: "Dir",
-          //   units: "º",
-          //   direction: true, 
-          //   layer: "Wind",
-          // },
-          // { 
-          //   name: "Wind",
-          //   abbr: "Wind",
-          //   icon: true,
-          //   units: "m/s", 
-          //   range: [0, 30],
-          //   signRange: [5,15],
-          //   color: '#6164ff',//'#71c3eb',
-          //   colorScale: 'boxfill/sst_36'
-          // },
-          
+        dataRows: [   
           { // Wave icon
             key: 'waveicon',
-            imgURL: 'icons.png',
+            imgURL: '/CasablancaBuoy/Assets/Logos/icons.png',
             position: 1,
             defURL: 'https://es.wisuki.com/images/px.png',
             source: 'Wave significant height',
@@ -185,7 +157,7 @@
           },
           { // Current icon
             key: 'currenticon',
-            imgURL: 'icons.png',
+            imgURL: '/CasablancaBuoy/Assets/Logos/icons.png',
             position: 2,
             defURL: 'https://es.wisuki.com/images/px.png',
             source: 'Sea surface velocity',
