@@ -132,6 +132,9 @@ export default {
   width: fit-content;
   padding: 0;
   align-items: flex-start;
+
+  pointer-events: none;
+  user-select: none;
 }
 
 .horizontal-container {
