@@ -40,7 +40,7 @@
             <!-- Image -->
             <span v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></span>
             <!-- SVG -->
-            <span v-else-if='dR.usesCustomSVG' v-html="dd.svg" class="clickable"></span>
+            <span v-else-if='dR.usesCustomSVG' v-html="dd.svg" class="clickable" :title="$t('swellCompositionSVG')"></span>
 
             <span v-else-if='!dd.loading' :style="getStyle(dR, dd)">{{dd.value}}</span>
             
@@ -69,26 +69,33 @@
 
     
 
-    <!-- Data -->
-    <!-- Total sea -->
-    <h4>{{ $t('Waves') }}</h4>
-    <span>{{ $t('Hm0') }}: {{  }}</span>
-    <span>{{ $t('Mdir') }}: {{  }}</span>
-    <!-- Primary swell -->
+    <!-- Bottom info -->
+    <div class="bottomInfoContainer">
+      <!-- Legend sea composition -->
+      <div class="legendContainer">
+        <span>{{ $t('Swell composition legend') }}</span>
+        <div class="legendItem">
+          <div class="icon-str" style="background:var(--lightBlue)"></div><span>  {{ $t('Wave significant height') }}</span>
+        </div>
+        <div class="legendItem">
+          <div class="icon-str" style="background:khaki"></div><span>  {{ $t('Wind wave significant height') }}</span>
+        </div>
+        <div class="legendItem">
+          <div class="icon-str" style="background:var(--blue)"></div><span>  {{ $t('Primary swell wave significant height') }}</span>
+        </div>
+        <div class="legendItem">
+          <div class="icon-str" style="background:var(--darkBlue)"></div><span>  {{ $t('Secondary swell wave significant height') }}</span>
+        </div>
+      </div>
 
-    <!-- Secondary swell -->
-
-    <!-- Wind waves -->
 
 
+      
+      <!-- Data source attribution -->
+      <span class="wrapText">{{$t('Data source')}}: <a class="widgetSpan clickable" title="Weather data source" :href="sourceDoi" target="_blank">E.U. CMEMS,
+              Copernicus Marine Service</a></span>
 
-    
-    <!-- Data source attribution -->
-    <span class="wrapText">{{$t('Data source')}}: <a class="widgetSpan clickable" title="Weather data source" :href="sourceDoi" target="_blank">E.U. CMEMS,
-            Copernicus Marine Service</a></span>
-    
-    <!-- Longitud and latitude -->
-    <span class="wrapText" style="user-select: all;">{{$t('Location')}}: Lat: {{latStr}} -- Lon: {{longStr}}</span>
+    </div>
     
 
 
@@ -688,6 +695,7 @@
 
   span {
     font-size: clamp(0.6rem, 1.2vw, 0.8rem);
+    padding: 0 !important;
   }
 
   .wrapText {
@@ -696,6 +704,26 @@
     pointer-events: all;
   }
 
+  .bottomInfoContainer {
+    display:flex;
+    flex-direction: row;
+  }
+
+  .bottomInfoContainer > * {
+    padding-right: 50px;
+  }
+
+  .legendContainer {
+    display:flex;
+    flex-direction: column;
+  }
+  
+  .legendItem {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
 
 
   @media screen and (max-width: 500px), screen and (max-height: 850px) {

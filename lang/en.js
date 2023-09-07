@@ -40,6 +40,7 @@ export default en = {
   "Wave period": "Wave period",
 
   "Swell composition": "Swell composition",
+  "Swell composition legend": "Swell composition legend",
 
   "Wind wave direction": "Wind wave direction",
   "Wind wave significant height": "Wind wave",

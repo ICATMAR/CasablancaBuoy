@@ -41,6 +41,8 @@ export default es = {
   "Wave period": "Periodo",
   
   "Swell composition": "Composición del oleaje",
+  "Swell composition legend": "Leyenda composición del oleaje",
+
 
   "Wind wave direction": "Dirección de oleaje de viento",
   "Wind wave significant height": "Oleaje de viento",

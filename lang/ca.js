@@ -40,6 +40,7 @@ export default ca = {
   "Wave period": "Període",
 
   "Swell composition": "Composició de l'onatge",
+  "Swell composition legend": "Llegenda composició d'onatge",
 
   "Wind wave direction": "Direcció de l'onatge de vent",
   "Wind wave significant height": "Onatge de vent",
