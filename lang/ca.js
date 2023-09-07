@@ -63,7 +63,7 @@ export default ca = {
   "Salinity": "Salinitat",
 
 
-  "swellCompositionSVG": "Groc: onatge de vent; Blau: onatge primari; Blau fosc: onatge secondari",
+  "swellCompositionSVG": "Blau clar: mar total; Groc: onatge de vent; Blau: mar de fons; Blau fosc: mar de fons 2",
 
 
   infoPanel: {

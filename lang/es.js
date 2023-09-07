@@ -65,7 +65,7 @@ export default es = {
   "Salinity": "Salinidad",
 
 
-  "swellCompositionSVG": "Amarillo: oleaje de viento; Azul: oleaje primario; Azul oscuro: oleaje secundario",
+  "swellCompositionSVG": "Azul claro: mar total; Amarillo: oleaje de viento; Azul: mar de fondo; Azul oscuro: mar de fondo 2",
 
 
   infoPanel: {

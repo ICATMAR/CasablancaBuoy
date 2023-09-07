@@ -62,7 +62,7 @@ export default en = {
   "Sea bottom temperature": "Sea bottom temperature",
   "Salinity": "Salinity",
 
-  "swellCompositionSVG": "Yellow: wind waves; Blue: primary swell; Dark blue: secondary swell",
+  "swellCompositionSVG": "Light blue: mean wave height; Yellow: wind waves; Blue: primary swell; Dark blue: secondary swell",
 
 
   infoPanel: {

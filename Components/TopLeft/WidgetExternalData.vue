@@ -9,45 +9,47 @@
     
     
     <!-- Table -->
-    <table>
-      <!-- Table Head - Days -->
-      <thead>
-        <tr>
-          <td></td>
-          <!-- Col for each day -->
-          <th class="wcol" style="min-width:40px" :key="dd" v-for="(dd, index) in daysString" :title="dates[index].toISOString()">
-            <span>{{$t(dd.split(' ')[0]) + ' ' + dd.split(' ')[1]}}</span>
-          </th>
-        </tr>
-      </thead>
-      <!-- Table body - Variables -->
-      <tbody>
-        <!-- Row -->
-        <tr :key="dR.name" v-for="(dR, index) in dataRows">
-          <!-- Row name -->
-          <th scope="row">
-            <span v-if="dR.imgURL== undefined && !dR.usesCustomSVG">{{$t(dR.name)}} ({{dR.units}})</span>
-            <span v-else-if="dR.usesCustomSVG">{{$t(dR.name)}}</span>
-          </th>
-          <!-- Values -->
-          <td class="wcol" :key="dd.key" v-for="dd in dataRows[index].data">
-            <!-- Loading -->
-            <div v-if='dd.loading && !dR.imgURL' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative;" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            <!-- Direction -->
-            <div v-else-if='dR.direction' :style="{'transform': 'rotate('+ (-dd.value - 90) +'deg)'}" :title="dd.value + 'º'"><span>&#10140;</span></div>
-            <!-- Image -->
-            <span v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></span>
-            <!-- SVG -->
-            <span v-else-if='dR.usesCustomSVG' v-html="dd.svg" class="clickable" :title="$t('swellCompositionSVG')"></span>
+    <div class="tableContainer">
+      <table>
+        <!-- Table Head - Days -->
+        <thead>
+          <tr>
+            <td></td>
+            <!-- Col for each day -->
+            <th class="wcol" style="min-width:40px" :key="dd" v-for="(dd, index) in daysString" :title="dates[index].toISOString()">
+              <span>{{$t(dd.split(' ')[0]) + ' ' + dd.split(' ')[1]}}</span>
+            </th>
+          </tr>
+        </thead>
+        <!-- Table body - Variables -->
+        <tbody>
+          <!-- Row -->
+          <tr :key="dR.name" v-for="(dR, index) in dataRows">
+            <!-- Row name -->
+            <th scope="row">
+              <span v-if="dR.imgURL== undefined && !dR.usesCustomSVG">{{$t(dR.name)}} ({{dR.units}})</span>
+              <span v-else-if="dR.usesCustomSVG">{{$t(dR.name)}}</span>
+            </th>
+            <!-- Values -->
+            <td class="wcol" :key="dd.key" v-for="dd in dataRows[index].data">
+              <!-- Loading -->
+              <div v-if='dd.loading && !dR.imgURL' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative;" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <!-- Direction -->
+              <div v-else-if='dR.direction' :style="{'transform': 'rotate('+ (-dd.value - 90) +'deg)'}" :title="dd.value + 'º'"><span>&#10140;</span></div>
+              <!-- Image -->
+              <span v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></span>
+              <!-- SVG -->
+              <span v-else-if='dR.usesCustomSVG' v-html="dd.svg" class="clickable" :title="$t('swellCompositionSVG')"></span>
 
-            <span v-else-if='!dd.loading' :style="getStyle(dR, dd)">{{dd.value}}</span>
-            
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              <span v-else-if='!dd.loading' :style="getStyle(dR, dd)">{{dd.value}}</span>
+              
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- TODO: CREATE PANEL WITH SOURCE INFO -->
     <!-- <div style="width: clamp(400px, 30vw, 600px)">
@@ -637,10 +639,25 @@
     padding: 8px;
   }
 
+  .tableContainer {
+    height: clamp(300px, 50vh, 600px);
+    overflow: auto;
+    pointer-events: all;
+    padding-right: 10px;
 
+    margin-right: 10px;
+    margin-bottom: 30px;
+
+    /* display: block;
+    overflow-x: auto;
+    white-space: nowrap; */
+
+    width: min(80vw, 577px);
+  }
 
   table {
-    margin-bottom: 30px;
+    
+    table-layout: fixed;
   }
 
   .wrow {
