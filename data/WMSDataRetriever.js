@@ -219,6 +219,58 @@ dataTypes = {
       // CRS instead of SRS
     },
   },
+  // WIND WAVE PERIOD MISSING
+  // SWELL
+  "Primary swell wave significant height": {
+    name: 'Primary swell wave significant height',
+    altNames: ['Primary swell wave significant height', 'Primary swell waves', 'VHM0_SW1'],
+    doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3',
+    url: 'med-hcmr-wav-rean',// Forecast 'med-hcmr-wav-an-fc',
+    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
+    version: '1.1.1',
+    layerName: 'VHM0_SW1', // 'VMDR' for direction in degrees
+    timeScales: ['h', 'h3', 'h6', 'h12'],
+    range: [0, 6],
+    units: 'm',
+    style: "boxfill/sst_36", //occam_pastel-30",
+    animation: {
+      layerNames: ['VHM0_SW1', 'VMDR_SW1'], // Intensity, Angle
+      format: 'value_angle',
+      type: 'whiteWave'
+    },
+    forecast: {
+      url: 'med-hcmr-wav-an-fc',
+      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
+      version: '1.1.1',
+      timeScales: ['h', 'h3', 'h6', 'h12'],
+      // CRS instead of SRS
+    },
+  },
+  "Secondary swell wave significant height": {
+    name: 'Secondary swell wave significant height',
+    altNames: ['Secondary swell wave significant height', 'Secondary swell waves', 'VHM0_SW2'],
+    doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3',
+    url: 'med-hcmr-wav-rean',// Forecast 'med-hcmr-wav-an-fc',
+    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
+    version: '1.1.1',
+    layerName: 'VHM0_SW2', // 'VMDR' for direction in degrees
+    timeScales: ['h', 'h3', 'h6', 'h12'],
+    range: [0, 6],
+    units: 'm',
+    style: "boxfill/sst_36", //occam_pastel-30",
+    animation: {
+      layerNames: ['VHM0_SW2', 'VMDR_SW2'], // Intensity, Angle
+      format: 'value_angle',
+      type: 'whiteWave'
+    },
+    forecast: {
+      url: 'med-hcmr-wav-an-fc',
+      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
+      version: '1.1.1',
+      timeScales: ['h', 'h3', 'h6', 'h12'],
+      // CRS instead of SRS
+    },
+  },
   'Chlorophyll': {
     // https://my.cmems-du.eu/thredds/wms/med-ogs-pft-rean-d?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
     // https://my.cmems-du.eu/thredds/wms/med-ogs-pft-rean-m?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
