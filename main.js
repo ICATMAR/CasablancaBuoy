@@ -8,8 +8,8 @@ import es from '/CasablancaBuoy/lang/es.js';
 import SceneManager from "/CasablancaBuoy/Components/SceneManager.js"
 window.SceneManager = SceneManager;
 // DataManager
-import DataManager from "/CasablancaBuoy/data/DataManager.js"
-window.DataManager = DataManager;
+// import DataManager from "/CasablancaBuoy/data/DataManager.js"
+// window.DataManager = DataManager;
 
 // WMS Data Retriever
 import WMSDataRetriever from '/CasablancaBuoy/data/WMSDataRetriever.js';
