@@ -41,7 +41,8 @@
       </tbody>
     </table>
 
-    <div style="width: clamp(400px, 30vw, 600px)">
+    <!-- TODO: CREATE PANEL WITH SOURCE INFO -->
+    <!-- <div style="width: clamp(400px, 30vw, 600px)">
         <span>
         <i>Generated using E.U. Copernicus Marine Service Information; </i>
         <i><a href="https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS6" target="_blank" rel="noreferrer noopener">Sea Physics Analysis and Forecast; </a></i>
@@ -56,7 +57,7 @@
         <i><a href="https://doi.org/10.48670/moi-00184" target="_blank" rel="noreferrer noopener">Wind L4 Near real Time; </a></i>
         <i><a href="https://doi.org/10.48670/moi-00185" target="_blank" rel="noreferrer noopener">Wind L4 Reprocessed; </a></i>
         </span>
-      </div>
+      </div> -->
 
     
 
@@ -155,6 +156,69 @@
             signRange: [6,15],
             color: '#6164ff' // TODO: color or colorScale. If color, go from transparent to the specified color.
           },
+          // Custom canvas
+          {
+            name: "Swell composition",
+            usesCustomCanvas: true,
+          },
+          // Wind waves
+          {
+            name: "Wind wave direction",
+            abbr: "Dir",
+            units: "º", 
+            direction: true, 
+            layer: "Wind wave significant height",
+          },
+          {
+            name: "Wind wave significant height",
+            abbr: "Wind waves",
+            icon: false,
+            units: "m", 
+            range: [0, 8],
+            signRange: [0.2,4],
+            color: '#6164ff',//'#71c3eb',
+            colorScale: 'boxfill/alg',
+          },
+          // TODO: download period and use it for the custom canvas
+          // Swell 1
+          {
+            name: "Primary swell wave direction",
+            abbr: "Dir",
+            units: "º", 
+            direction: true, 
+            layer: "Primary swell wave significant height",
+          },
+          {
+            name: "Primary swell wave significant height",
+            abbr: "Swell 1",
+            icon: false,
+            units: "m", 
+            range: [0, 8],
+            signRange: [0.2,4],
+            color: '#6164ff',//'#71c3eb',
+            colorScale: 'boxfill/alg',
+          },
+          // Swell 2
+          {
+            name: "Secondary swell wave direction",
+            abbr: "Dir",
+            units: "º", 
+            direction: true, 
+            layer: "Secondary swell wave significant height",
+          },
+          {
+            name: "Secondary swell wave significant height",
+            abbr: "Swell 2",
+            icon: false,
+            units: "m", 
+            range: [0, 8],
+            signRange: [0.2,4],
+            color: '#6164ff',//'#71c3eb',
+            colorScale: 'boxfill/alg',
+          },
+          
+
+
           { // Current icon
             key: 'currenticon',
             imgURL: '/CasablancaBuoy/Assets/Logos/icons.png',
