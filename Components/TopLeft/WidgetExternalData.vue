@@ -28,11 +28,16 @@
           <th scope="row"><span v-if="dR.imgURL== undefined">{{$t(dR.name)}} ({{dR.units}})</span></th>
           <!-- Values -->
           <td class="wcol" :key="dd.key" v-for="dd in dataRows[index].data">
+            <!-- Loading -->
             <div v-if='dd.loading && !dR.imgURL' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative;" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
+            <!-- Direction -->
             <div v-else-if='dR.direction' :style="{'transform': 'rotate('+ (-dd.value - 90) +'deg)'}" :title="dd.value + 'º'"><span>&#10140;</span></div>
+            <!-- Image -->
             <span v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></span>
+            <!-- SVG -->
+            <span v-else-if='dR.usesCustomSVG' v-html="dd.svg" class="clickable"></span>
 
             <span v-else-if='!dd.loading' :style="getStyle(dR, dd)">{{dd.value}}</span>
             
@@ -156,10 +161,10 @@
             signRange: [6,15],
             color: '#6164ff' // TODO: color or colorScale. If color, go from transparent to the specified color.
           },
-          // Custom canvas
+          // Custom SVG
           {
             name: "Swell composition",
-            usesCustomCanvas: true,
+            usesCustomSVG: true,
           },
           // Wind waves
           {
@@ -179,7 +184,7 @@
             color: '#6164ff',//'#71c3eb',
             colorScale: 'boxfill/alg',
           },
-          // TODO: download period and use it for the custom canvas
+          // TODO: download period and use it for the custom SVG
           // Swell 1
           {
             name: "Primary swell wave direction",
@@ -297,8 +302,8 @@
         this.dataRows.forEach((rr, rIndex) => {
           this.dates.forEach((date, dIndex) => {
             let layerName = rr.direction ? rr.layer : rr.name;
-            // Icon row does not load data
-            if (layerName !== undefined){
+            // Icon row and custom SVG does not load data
+            if (layerName !== undefined && rr.usesCustomSVG != true){
               this.dataRetriever.getDataAtPoint(layerName, date.toISOString(), lat, long, 'd', rr.direction)
                 .then(value => {
                   if (value == undefined){
@@ -321,6 +326,9 @@
                   console.error("Can't get CMEMS-WMS " + layerName + " on " + date.getUTCFullYear() + "/" + (date.getMonth()+1) + "\nError: " + error);
                   rr.data[dIndex].value = 'x';
                   rr.data[dIndex].loading = false;
+                })
+                .finally(() => {
+                  this.createCustomSVG();
                 });
             } // end of if
           
@@ -413,6 +421,60 @@
         }
 
         
+      },
+
+
+      // Create a SVG that represents the swell composition
+      createCustomSVG: function(){
+        let matrix = [];
+        this.dataRows.forEach(dr => {
+          
+          // Wave sign. height, WW, SW1, SW2
+          let index = undefined;
+          if (dr.name == 'Wave significant height')
+            index = 0;
+          else if (dr.name == 'Wind wave significant height')
+            index = 1;
+          else if (dr.name == 'Primary swell wave significant height')
+            index = 2;
+          else if (dr.name == 'Secondary swell wave significant height')
+            index = 3;
+        
+          // Store values in matrix
+          if (index !== undefined){
+            // Create data matrix to use later
+            matrix[index] = [];
+            for (let i = 0; i < this.numDays; i++){
+              matrix[index][i] = dr.data[i].value;
+            }
+          }
+        });
+
+        // Create SVG
+        this.dataRows.forEach(dr => {
+          // Uses custom SVG
+          if (dr.usesCustomSVG){
+            for (let i = 0; i < this.numDays; i++){
+              let wsh = matrix[0][i];
+              let wwshNorm = matrix[1][i] / wsh;
+              let sw1Norm = matrix[2][i] / wsh;
+              let sw2Norm = matrix[3][i] / wsh;
+              // https://sparkbox.com/foundry/how_to_code_an_SVG_pie_chart
+              let size = 28;
+              let svgStr = `
+                <svg height="22" width="22" viewBox="0 0 22 22" class="clickable" style="width:${size}px; height:${size}px" class="width:${size}px;height:${size}px" >
+                  <circle r="10" cx="11" cy="11" fill="var(--lightBlue)" />
+                  <circle r="4" cx="11" cy="11" fill="transparent" stroke="khaki" stroke-width="8" stroke-dasharray="calc(${wwshNorm}*8*3.142) calc(8*3.142)" />
+                  <circle r="2.5" cx="11" cy="11" fill="transparent" stroke="var(--blue)" stroke-width="5" stroke-dasharray="calc(${sw1Norm}*5*3.142) calc(5*3.142)" />
+                  <circle r="1.5" cx="11" cy="11" fill="transparent" stroke="var(--darkBlue)" stroke-width="3" stroke-dasharray="calc(${sw2Norm}*3*3.142) calc(3*3.142)" />
+                </svg>
+                `
+              
+              dr.data[i].svg = svgStr;
+              dr.data[i].loading = false;
+            }
+          }
+        });
       },
 
 
