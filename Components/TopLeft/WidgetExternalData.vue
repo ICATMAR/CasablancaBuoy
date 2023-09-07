@@ -25,7 +25,10 @@
         <!-- Row -->
         <tr :key="dR.name" v-for="(dR, index) in dataRows">
           <!-- Row name -->
-          <th scope="row"><span v-if="dR.imgURL== undefined">{{$t(dR.name)}} ({{dR.units}})</span></th>
+          <th scope="row">
+            <span v-if="dR.imgURL== undefined && !dR.usesCustomSVG">{{$t(dR.name)}} ({{dR.units}})</span>
+            <span v-else-if="dR.usesCustomSVG">{{$t(dR.name)}}</span>
+          </th>
           <!-- Values -->
           <td class="wcol" :key="dd.key" v-for="dd in dataRows[index].data">
             <!-- Loading -->
@@ -454,7 +457,7 @@
             matrix[index] = [];
             for (let i = 0; i < this.numDays; i++){
               let value = parseFloat(dr.data[i].value);
-              if (value == '' || isNaN(value) || value == undefined)
+              if (isNaN(value) || value == undefined)
                 return;
               matrix[index][i] = value;
             }
@@ -476,6 +479,12 @@
               let wwDir = matrix[5][i];
               let sw1Dir = matrix[6][i];
               let sw2Dir = matrix[7][i];
+
+              // Check that all data is available to create SVG
+              for (let j = 0; j < 8; j++){
+                if (isNaN(matrix[j][i]) || matrix[j][i] == undefined)
+                  return;
+              }
 
               // https://sparkbox.com/foundry/how_to_code_an_SVG_pie_chart
               let size = 40;
