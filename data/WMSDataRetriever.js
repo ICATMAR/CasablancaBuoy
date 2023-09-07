@@ -443,7 +443,7 @@ dataTypes = {
 
   // Get url and parameters for a given data type and date
   getDataTypeURL = function(dataName, date, timeScale){
-    debugger;
+
 
     // Find data type with that name
     let dataType = undefined;
@@ -558,47 +558,34 @@ dataTypes = {
     
     return {
       url: url, 
+      version: version,
       params: params,
       name: dataType.name, // not necessary?
       doi: dataType.doi,
       attributions: '© CMEMS', // TODO
       animation: dataType.animation,
+      range: dataType.range,
     }
   }
 
 
 
   // Get data at a specific point
-  getDataAtPoint = async function(dataName, date, lat, long, timeScale, direction){
-    
-    let dataInfo = this.getDataTypeURL(dataName, date, timeScale);
-    debugger;
     // Input variables
     // var dataName = "Sea temperature";
     // var lat = 41;
     // var long = 2.9;
     // var date = '2010-01-12T12:00:00.000Z';
     // var timeScale = 'd';
+  getDataAtPoint = async function(dataName, date, lat, long, timeScale, direction){
+    
+    let dataInfo = this.getDataTypeURL(dataName, date, timeScale);
 
-    // TODO: most of this is already done in getDataTypeURL, but here repeated for animation and direction parameters
-    // Find data type with that name
-    let dataType = undefined;
-    Object.keys(this.dataTypes).forEach(dKey => {
-      this.dataTypes[dKey].altNames.forEach(altN => {
-        if (altN.toLowerCase() == dataName.toLowerCase())
-          dataType = this.dataTypes[dKey];
-      });
-       if (dKey.toLowerCase() == dataName.toLowerCase()) dataType = this.dataTypes[dKey];
-    });
-    if (dataType == undefined){
-      console.error("Data type does not exists: " + dataName);
-      return;
-    }
     
     // If we want the direction
     if (direction) {
       // Check if direction exists (animation)
-      if (dataType.animation == undefined) {
+      if (dataInfo.animation == undefined) {
         console.error("Data type " + dataName + " does not have direction information.");
         return;
       }
@@ -632,7 +619,10 @@ dataTypes = {
 
 
     // Construct WMS url
-    let url = dataInfo.url;    
+    let url = dataInfo.url;
+    // WMS Base
+    url += '?SERVICE=WMS' + '&VERSION=' + dataInfo.version + '&REQUEST=GetMap&FORMAT=image/png';
+    // Parameters
     Object.keys(dataInfo.params).forEach(ppKey => {
       url = WMSDataRetriever.setWMSParameter(url, ppKey, dataInfo.params[ppKey]);
     });
@@ -641,13 +631,13 @@ dataTypes = {
     // If no direction is requested
     if (direction == undefined){
       // Get value from URL
-      return await this.getPreciseValueFromURL(url, dataType.range);
+      return await this.getPreciseValueFromURL(url, dataInfo.range);
     }
 
 
 
     // If direction is requested
-    let animData = dataType.animation;
+    let animData = dataInfo.animation;
     // Angle format
     if (animData.format == 'value_angle'){
       url = WMSDataRetriever.setWMSParameter(url, 'LAYERS', animData.layerNames[1]);
@@ -662,7 +652,7 @@ dataTypes = {
 
       // Calculate angle
       // TODO: could call an async function where east and north are requested at the same time
-      return await this.getEastNorthValues(url, animData.layerNames, dataType.range);
+      return await this.getEastNorthValues(url, animData.layerNames, dataInfo.range);
     }
 
   }
@@ -757,7 +747,7 @@ dataTypes = {
   static setWMSParameter(wmsURL, paramName, paramContent) {
     // If parameter does not exist
     if (wmsURL.indexOf(paramName + "=") == -1) {
-      console.log("Parameter ", paramName, " does not exist in WMS URL");
+      //console.log("Parameter ", paramName, " does not exist in WMS URL");
       return wmsURL + '&' + paramName + '=' + paramContent;
     }
     let currentContent = WMSDataRetriever.getWMSParameter(wmsURL, paramName);

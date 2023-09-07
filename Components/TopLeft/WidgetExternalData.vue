@@ -4,8 +4,8 @@
 
 
     <div>
-      <h6>{{$t('Weather and sea conditions')}}</h6>
-      {{$t('Date')}}: {{currentDateHTML}}, {{$t('Latitude')}}: {{lat}} º, {{$t('Longitude')}}: {{long}} º
+      <h4>{{$t('Weather and sea conditions')}}</h4>
+      <span>{{$t('Date')}}: {{currentDateHTML}}, {{$t('Latitude')}}: {{lat}} º, {{$t('Longitude')}}: {{long}} º</span>
     </div>
     
     
@@ -17,7 +17,7 @@
           <td></td>
           <!-- Col for each day -->
           <th class="wcol" style="min-width:40px" :key="dd" v-for="(dd, index) in daysString" :title="dates[index].toISOString()">
-            {{$t(dd.split(' ')[0]) + ' ' + dd.split(' ')[1]}}
+            <span>{{$t(dd.split(' ')[0]) + ' ' + dd.split(' ')[1]}}</span>
           </th>
         </tr>
       </thead>
@@ -32,31 +32,34 @@
             <div v-if='dd.loading && !dR.imgURL' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative;" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
-            <div v-else-if='dR.direction' :style="{'transform': 'rotate('+ (-dd.value - 90) +'deg)'}" :title="dd.value + 'º'">&#10140;</div>
-            <div v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></div>
+            <div v-else-if='dR.direction' :style="{'transform': 'rotate('+ (-dd.value - 90) +'deg)'}" :title="dd.value + 'º'"><span>&#10140;</span></div>
+            <span v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></span>
 
-            <div v-else-if='!dd.loading' :style="getStyle(dR, dd)">{{dd.value}}</div>
+            <span v-else-if='!dd.loading' :style="getStyle(dR, dd)">{{dd.value}}</span>
             
           </td>
         </tr>
       </tbody>
-      
     </table>
 
-    <div>
-      <i>Generated using E.U. Copernicus Marine Service Information; </i>
-      <i><a href="https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS6" target="_blank" rel="noreferrer noopener">Sea Physics Analysis and Forecast; </a></i>
-      <i><a href="https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1" target="_blank" rel="noreferrer noopener">Sea Physics Reanalysis; </a></i>
+    <div style="width: clamp(400px, 30vw, 600px)">
+        <span>
+        <i>Generated using E.U. Copernicus Marine Service Information; </i>
+        <i><a href="https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS6" target="_blank" rel="noreferrer noopener">Sea Physics Analysis and Forecast; </a></i>
+        <i><a href="https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1" target="_blank" rel="noreferrer noopener">Sea Physics Reanalysis; </a></i>
 
-      <i><a href="https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3" target="_blank" rel="noreferrer noopener">Sea Waves Analysis and Forecast; </a></i>
-      <i><a href="https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012" target="_blank" rel="noreferrer noopener">Sea Waves Reanalysis; </a></i>
+        <i><a href="https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3" target="_blank" rel="noreferrer noopener">Sea Waves Analysis and Forecast; </a></i>
+        <i><a href="https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012" target="_blank" rel="noreferrer noopener">Sea Waves Reanalysis; </a></i>
 
-      <i><a href="https://doi.org/10.25423/cmcc/medsea_analysisforecast_bgc_006_014_medbfm3" target="_blank" rel="noreferrer noopener">Sea Biogeochemistry Analysis and Forecast; </a></i>
-      <i><a href="https://doi.org/10.25423/cmcc/medsea_multiyear_bgc_006_008_medbfm3" target="_blank" rel="noreferrer noopener">Sea Biogechemistry Reanalysis; </a></i>
+        <i><a href="https://doi.org/10.25423/cmcc/medsea_analysisforecast_bgc_006_014_medbfm3" target="_blank" rel="noreferrer noopener">Sea Biogeochemistry Analysis and Forecast; </a></i>
+        <i><a href="https://doi.org/10.25423/cmcc/medsea_multiyear_bgc_006_008_medbfm3" target="_blank" rel="noreferrer noopener">Sea Biogechemistry Reanalysis; </a></i>
 
-      <i><a href="https://doi.org/10.48670/moi-00184" target="_blank" rel="noreferrer noopener">Wind L4 Near real Time; </a></i>
-      <i><a href="https://doi.org/10.48670/moi-00185" target="_blank" rel="noreferrer noopener">Wind L4 Reprocessed; </a></i>
-    </div>
+        <i><a href="https://doi.org/10.48670/moi-00184" target="_blank" rel="noreferrer noopener">Wind L4 Near real Time; </a></i>
+        <i><a href="https://doi.org/10.48670/moi-00185" target="_blank" rel="noreferrer noopener">Wind L4 Reprocessed; </a></i>
+        </span>
+      </div>
+
+    
 
     <!-- Data -->
     <!-- Total sea -->
@@ -77,7 +80,7 @@
             Copernicus Marine Service</a></span>
     
     <!-- Longitud and latitude -->
-    <span class="wrapText" style="user-select: all;">{{$t('Location')}}: Lat: {{lat}} -- Lon: {{long}}</span>
+    <span class="wrapText" style="user-select: all;">{{$t('Location')}}: Lat: {{latStr}} -- Lon: {{longStr}}</span>
     
 
 
@@ -240,8 +243,10 @@
         numDays: 7,
         daysString: [],
         currentDateHTML: '',
-        long: 3.227735,
-        lat: 42.0728,
+        long: 1.345567,
+        lat: 40.704597,
+        longStr: '1.34',
+        latStr: '40.70',
       }
     },
     methods: {
@@ -376,8 +381,8 @@
 
       updateTable: async function(inputDate, long, lat){
 
-        this.lat = lat.toFixed(2);
-        this.long = long.toFixed(2);
+        this.latStr = lat.toFixed(2);
+        this.longStr = long.toFixed(2);
         let str = inputDate.toString().substring(0,15);
         // Translate
         this.currentDateHTML = this.$i18n.t(str.split(" ")[0]) + " " + this.$i18n.t(str.split(" ")[1]) + " " + str.split(" ")[2] + " " + str.split(" ")[3];
