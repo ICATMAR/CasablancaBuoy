@@ -277,6 +277,7 @@
           },
         ],
         numDays: 7,
+        numDaysAhead: 4,
         daysString: [],
         currentDateHTML: '',
         long: 1.345567,
@@ -291,7 +292,7 @@
 
 
       // PRIVATE METHODS
-      getData: function(lat, long){
+      getData: async function(lat, long){
         // Get data
         this.dataRows.forEach((rr, rIndex) => {
           this.dates.forEach((date, dIndex) => {
@@ -317,7 +318,7 @@
                   }
                 })
                 .catch(error => {
-                  console.error("Can't get CMEMS-WMS " + layerName + " on " + date.getUTCFullYear() + "/" + (date.getMonth()+1));
+                  console.error("Can't get CMEMS-WMS " + layerName + " on " + date.getUTCFullYear() + "/" + (date.getMonth()+1) + "\nError: " + error);
                   rr.data[dIndex].value = 'x';
                   rr.data[dIndex].loading = false;
                 });
@@ -403,7 +404,7 @@
       createDates: function(inputDate) {
         // If dates does not exists (initialization)
         this.dates = this.dates == undefined ? this.dates = [] : this.dates;
-        let tempDate = new Date(inputDate.getTime());
+        let tempDate = new Date(inputDate.getTime() + this.numDaysAhead*24*60*60*1000);
 
         for (let i = 0; i < this.numDays; i++){
           this.daysString[this.numDays-1 - i] = tempDate.toDateString().substring(0,2) + ' ' + tempDate.getDate();
