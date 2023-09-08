@@ -6,98 +6,14 @@
     <div>
       <span>{{$t('Date')}}: {{currentDateHTML}}, {{$t('Latitude')}}: {{lat}} º, {{$t('Longitude')}}: {{long}} º</span>
     </div>
+
+    <button @click="moreDataClicked">More data</button>
     
-    
-    <!-- Table -->
-    <div class="tableContainer">
-      <table>
-        <!-- Table Head - Days -->
-        <thead>
-          <tr>
-            <td></td>
-            <!-- Col for each day -->
-            <th class="wcol" style="min-width:40px" :key="dd" v-for="(dd, index) in daysString" :title="dates[index].toISOString()">
-              <span>{{$t(dd.split(' ')[0]) + ' ' + dd.split(' ')[1]}}</span>
-            </th>
-          </tr>
-        </thead>
-        <!-- Table body - Variables -->
-        <tbody>
-          <!-- Row -->
-          <tr :key="dR.name" v-for="(dR, index) in dataRows">
-            <!-- Row name -->
-            <th scope="row">
-              <span v-if="dR.imgURL== undefined && !dR.usesCustomSVG">{{$t(dR.name)}} ({{dR.units}})</span>
-              <span v-else-if="dR.usesCustomSVG">{{$t(dR.name)}}</span>
-            </th>
-            <!-- Values -->
-            <td class="wcol" :key="dd.key" v-for="dd in dataRows[index].data">
-              <!-- Loading -->
-              <div v-if='dd.loading && !dR.imgURL' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative;" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-              <!-- Direction -->
-              <div v-else-if='dR.direction' :style="{'transform': 'rotate('+ (-dd.value - 90) +'deg)'}" :title="dd.value + 'º'"><span>&#10140;</span></div>
-              <!-- Image -->
-              <span v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></span>
-              <!-- SVG -->
-              <span v-else-if='dR.usesCustomSVG' v-html="dd.svg" class="clickable" :title="$t('swellCompositionSVG')"></span>
+  
+    <!-- Data source attribution -->
+    <span class="wrapText">{{$t('Data source')}}: <a class="widgetSpan clickable" title="Weather data source" :href="sourceDoi" target="_blank">E.U. CMEMS,
+            Copernicus Marine Service</a></span>
 
-              <span v-else-if='!dd.loading' :style="getStyle(dR, dd)">{{dd.value}}</span>
-              
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- TODO: CREATE PANEL WITH SOURCE INFO -->
-    <!-- <div style="width: clamp(400px, 30vw, 600px)">
-        <span>
-        <i>Generated using E.U. Copernicus Marine Service Information; </i>
-        <i><a href="https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS6" target="_blank" rel="noreferrer noopener">Sea Physics Analysis and Forecast; </a></i>
-        <i><a href="https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1" target="_blank" rel="noreferrer noopener">Sea Physics Reanalysis; </a></i>
-
-        <i><a href="https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3" target="_blank" rel="noreferrer noopener">Sea Waves Analysis and Forecast; </a></i>
-        <i><a href="https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012" target="_blank" rel="noreferrer noopener">Sea Waves Reanalysis; </a></i>
-
-        <i><a href="https://doi.org/10.25423/cmcc/medsea_analysisforecast_bgc_006_014_medbfm3" target="_blank" rel="noreferrer noopener">Sea Biogeochemistry Analysis and Forecast; </a></i>
-        <i><a href="https://doi.org/10.25423/cmcc/medsea_multiyear_bgc_006_008_medbfm3" target="_blank" rel="noreferrer noopener">Sea Biogechemistry Reanalysis; </a></i>
-
-        <i><a href="https://doi.org/10.48670/moi-00184" target="_blank" rel="noreferrer noopener">Wind L4 Near real Time; </a></i>
-        <i><a href="https://doi.org/10.48670/moi-00185" target="_blank" rel="noreferrer noopener">Wind L4 Reprocessed; </a></i>
-        </span>
-      </div> -->
-
-    
-
-    <!-- Bottom info -->
-    <div class="bottomInfoContainer">
-      <!-- Legend sea composition -->
-      <div class="legendContainer">
-        <span>{{ $t('Swell composition legend') }}</span>
-        <div class="legendItem">
-          <div class="icon-str" style="background:var(--lightBlue)"></div><span>  {{ $t('Wave significant height') }}</span>
-        </div>
-        <div class="legendItem">
-          <div class="icon-str" style="background:khaki"></div><span>  {{ $t('Wind wave significant height') }}</span>
-        </div>
-        <div class="legendItem">
-          <div class="icon-str" style="background:var(--blue)"></div><span>  {{ $t('Primary swell wave significant height') }}</span>
-        </div>
-        <div class="legendItem">
-          <div class="icon-str" style="background:var(--darkBlue)"></div><span>  {{ $t('Secondary swell wave significant height') }}</span>
-        </div>
-      </div>
-
-
-
-      
-      <!-- Data source attribution -->
-      <span class="wrapText">{{$t('Data source')}}: <a class="widgetSpan clickable" title="Weather data source" :href="sourceDoi" target="_blank">E.U. CMEMS,
-              Copernicus Marine Service</a></span>
-
-    </div>
     
 
 
@@ -133,7 +49,7 @@
         // https://origin.fontawesome.com/search?o=r&m=free&f=classic
         isWidgetVisible: false,
         // Defaults
-        sourceDoi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
+        sourceDoi: 'https://marine.copernicus.eu/',
 
 
 
@@ -305,7 +221,9 @@
     },
     methods: {
       // USER INTERACTION
-
+      moreDataClicked: function(){
+        window.eventBus.emit('OpenCentralPanel', "cmemsPanel");
+      },
 
 
       // PRIVATE METHODS

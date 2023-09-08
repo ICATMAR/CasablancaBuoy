@@ -14,6 +14,9 @@
       <!-- Wind panel -->
       <wind-panel v-show="panelName == 'windPanel'"></wind-panel>
 
+      <!-- CMEMS panel -->
+      <cmems-panel v-show="panelName == 'cmemsPanel'" :isVisible="!hidePanel && panelName == 'cmemsPanel'"></cmems-panel>
+
     </div>
   </div>
 </template>
@@ -27,6 +30,7 @@
 import InfoPanel from '/CasablancaBuoy/Components//Panels/InfoPanel.vue';
 import SeaPanel from "/CasablancaBuoy/Components/Panels/SeaPanel.vue"
 import WindPanel from "/CasablancaBuoy/Components/Panels/WindPanel.vue"
+import ExternalDataCMEMS from '/CasablancaBuoy/Components/Panels/ExternalDataCMEMS.vue';
 
 export default {
   name: "CentralPanel",
@@ -69,6 +73,7 @@ export default {
     "sea-panel": SeaPanel,
     "wind-panel": WindPanel,
     "info-panel": InfoPanel,
+    "cmems-panel": ExternalDataCMEMS,
   }
 }
 </script>
@@ -79,7 +84,7 @@ export default {
 #central-panel {
   z-index: 2;
   background-color: #d7effab3;
-  max-width: 600px;
+  max-width: 700px;
   max-height: 90vh!important;
   position: relative;
   top: 50%;
