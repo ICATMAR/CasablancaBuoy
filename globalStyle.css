@@ -35,6 +35,14 @@
   text-decoration: none;
 }
 
+h2, h3 {
+  padding: 1rem;
+}
+
+p {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
 
 span {
   color: white;
