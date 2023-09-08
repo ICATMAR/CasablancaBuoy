@@ -4,14 +4,33 @@
 
 
     <div>
-      <span>{{$t('Date')}}: {{currentDateHTML}}</span>
+      <div v-for="dT in dataTypesToShow" style="display: flex; flex-direction: row; flex-wrap: nowrap;">
+        <!-- Data name -->
+        <span style="margin-right: 4px;">{{dT}}:</span>
+        <!-- Data value -->
+        <template v-if="dataValues[dT] !== undefined">
+          <!-- Loading -->
+          <div v-if='dataValues[dT].loading' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative; color:black !important;" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <!-- Direction -->
+          <div v-else-if='dataValues[dT].direction' 
+            :style="{'width': '20px', 'height': '20px', 'transform': 'rotate('+ (-dataValues[dT].value - 90) +'deg)'}" 
+            :title="dataValues[dT].value + 'º'"><span>&#10140;</span>
+          </div>
+          <!-- Value -->
+          <span v-else-if='!dataValues[dT].loading'> {{dataValues[dT].value}} {{dataValues[dT].units}}</span>
+
+
+        </template>
+      </div>
     </div>
 
     <button @click="moreDataClicked"><span>{{$t('More data')}}</span></button>
     
   
     <!-- Date -->
-    <div class="timeStringContainer">
+    <div class="timeStringContainer" :title="currentDateHTML">
       <time-string></time-string>
     </div>
 
@@ -39,11 +58,10 @@
       // Create data retriever
       this.dataRetriever = new WMSDataRetriever();
 
-      // Create data array inside dataRows
+      // Create data object
+      this.dataValues = {};
       this.dataRows.forEach(dr => {
-        dr.data = [];
-        for (let i = 0; i < this.numDays; i++)
-          dr.data[i] = {value: '', loading: true, key: dr.name ? dr.name + i : dr.key + i};
+        this.dataValues[dr.name] = {value: undefined, loading: true, key: dr.name};
       });
     },
     mounted() {
@@ -57,20 +75,20 @@
         isWidgetVisible: false,
         // Defaults
         sourceDoi: 'https://marine.copernicus.eu/',
+        dataTypesToShow: [
+          'Wave significant height',
+          'Wave direction',
+          'Wave period',
+          'Wind wave significant height',
+          'Wind wave direction'
+        ],
+        dataValues: {},
 
 
 
 
-        dataRows: [   
-          { // Wave icon
-            key: 'waveicon',
-            imgURL: '/CasablancaBuoy/Assets/Logos/icons.png',
-            position: 1,
-            defURL: 'https://es.wisuki.com/images/px.png',
-            source: 'Wave significant height',
-            signRange: [1, 4],
-            color: '#6164ff',
-          },
+
+        dataRows: [
           {
             name: "Wave direction",
             abbr: "Dir",
@@ -94,12 +112,7 @@
             units: "s", 
             range: [0,25],
             signRange: [6,15],
-            color: '#6164ff' // TODO: color or colorScale. If color, go from transparent to the specified color.
-          },
-          // Custom SVG
-          {
-            name: "Swell composition",
-            usesCustomSVG: true,
+            color: '#6164ff', // TODO: color or colorScale. If color, go from transparent to the specified color.
           },
           // Wind waves
           {
@@ -119,7 +132,6 @@
             color: '#6164ff',//'#71c3eb',
             colorScale: 'boxfill/alg',
           },
-          // TODO: download period and use it for the custom SVG
           // Swell 1
           {
             name: "Primary swell wave direction",
@@ -159,15 +171,7 @@
           
 
 
-          { // Current icon
-            key: 'currenticon',
-            imgURL: '/CasablancaBuoy/Assets/Logos/icons.png',
-            position: 2,
-            defURL: 'https://es.wisuki.com/images/px.png',
-            source: 'Sea surface velocity',
-            signRange: [0.25, 1],
-            color: '#6164ff',
-          },
+
           {
             name: "Sea current direction",
             abbr: "Dir",
@@ -184,41 +188,8 @@
             signRange: [0.25, 1],
             color: '#6164ff',//'#71c3eb',
           },
-          {
-            name: "Chlorophyll",
-            abbr: "Chl",
-            units: "mg/m3", 
-            range: [0, 2.5],
-            signRange: [0.5,1],
-            color: '#6164ff'
-          },
-          {
-            name: "Salinity",
-            abbr: "Sal",
-            units: "‰", 
-            range: [30, 45],
-            signRange: [38, 40],
-            color: '#6164ff'
-          },
-          {
-            name: "Sea surface temperature",
-            abbr: "SST",
-            units: 'ºC',
-            elevation: true, // TODO: ALLOWS 2D PLOT IF CLICKED ON THE VARIABLE NAME ▼?
-            range: [10, 25],
-            colorScale: 'boxfill/sst_36',
-          },
-          {
-            name: "Sea bottom temperature",
-            abbr: "Bottom t",
-            units: 'ºC',
-            range: [10, 25],
-            colorScale: 'boxfill/sst_36'
-          },
+          
         ],
-        numDays: 7,
-        numDaysAhead: 4,
-        daysString: [],
         currentDateHTML: '',
         long: 1.345567,
         lat: 40.704597,
@@ -234,43 +205,38 @@
 
 
       // PRIVATE METHODS
-      getData: async function(lat, long){
+      getData: async function(date, lat, long){
         // Get data
         this.dataRows.forEach((rr, rIndex) => {
-          this.dates.forEach((date, dIndex) => {
-            let layerName = rr.direction ? rr.layer : rr.name;
-            // Icon row and custom SVG does not load data
-            if (layerName !== undefined && rr.usesCustomSVG != true){
-              this.dataRetriever.getDataAtPoint(layerName, date.toISOString(), lat, long, 'd', rr.direction)
-                .then(value => {
-                  if (value == undefined){
-                    rr.data[dIndex].value = 'x';
-                    rr.data[dIndex].loading = false;
-                    return;
-                  }
-                  rr.data[dIndex].value = value.toFixed(2);
-                  rr.data[dIndex].loading = false;
-                  // Icon
-                  if (rr.icon){
-                    // Find dataRow with source
-                    let iconRow = this.dataRows.filter(e => e.source == rr.name)[0];
-                    if (iconRow == undefined) {console.error('Icon is not found for ' + rr.name); return};
-                    iconRow.data[dIndex].value = rr.data[dIndex].value;
-                    iconRow.data[dIndex].loading = false;
-                  }
-                })
-                .catch(error => {
-                  console.error("Can't get CMEMS-WMS " + layerName + " on " + date.getUTCFullYear() + "/" + (date.getMonth()+1) + "\nError: " + error);
-                  rr.data[dIndex].value = 'x';
-                  rr.data[dIndex].loading = false;
-                })
-                .finally(() => {
-                  this.createCustomSVG();
-                });
-            } // end of if
+          let layerName = rr.direction ? rr.layer : rr.name;
+          // Icon row and custom SVG does not load data
+          if (layerName !== undefined && rr.usesCustomSVG != true){
+            this.dataRetriever.getDataAtPoint(layerName, date.toISOString(), lat, long, 'h', rr.direction)
+              .then(value => {
+                if (value == undefined){
+                  this.dataValues[rr.name].value = 'x';
+                  this.dataValues[rr.name].loading = false;
+                  return;
+                }
+                this.dataValues[rr.name].value = value.toFixed(2);
+                this.dataValues[rr.name].loading = false;
+                this.dataValues[rr.name].units = rr.units;
+                if (rr.direction)
+                  this.dataValues[rr.name].direction = true;
+
+              })
+              .catch(error => {
+                console.error("Can't get CMEMS-WMS " + layerName + " on " + date.getUTCFullYear() + "/" + (date.getMonth()+1) + "\nError: " + error);
+                this.dataValues[rr.name].value = 'x';
+                this.dataValues[rr.name].loading = false;
+              })
+              .finally(() => {
+                //this.createCustomSVG();
+              });
+          } // end of if
           
 
-          });
+          
         })
       
       
@@ -345,20 +311,7 @@
         }
       },
 
-      // Create dates
-      createDates: function(inputDate) {
-        // If dates does not exists (initialization)
-        this.dates = this.dates == undefined ? this.dates = [] : this.dates;
-        let tempDate = new Date(inputDate.getTime() + this.numDaysAhead*24*60*60*1000);
 
-        for (let i = 0; i < this.numDays; i++){
-          this.daysString[this.numDays-1 - i] = tempDate.toDateString().substring(0,2) + ' ' + tempDate.getDate();
-          this.dates[this.numDays-1 - i] = new Date(tempDate.getTime());
-          tempDate.setDate(tempDate.getDate() - 1);
-        }
-
-        
-      },
 
 
       // Create a SVG that represents the swell composition
@@ -466,10 +419,9 @@
             dr.data[i].loading = true;
           }
         });
-        // Create dates
-        this.createDates(inputDate);
+
         // Update data
-        this.getData(lat, long);
+        this.getData(inputDate, lat, long);
       },
 
       fetchExternalData: function(){
