@@ -132,6 +132,14 @@ export default en = {
   },
 
 
+  externalDataCMEMS: {
+    title: "Wave data and other parameters",
+    p1: `Data are downloaded using the Copernicus service. 
+    In the following table you will be able to see data from previous and posterior days from the selected date (today by default). 
+    The data comes from models and not from observations.`,
+  }, 
+
+
   timeControl: {
     "timeSliderTip": "Drag to select the date",
     "dailyMax": "Daily maximum (OBSEA)",

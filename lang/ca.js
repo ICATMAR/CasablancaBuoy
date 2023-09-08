@@ -133,6 +133,13 @@ export default ca = {
     windParams: 'Modifica el vent',
   },
 
+  externalDataCMEMS: {
+    title: "Dades d'onatge i altres",
+    p1: `Les dades es descarreguen del servei de Copernicus. 
+    A la següent taula podràs veure les dades dels dies anteriors i posteriors a la data seleccionada (avui per defecte). 
+    Les dades provenen de models i no d'observacions en situ.`,
+  }, 
+
   timeControl: {
     "timeSliderTip": "Arrossega per seleccionar la data",
     "dailyMax": "Màxim diari (OBSEA)",

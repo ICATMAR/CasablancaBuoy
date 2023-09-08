@@ -137,6 +137,13 @@ export default es = {
     windParams: 'Modifica el viento',
   },
 
+  externalDataCMEMS: {
+    title: "Datos de olaje y otros",
+    p1: `Los datos se descargan del servicio de Copernicus. 
+    En la siguiente tabla puedes ver los datos de los dias anteriors y posteriores a la fecha seleccionada (hoy por defecto).
+    Los datos provienen de modelos y no de observaciones in situ.`,
+  }, 
+
   timeControl: {
     "timeSliderTip": "Arrastra para seleccionar la fecha",
     "dailyMax": "Máximo diario (OBSEA)",
