@@ -119,7 +119,9 @@ export default {
   },
   mounted() {
     // EVENTS
-
+    window.eventBus.on('TimeString_SelectedDateChanged', (tmst) => {
+      this.currentDate = new Date(tmst);
+    });
   },
   data (){
     return {

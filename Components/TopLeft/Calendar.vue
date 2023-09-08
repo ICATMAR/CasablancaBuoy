@@ -5,7 +5,7 @@
       <div class="white-text" style="padding:10px">Select the date (UTC-0)</div>
       <!-- YEAR -->
       <!-- Calendar -->
-      <div class="yearContainer" v-show="timeScaleToShow == 'year'">
+      <div class="timeline yearContainer" v-show="timeScaleToShow == 'year'">
         <button v-for="yy in years" class="clickable white-text"
           :class="[yy.isSelected ? 'yearButton button-active' : yy.num % 2 == 0 ? 'yearButton' : 'yearButton even']"
           @click="onYearClicked($event)" :key="yy.num" :id="yy.num" :title="yy.num"
@@ -73,8 +73,9 @@ export default {
   emits: ["hideCalendar"],
   created() {
     // Start and end dates if startDate and endDate are flexible
-    this.startDate = new Date(2023, 3, 1); 
+    this.startDate = new Date(2000, 1, 1); 
     this.endDate = new Date();
+    this.endDate.setUTCHours(this.endDate.getUTCHours() + 24*5);
 
     // Start/End year and month
     this.startYear = this.startDate.getUTCFullYear();
@@ -201,8 +202,6 @@ export default {
     acceptClicked: function(){
       // Reset calendar
       this.timeScaleToShow = 'year';
-      // Change GUI timestamp
-      window.GUIManager.currentTmst = this.tempTmst;
       // Send event
       window.eventBus.emit('Calendar_SelectedDate', this.tempTmst);
       // Hide the window
@@ -226,7 +225,7 @@ export default {
 
     // INTERNAL METHODS
     createHTML: function(tmst) {
-      return;
+      
       let startYear = this.startYear;
       let startMonth = this.startMonth;
       let endYear = this.endYear;
@@ -246,7 +245,7 @@ export default {
       this.years = [{ num: startYear, name: startYear, wght: 1, isSelected: selYear == startYear}];
       // Fill years
       for (let i = 1; i<=totalYears; i++){
-          this.years.push({num: startYear + i, name: startYear + 1, wght: 1, isSelected: selYear == startYear + i});
+          this.years.push({num: startYear + i, name: startYear + i, wght: 1, isSelected: selYear == startYear + i});
       }
 
       // MONTHS
@@ -276,8 +275,6 @@ export default {
       this.days = [];
       let startDay = 1;
       let endDay = this.getDaysInMonth(selYear, selMonth);
-      // Get data availability
-      let dailyData = window.DataManager.getDailyDataAvailability();
       
       // First month of data
       if (selMonth == startMonth && selYear == startYear){
@@ -289,7 +286,7 @@ export default {
       }
       // Fill days
       for (let i = startDay; i <= endDay; i++){ 
-        let dataExists = dailyData[selYear + '-' + String((selMonth+1)).padStart(2, '0') + '-' + String((i)).padStart(2, '0')];
+        let dataExists = true;
         this.days.push({
                     num: i,
                     wght: 1,
@@ -307,10 +304,9 @@ export default {
       // HOURS
       this.hours = [];
       // Iterate data availability
-      let hourlyData = window.DataManager.getHourlyDataAvailability();
 
       for (let i = 0; i < 24; i++){
-        let dataExists = hourlyData[selYear + '-' + String((selMonth+1)).padStart(2, '0') + '-' + String((selDay)).padStart(2, '0') + "T" + String((i)).padStart(2, '0') + "Z"];
+        let dataExists = true;
 
         this.hours.push({
           num: i,

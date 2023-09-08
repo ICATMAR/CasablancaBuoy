@@ -31,7 +31,7 @@
   
     <!-- Date -->
     <div class="timeStringContainer" :title="currentDateHTML">
-      <time-string></time-string>
+      <time-string ref="timeString" @changeSelectedDate="stepInTimeInHours"></time-string>
     </div>
 
     <!-- Location -->
@@ -66,7 +66,20 @@
     },
     mounted() {
       // EVENTS
-      
+      window.eventBus.on('TimeString_SelectedDateChanged', (tmst) => {
+        // Save current date
+        this.currentDate = new Date(tmst);
+        // Reset values
+        Object.keys(this.dataValues).forEach(key => this.dataValues[key].loading = true);
+        // Fetch data
+        this.fetchExternalData();
+      });
+
+      // Create date
+      let tmst = new Date().toISOString();
+      tmst = tmst.substring(0,14) + '00:00.000Z'; // Hourly
+      // Set date in time string, which generates global event
+      this.$refs.timeString.setCurrentTmst(tmst); // --> it triggers TimeString_SelectedDateChanged
     },
     data (){
       return {
@@ -83,6 +96,7 @@
           'Wind wave direction'
         ],
         dataValues: {},
+        currentDate: new Date(),
 
 
 
@@ -201,6 +215,10 @@
       // USER INTERACTION
       moreDataClicked: function(){
         window.eventBus.emit('OpenCentralPanel', "cmemsPanel");
+      },
+      // Event from time string
+      stepInTimeInHours: function(hours){
+
       },
 
 
@@ -428,7 +446,7 @@
         if (!this.isWidgetVisible)
           return
 
-        let date = new Date();
+        let date = this.currentDate;
         this.updateTable(date, this.long, this.lat);
 
         return;
@@ -524,6 +542,10 @@
     padding-left: 30px;
   }
 
+  .timeStringContainer {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
 
   .isShownInMobile {
     display: none;

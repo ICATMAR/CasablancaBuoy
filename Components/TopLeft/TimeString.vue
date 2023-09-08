@@ -57,12 +57,20 @@ export default {
     // USER ACTIONS
     // Change current timestamp
     changeSelectedDate(timeDifferenceInHours){
-      this.$emit('changeSelectedDate', timeDifferenceInHours);
+      let d = new Date(this.currentTmst);
+      d.setUTCHours(d.getUTCHours() + timeDifferenceInHours);
+      this.currentTmst = d.toISOString();
+      this.setTimeStr(this.currentTmst);
     },
 
 
     // PRIVATE
-    setTimeStr: (tmst) => this.timeStr = this.formatTimestampString(tmst),
+    setTimeStr: function(tmst) {
+      this.timeStr = this.formatTimestampString(tmst);
+      // Emit event
+      window.eventBus.emit('TimeString_SelectedDateChanged', tmst);
+    },
+
     // Format the time string to a human readable format
     formatTimestampString: function(tmst){
       this.currentTmst = tmst;
@@ -102,7 +110,7 @@ export default {
 
 
     // PUBLIC
-    setCurrentDate: function(tmst){
+    setCurrentTmst: function(tmst){
       this.setTimeStr(tmst);
     }
   },
