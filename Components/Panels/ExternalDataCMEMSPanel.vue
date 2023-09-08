@@ -29,7 +29,7 @@
             <!-- Values -->
             <td class="wcol" :key="dd.key" v-for="dd in dataRows[index].data">
               <!-- Loading -->
-              <div v-if='dd.loading && !dR.imgURL' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative;" role="status">
+              <div v-if='dd.loading && !dR.imgURL' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative; color:black !important;" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
               <!-- Direction -->
@@ -52,7 +52,7 @@
     <div class="bottomInfoContainer">
       <!-- Legend sea composition -->
       <div class="legendContainer">
-        <span>{{ $t('Swell composition legend') }}</span>
+        <span style="margin-bottom: 10px;">{{ $t('Swell composition legend') }}</span>
         <div class="legendItem">
           <div class="icon-str" style="background:var(--lightBlue)"></div><span>  {{ $t('Wave significant height') }}</span>
         </div>
@@ -622,6 +622,8 @@ export default {
   span {
     font-size: clamp(0.6rem, 1.2vw, 0.8rem);
     padding: 0 !important;
+    color: black;
+    text-shadow: none;
   }
 
   .wrapText {

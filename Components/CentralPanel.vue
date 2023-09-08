@@ -92,6 +92,9 @@ export default {
   transform: translate(-50%, -50%);
   
   overflow-y: auto;
+
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
 }
 #central-panel > div {
   max-height: 90vh !important;
