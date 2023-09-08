@@ -4,12 +4,19 @@
 
 
     <div>
-      <span>{{$t('Date')}}: {{currentDateHTML}}, {{$t('Latitude')}}: {{lat}} º, {{$t('Longitude')}}: {{long}} º</span>
+      <span>{{$t('Date')}}: {{currentDateHTML}}</span>
     </div>
 
-    <button @click="moreDataClicked">More data</button>
+    <button @click="moreDataClicked"><span>{{$t('More data')}}</span></button>
     
   
+    <!-- Date -->
+    <div class="timeStringContainer">
+      <time-string></time-string>
+    </div>
+
+    <!-- Location -->
+    <span>{{$t('Latitude')}}: {{lat}} º, {{$t('Longitude')}}: {{long}} º</span>
     <!-- Data source attribution -->
     <span class="wrapText">{{$t('Data source')}}: <a class="widgetSpan clickable" title="Weather data source" :href="sourceDoi" target="_blank">E.U. CMEMS,
             Copernicus Marine Service</a></span>
@@ -24,7 +31,7 @@
   <script>
   
   // Import components
-
+  import TimeString from "./TimeString.vue"
 
   export default {
     name: 'widgetExternalData', // Caps, no -
@@ -524,11 +531,28 @@
   
     },
     components: {
+      "time-string": TimeString,
     }
   }
   </script>
   
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
   
   <style scoped>
@@ -548,65 +572,6 @@
     padding-left: 30px;
   }
 
-
-  .vertical-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 8px;
-  }
-
-  .tableContainer {
-    height: clamp(300px, 50vh, 600px);
-    overflow: auto;
-    pointer-events: all;
-    padding-right: 10px;
-
-    margin-right: 10px;
-    margin-bottom: 30px;
-
-    /* display: block;
-    overflow-x: auto;
-    white-space: nowrap; */
-
-    width: min(80vw, 577px);
-  }
-
-  table {
-    
-    table-layout: fixed;
-  }
-
-  .wrow {
-    /* display: flex;
-    flex-direction: row; */
-    /* border:rgb(95, 95, 95);
-    border-style: solid; */
-    text-align: center;
-  }
-
-  .wcol {
-    /* border:rgb(252, 252, 252);
-    border-style: solid; */
-    border-style:none;
-    /* flex-grow: 1; */
-    text-align: center;
-    align-items: center;
-    padding: 2px;
-  }
-
-
-  img {
-    border-radius: 9px;
-    width: 32px;
-    height: 32px;
-    background-repeat: no-repeat;
-  }
-
-
-
-  
 
   .isShownInMobile {
     display: none;
@@ -637,27 +602,6 @@
     inline-size: 190px;
     overflow-wrap: break-word;
     pointer-events: all;
-  }
-
-  .bottomInfoContainer {
-    display:flex;
-    flex-direction: row;
-  }
-
-  .bottomInfoContainer > * {
-    padding-right: 50px;
-  }
-
-  .legendContainer {
-    display:flex;
-    flex-direction: column;
-  }
-  
-  .legendItem {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
   }
 
 
