@@ -64,7 +64,7 @@ export default {
   methods: {
     // USER ACTIONS
     compassButtonClicked: function (e) {
-      window.eventBus.emit('TopRightNav_compassButtonClicked');
+      window.eventBus.emit('TopRightMenu_compassButtonClicked');
     },
     buoyButtonClicked: function(e){
       window.eventBus.emit('InstrumentsMenu_buoyButtonClicked');

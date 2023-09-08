@@ -203,10 +203,10 @@ export default {
 
 
     // compassButtonClicked: function (e) {
-    //   window.eventBus.emit('TopRightNav_compassButtonClicked');
+    //   window.eventBus.emit('TopRightMenu_compassButtonClicked');
     // },
     // infoButtonClicked: function (e) {
-    //   window.eventBus.emit('TopRightNav_infoButtonClicked');
+    //   window.eventBus.emit('TopRightMenu_infoButtonClicked');
     //   window.open('https://github.com/BlueNetCat/OBSEA', '_blank');
     // }
   },

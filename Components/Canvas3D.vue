@@ -44,7 +44,7 @@ export default {
 
     // ***** TOP-RIGHT ICONS *****
     // Face northward
-    window.eventBus.on('TopRightNav_compassButtonClicked', () => {
+    window.eventBus.on('TopRightMenu_compassButtonClicked', () => {
       this.sceneManager.faceNorthward();
     });
 
