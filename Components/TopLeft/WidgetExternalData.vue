@@ -10,7 +10,7 @@
         <!-- Data value -->
         <template v-if="dataValues[dT] !== undefined">
           <!-- Loading -->
-          <div v-if='dataValues[dT].loading' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative; color:black !important;" role="status">
+          <div v-if='dataValues[dT].loading' class="spinner-border text-light" style="width: 1rem; height: 1rem; position: relative" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
           <!-- Direction -->
