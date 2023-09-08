@@ -83,10 +83,10 @@ export default {
       let hoursDiff = Math.floor(timeDiff/(60*60*1000));
       let minDiff = 60 - Math.floor(timeDiff/(60*1000) - hoursDiff*60);
     
-      if (hoursDiff < -24 * 31){
+      if (hoursDiff < -24 * 31 || hoursDiff > 24 * 31){
         return ss;
       }
-      else if (hoursDiff < -24){
+      else if (hoursDiff < -24 || hoursDiff > 24){
         let daysDiff = Math.floor(hoursDiff / 24);
         hoursDiff = hoursDiff - daysDiff*24;
         return ss + " ("+ daysDiff + "d " + Math.abs(hoursDiff+1) + "h)";
