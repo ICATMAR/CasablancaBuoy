@@ -49,7 +49,6 @@ export const OceanVertShader = /* glsl */ `
 
   uniform vec4 u_wave1Params;
   uniform vec4 u_wave2Params;
-  uniform vec4 u_wave3Params;
 
   
 
@@ -136,13 +135,6 @@ export const OceanVertShader = /* glsl */ `
     tangent = normalize(tangent);
     binormal = normalize(binormal);
 
-    modPos += GerstnerWave(u_wave3Params, position, tangent, binormal); 
-    // Attenuation
-    modPos.y *= distanceFactor;
-    tangent.x /= distanceFactor;
-    binormal.z /= distanceFactor;
-    tangent = normalize(tangent);
-    binormal = normalize(binormal);
 
 
     // Iterate over all the waves

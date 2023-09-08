@@ -28,7 +28,6 @@ class OceanEntity {
   swellParameters = [
     { Hm0: 0.1, Mdir: 0, Steepness: 0.1 },
     { Hm0: 0.2, Mdir: 129, Steepness: 0.05 },
-    { Hm0: 0.05, Mdir: 264, Steepness: 0.1 }
   ]
 
 //   0.1, 0.1, 1.0, 0.0)
@@ -97,7 +96,6 @@ class OceanEntity {
           // u_direction: { value: new THREE.Vector2(1, 0) },
           u_wave1Params: { value: new THREE.Vector4(0.1, 0.1, 0.0, 1.0) }, // steepness, waveHeight, directionx, directionz
           u_wave2Params: { value: new THREE.Vector4(0.05, 0.2, 0.5, 1.0) }, // steepness, waveHeight, directionx, directionz
-          u_wave3Params: { value: new THREE.Vector4(0.1, 0.05, 1.0, 1.0) }, // steepness, waveHeight, directionx, directionz
           u_normalTexture: {value: normalTexture}, // TODO: WHAT IF THE TEXTURE TAKES TOO LONG TO LOAD?
         },
         vertexShader: OceanVertShader,
@@ -186,7 +184,6 @@ class OceanEntity {
     // USER GUI
     this.customWaveParameters[0] = this.getWaveParametersHTML("1");
     this.customWaveParameters[1] = this.getWaveParametersHTML("2");
-    this.customWaveParameters[2] = this.getWaveParametersHTML("3");
     this.oceanSteepness = this.getOceanParameters();
     
   }
@@ -207,6 +204,7 @@ class OceanEntity {
   updateSwell = function(varName, value, index){
     if (!this.oceanTile)
       return;
+    index = index || 0;
     if (varName == 'height'){
       this.swellParameters[index].Hm0 = value;
       this.oceanTile.material.uniforms.u_wave1Params.value.y = value;// steepness, waveHeight, directionx, directionz
@@ -322,7 +320,6 @@ class OceanEntity {
     this.tempVec3.copy(position);
     position.add(this.getGerstnerPosition(params1, this.tempVec3, tangent, binormal));
     position.add(this.getGerstnerPosition(params2, this.tempVec3, tangent, binormal));
-    position.add(this.getGerstnerPosition(params3, this.tempVec3, tangent, binormal));
 
     let normal = this.normal;
     normal.crossVectors(binormal, tangent);
@@ -336,8 +333,7 @@ class OceanEntity {
 
     let calcNormal = this.getGerstnerNormal(position, 
       this.swellParameters[0], 
-      this.swellParameters[1], 
-      this.swellParameters[2]);
+      this.swellParameters[1]);
 
     normal.set(calcNormal.x, calcNormal.y, calcNormal.z);
 
@@ -449,8 +445,7 @@ getOceanParameters = function(){
       // let params2 = this.customWaveParameters[1];
       // oceanTile.material.uniforms.u_wave2Params.value.set(...params2);
 
-      // let params3 = this.customWaveParameters[2];
-      // oceanTile.material.uniforms.u_wave3Params.value.set(...params3);
+
 
       oceanTile.material.uniforms.u_time.uniformsNeedUpdate = true;
     }

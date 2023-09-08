@@ -70,7 +70,7 @@ export default {
       // Swell 1
       this.generateSwell(dataValues['Primary swell wave significant height'].value, dataValues['Primary swell wave direction'].value);
       // Swell 2
-      //this.generateSwell(dataValues['Secondary swell wave significant height'], dataValues['Secondary swell wave direction'], 2);
+      this.generateSwell(dataValues['Secondary swell wave significant height'].value, dataValues['Secondary swell wave direction'].value, 1);
 
       // Flag
       this.sceneManager.flag.showFlag();
@@ -241,13 +241,13 @@ export default {
   },
   methods: {
     //onclick: function(e){},    
-    generateSwell: function(Hm0, Mdir) {
+    generateSwell: function(Hm0, Mdir, index) {
       // Calculate steepness
       let steepness = 0.1 + 0.2 * Math.min(1, Hm0/3);
       if (Hm0 < 0.1) steepness = 0.05;
-      this.sceneManager.ocean.updateSwell('height', Hm0, 0);
-      this.sceneManager.ocean.updateSwell('direction', Mdir, 0);
-      this.sceneManager.ocean.updateSwell('steepness', steepness, 0);
+      this.sceneManager.ocean.updateSwell('height', Hm0, index);
+      this.sceneManager.ocean.updateSwell('direction', Mdir, index);
+      this.sceneManager.ocean.updateSwell('steepness', steepness, index);
     },
   },
   components: {
