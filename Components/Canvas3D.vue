@@ -49,6 +49,45 @@ export default {
     });
 
 
+
+
+    // ********** CMEMS DATA **********
+    window.eventBus.on('WidgetExternalData_CMEMSDataLoaded', dataValues => {
+      
+      // Wave sign. height
+      this.sceneManager.ocean.updateWaveSignificantHeight(dataValues['Wave significant height'].value);
+      // Wave direction
+      this.sceneManager.ocean.updateMeanWaveDirection(dataValues['Wave direction'].value);
+      // Calculate spread according to difference between wave and wind wave direction
+      let angleDiff = Math.abs(dataValues['Wave direction'].value - dataValues['Wind wave direction'].value);
+      let dirSpreading = Math.min(Math.max(30, angleDiff * 2), 180);
+      this.sceneManager.ocean.updateDirectionalSpread(dirSpreading);
+      // Steepness based on wind wave
+      let percentageWindWave = dataValues['Wind wave significant height'].value / dataValues['Wave significant height'].value;
+      let steepness = 0.05 + 0.25 * Math.min(1, percentageWindWave); // TODO: use wind wave directly?
+      this.sceneManager.ocean.updateSteepness(steepness);
+
+      // Swell 1
+      this.generateSwell(dataValues['Primary swell wave significant height'].value, dataValues['Primary swell wave direction'].value);
+      // Swell 2
+      //this.generateSwell(dataValues['Secondary swell wave significant height'], dataValues['Secondary swell wave direction'], 2);
+
+      // Flag
+      this.sceneManager.flag.showFlag();
+      // Phillips, O.M. 1957. On the generation of waves by turbulent wind. Journal of Fluid Mechanics. 2 (5): 417–445.
+      // Hs = C * (U^2 / g)
+      let wwHm0 = dataValues['Wind wave significant height'].value;
+      let C = 0.08;
+      let U = Math.sqrt(wwHm0 * 9.81 / C); // wind speed in m/s
+      this.sceneManager.flag.setWindParameters('windSpeed', U * 3.6); // km/h
+      this.sceneManager.flag.setWindParameters('windDirection', dataValues['Wind wave direction'].value);
+    })
+
+
+
+
+
+
     // ***** TIME BAR WITH DATA *****
     const updateData = (dataInTimestamp) => {
       // Ocean
@@ -59,7 +98,7 @@ export default {
           this.sceneManager.ocean.updateMeanWaveDirection(dataInTimestamp['Mdir']);
           this.sceneManager.ocean.updateDirectionalSpread(dataInTimestamp['Spr1']);
           // Generate swell
-          generateSwell(dataInTimestamp['Hm0'], dataInTimestamp['Mdir']);
+          this.generateSwell(dataInTimestamp['Hm0'], dataInTimestamp['Mdir']);
           // Calculate steepness
           let steepness = 0.1 + 0.3 * Math.min(1, dataInTimestamp['Hm0'] / 6);
           this.sceneManager.ocean.updateSteepness(steepness);
@@ -69,7 +108,7 @@ export default {
           this.sceneManager.ocean.updateDirectionalSpread(180);
           this.sceneManager.ocean.updateSteepness(0.05);
           // Reset swell
-          generateSwell(0.05, 180);
+          this.generateSwell(0.05, 180);
         }
       }
       // Wind
@@ -116,14 +155,7 @@ export default {
           this.sceneManager.salText.removeText();
 
     };
-    const generateSwell = (Hm0, Mdir) => {
-      // Calculate steepness
-      let steepness = 0.1 + 0.2 * Math.min(1, Hm0/3);
-      if (Hm0 < 0.1) steepness = 0.05;
-      this.sceneManager.ocean.updateSwell('height', Hm0, 0);
-      this.sceneManager.ocean.updateSwell('direction', Mdir, 0);
-      this.sceneManager.ocean.updateSwell('steepness', steepness, 0);
-    }
+    
     window.eventBus.on('DataStreamsBar_dataDailyUpdate', updateData);
     window.eventBus.on('DataStreamsBar_dataHalfHourlyUpdate', updateData);
 
@@ -209,6 +241,14 @@ export default {
   },
   methods: {
     //onclick: function(e){},    
+    generateSwell: function(Hm0, Mdir) {
+      // Calculate steepness
+      let steepness = 0.1 + 0.2 * Math.min(1, Hm0/3);
+      if (Hm0 < 0.1) steepness = 0.05;
+      this.sceneManager.ocean.updateSwell('height', Hm0, 0);
+      this.sceneManager.ocean.updateSwell('direction', Mdir, 0);
+      this.sceneManager.ocean.updateSwell('steepness', steepness, 0);
+    },
   },
   components: {
     //"ol-map": Map,

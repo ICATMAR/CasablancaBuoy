@@ -19,15 +19,17 @@
             :title="dataValues[dT].value + 'º'"><span>&#10140;</span>
           </div>
           <!-- Value -->
-          <span v-else-if='!dataValues[dT].loading'> {{dataValues[dT].value}} {{dataValues[dT].units}}</span>
+          <span v-else-if='!dataValues[dT].loading'> {{dataValues[dT].valueStr}} {{dataValues[dT].units}}</span>
 
 
         </template>
       </div>
     </div>
 
-    <button @click="moreDataClicked"><span>{{$t('More data')}}</span></button>
-    
+    <div class="extraButtonsContainer">
+      <button @click="moreDataClicked"><span>{{$t('More data')}}</span></button>
+      <button @click="regenerateClicked"><span>{{$t('Regenerate ocean')}}</span></button>
+    </div>
   
     <!-- Date -->
     <div class="timeStringContainer" :title="currentDateHTML">
@@ -216,6 +218,20 @@
       moreDataClicked: function(){
         window.eventBus.emit('OpenCentralPanel', "cmemsPanel");
       },
+      regenerateClicked: function(){
+        // Check if all data are loaded
+        Object.keys(this.dataValues).forEach(key => {
+          let dV = this.dataValues[key];
+          if (dV.loading)
+            return;
+          else if (dV.value == 'x')
+            return;
+          else if (dV.value == undefined)
+            return;
+        })
+        // Send event
+        window.eventBus.emit('WidgetExternalData_CMEMSDataLoaded', this.dataValues);
+      },
       // Event from time string
       stepInTimeInHours: function(hours){
 
@@ -224,6 +240,8 @@
 
       // PRIVATE METHODS
       getData: async function(date, lat, long){
+        let totalDataRows = this.dataRows.length;
+        let count = 0;
         // Get data
         this.dataRows.forEach((rr, rIndex) => {
           let layerName = rr.direction ? rr.layer : rr.name;
@@ -236,12 +254,16 @@
                   this.dataValues[rr.name].loading = false;
                   return;
                 }
-                this.dataValues[rr.name].value = value.toFixed(2);
+                this.dataValues[rr.name].value = value;
+                this.dataValues[rr.name].valueStr = value.toFixed(2);
                 this.dataValues[rr.name].loading = false;
                 this.dataValues[rr.name].units = rr.units;
                 if (rr.direction)
                   this.dataValues[rr.name].direction = true;
 
+                count++;
+                if (count == totalDataRows)
+                  this.allPromisesFinished();
               })
               .catch(error => {
                 console.error("Can't get CMEMS-WMS " + layerName + " on " + date.getUTCFullYear() + "/" + (date.getMonth()+1) + "\nError: " + error);
@@ -250,6 +272,8 @@
               })
               .finally(() => {
                 //this.createCustomSVG();
+                // Prepare event to update the simulation
+                //this.allPromisesFinished();
               });
           } // end of if
           
@@ -450,41 +474,13 @@
         this.updateTable(date, this.long, this.lat);
 
         return;
-
-        
-        // Get date
-        //let date = new Date();
-        //let tmst = date.toISOString();
-        
-        // Fetch data (promises)
-        
-        // How to fetch direction also? Check in VISAP!
-
-        // Fetch data:
-        // Primary swell direction
-        // Primary swell Hm0
-        // Primary swell period
-
-        // Secondary swell (three params)
-
-        // Mdir
-        // Hm0
-        // Period?
-
-        // Wind wave height
-        // Wind wave dir
-        // Wind wave period
-
-        // 4x3 data points
-
-
-        // Get clima URL
-        let infoWMS = this.dataRetriever.getDataTypeURL(this.selClimaLayer, tmst, 'h');
-        this.sourceDoi = infoWMS == undefined ? 'https://resources.marine.copernicus.eu/products' : infoWMS.doi;
-        // If source is not found, it will send undefined
-        window.eventBus.emit('WidgetExternalData_ClimaLayerChange', infoWMS);
-        // Set legend
-        this.$refs.wmsLegend.setWMSLegend(infoWMS);
+      },
+      // Sends an event if all data values have been loaded and filled
+      allPromisesFinished(){
+        // Manually correct wind wave
+        this.dataValues['Wind wave significant height'].value = Math.abs(this.dataValues['Wind wave significant height'].value);
+        // Send event
+        window.eventBus.emit('WidgetExternalData_CMEMSDataLoaded', this.dataValues);
       },
 
 
