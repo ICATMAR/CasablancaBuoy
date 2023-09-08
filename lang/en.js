@@ -1,6 +1,8 @@
 let en;
 export default en = {
   "Date": "Date",
+  "Longitude": "Longitude",
+  "Latitude": "Latitude",
 
   "buoyButtonTitle": "Center the camera on the surface buoy",
   "baseButtonTitle": "Center the camera on the underwater observatory",

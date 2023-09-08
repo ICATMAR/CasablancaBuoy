@@ -1,6 +1,8 @@
 let ca;
 export default ca = {
   "Date": "Data",
+  "Longitude": "Longitud",
+  "Latitude": "Latitud",
 
   "buoyButtonTitle": "Centra la càmara a la boia de superficie",
   "baseButtonTitle": "Centra la càmara a l'observatori submarí",
@@ -167,7 +169,22 @@ export default ca = {
     // "Oct": ,
     // "Nov": ,
     "Dec": "Des",
-  
 
+    "Mo": "Dl",
+    "Tu": "Dt",
+    "We": "Dm",
+    "Th": "Dj",
+    "Fr": "Dv",
+    "Sa": "Ds",
+    "Su": "Dg",
+
+    "Mon": "Dl",
+    "Tue": "Dt",
+    "Wed": "Dm",
+    "Thu": "Dj",
+    "Fri": "Dv",
+    "Sat": "Ds",
+    "Sun": "Dg",
+  
   "Data": "Dades",
 }

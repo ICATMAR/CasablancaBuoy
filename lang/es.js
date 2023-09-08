@@ -1,6 +1,8 @@
 let es;
 export default es = {
   "Date": "Fecha",
+  "Longitude": "Longitud",
+  "Latitude": "Latitud",
 
   "buoyButtonTitle": "Centra la cámara en la boya de superfície",
   "baseButtonTitle": "Centra la cámara en el observatorio submarino",
@@ -174,7 +176,22 @@ export default es = {
     // "Oct": ,
     // "Nov": ,
     "Dec": "Dic",
-  
+
+    "Mo": "Lu",
+    "Tu": "Ma",
+    "We": "Mi",
+    "Th": "Ju",
+    "Fr": "Vi",
+    "Sa": "Sa",
+    "Su": "Do",
+    
+    "Mon": "Lu",
+    "Tue": "Ma",
+    "Wed": "Mi",
+    "Thu": "Ju",
+    "Fri": "Vi",
+    "Sat": "Sa",
+    "Sun": "Do",
   
 
   "Data": "Datos",
