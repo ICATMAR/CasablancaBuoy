@@ -575,7 +575,6 @@ export default {
     text-align: justify;
   }
  .tableContainer {
-    width: min(80vw, 650px);
     height: clamp(300px, 50vh, 600px);
     overflow: auto;
     pointer-events: all;

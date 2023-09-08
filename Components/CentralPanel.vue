@@ -30,7 +30,7 @@
 import InfoPanel from '/CasablancaBuoy/Components//Panels/InfoPanel.vue';
 import SeaPanel from "/CasablancaBuoy/Components/Panels/SeaPanel.vue"
 import WindPanel from "/CasablancaBuoy/Components/Panels/WindPanel.vue"
-import ExternalDataCMEMS from '/CasablancaBuoy/Components/Panels/ExternalDataCMEMS.vue';
+import ExternalDataCMEMSPanel from '/CasablancaBuoy/Components/Panels/ExternalDataCMEMSPanel.vue';
 
 export default {
   name: "CentralPanel",
@@ -73,7 +73,7 @@ export default {
     "sea-panel": SeaPanel,
     "wind-panel": WindPanel,
     "info-panel": InfoPanel,
-    "cmems-panel": ExternalDataCMEMS,
+    "cmems-panel": ExternalDataCMEMSPanel,
   }
 }
 </script>
@@ -82,7 +82,7 @@ export default {
 
 <style scoped>
 #central-panel {
-  z-index: 2;
+  z-index: 15;
   background-color: #d7effab3;
   max-width: 700px;
   max-height: 90vh!important;
