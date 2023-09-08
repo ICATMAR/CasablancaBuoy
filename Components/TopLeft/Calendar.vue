@@ -264,6 +264,9 @@ export default {
       else if (selYear == endYear){
         startMonth = 0;
         endMonth = this.endDate.getUTCMonth();
+      } else {
+        startMonth = 0;
+        endMonth = 11;
       }
 
       // Fill months
