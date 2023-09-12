@@ -127,7 +127,8 @@ export default ca = {
     p1: `Les dades es descarreguen del servei de Copernicus. 
     A la següent taula podràs veure les dades dels dies anteriors i posteriors a la data seleccionada (avui per defecte). 
     Les dades provenen de models i no d'observacions en situ.`,
-    generatedCMEMS: "Generat amb E.U. Copernicus Marine Service Information: "
+    generatedCMEMS: "Generat amb E.U. Copernicus Marine Service Information: ",
+    datesModify: "Canvia les dates",
   }, 
 
   timeControl: {

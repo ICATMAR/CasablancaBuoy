@@ -47,6 +47,13 @@
       </table>
     </div>
 
+    <!-- Day ahead - behind -->
+    <p class="modifyDatesContainer">
+      <button class="icon-str" title="-48h" @click="changeSelDate(-48)">≪</button>
+      <span>{{ $t('externalDataCMEMS.datesModify') }}</span>
+      <button class="icon-str" title="+48h" @click="changeSelDate(48)">≫</button>
+    </p>
+
 
     <!-- Bottom info -->
     <div class="bottomInfoContainer">
@@ -303,7 +310,11 @@ export default {
   },
   methods: {
     // USER INTERACTION
-
+    changeSelDate: function(hours){
+      this.currentDate.setUTCHours(this.currentDate.getUTCHours() + hours);
+      // Update table
+      this.updateTable(this.currentDate, this.long, this.lat);
+    },
 
 
     // PRIVATE METHODS
@@ -576,7 +587,23 @@ export default {
   p {
     text-align: justify;
   }
- .tableContainer {
+
+  .modifyDatesContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -20px;
+    margin-bottom: 20px;
+    width: 100%;
+    background: rgb(224 247 255);
+    border-radius: 10px;
+  }
+  .modifyDatesContainer > button {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .tableContainer {
     height: clamp(300px, 50vh, 600px);
     overflow: auto;
     pointer-events: all;

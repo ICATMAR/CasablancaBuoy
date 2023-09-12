@@ -142,7 +142,8 @@ export default es = {
     p1: `Los datos se descargan del servicio de Copernicus. 
     En la siguiente tabla puedes ver los datos de los dias anteriors y posteriores a la fecha seleccionada (hoy por defecto).
     Los datos provienen de modelos y no de observaciones in situ.`,
-    generatedCMEMS: "Generado con E.U. Copernicus Marine Service Information: "
+    generatedCMEMS: "Generado con E.U. Copernicus Marine Service Information: ",
+    datesModify: "Cambia las fechas",
   }, 
 
   timeControl: {
