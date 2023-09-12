@@ -526,7 +526,7 @@
     z-index: 11;
     user-select: none;
 
-    padding-top: 0px !important;
+    /* padding-top: 0px !important; */
     margin-top: -8px !important;
 
     max-height: 100%;
@@ -535,7 +535,10 @@
     flex-direction: column !important;
     align-items: flex-start !important;
 
-    padding-left: 30px;
+    padding: 10px 30px 20px 30px;
+    border-radius: 10px;
+
+    background:rgba(82, 181, 217, 0.5);
   }
 
   .timeStringContainer {
