@@ -137,6 +137,7 @@ export default en = {
     p1: `Data are downloaded using the Copernicus service. 
     In the following table you will be able to see data from previous and posterior days from the selected date (today by default). 
     The data comes from models and not from observations.`,
+    generatedCMEMS: "Generated using E.U. Copernicus Marine Service Information: ",
   }, 
 
 

@@ -37,7 +37,7 @@
               <!-- Image -->
               <span v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></span>
               <!-- SVG -->
-              <span v-else-if='dR.usesCustomSVG' v-html="dd.svg" class="clickable" :title="$t('swellCompositionSVG')"></span>
+              <span v-else-if='dR.usesCustomSVG' v-html="dd.svg" class="" :title="$t('swellCompositionSVG')"></span>
 
               <span v-else-if='!dd.loading' :style="getStyle(dR, dd)">{{dd.value}}</span>
               
@@ -71,7 +71,7 @@
       <!-- <span class="wrapText">{{$t('Data source')}}: <a class="widgetSpan clickable" title="Weather data source" :href="sourceDoi" target="_blank">E.U. CMEMS,
               Copernicus Marine Service</a></span> -->
       <span style="width: 50%">
-        <i>{{$t('GeneratedCMEMS')}}Generated using E.U. Copernicus Marine Service Information; </i>
+        <i>{{$t('externalDataCMEMS.generatedCMEMS')}}</i>
         <i><a href="https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS6" target="_blank" rel="noreferrer noopener">Sea Physics Analysis and Forecast; </a></i>
         <i><a href="https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1" target="_blank" rel="noreferrer noopener">Sea Physics Reanalysis; </a></i>
 
@@ -496,7 +496,7 @@ export default {
             // https://sparkbox.com/foundry/how_to_code_an_SVG_pie_chart
             let size = 40;
             let svgStr = `
-              <svg height="26" width="26" viewBox="0 0 26 26" class="clickable" style="width:${size}px; height:${size}px" class="width:${size}px;height:${size}px" >
+              <svg height="26" width="26" viewBox="0 0 26 26" class="" style="width:${size}px; height:${size}px" class="width:${size}px;height:${size}px" >
                 <circle r="10" cx="13" cy="13" fill="var(--lightBlue)" />
                 <polygon points="8, 4.5, 13, 0, 18, 4.5" fill="var(--lightBlue)" transform="rotate(-${wDir}, 13, 13)" />
                 
