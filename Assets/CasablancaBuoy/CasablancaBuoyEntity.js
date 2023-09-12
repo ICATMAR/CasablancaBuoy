@@ -20,13 +20,15 @@ class CasablancaBuoyEntity {
 
       this.root = root;
 
-      // Material AO
-      let mesh = root.children[0];
-      let material = mesh.material;    
-
-      // Move upwards
-      mesh.translateY(0.3);
-
+      // Move upwards all children objects
+      root.children.forEach(ch => {
+        if (ch.name == 'UPC_textFront')
+        ch.translateZ(-0.3);
+        else
+          ch.translateY(0.3);
+      
+      });
+      
 
       scene.add(root);
       this.isLoaded = true;
