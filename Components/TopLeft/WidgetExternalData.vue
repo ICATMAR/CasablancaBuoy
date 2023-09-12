@@ -15,8 +15,8 @@
           </div>
           <!-- Direction -->
           <div v-else-if='dataValues[dT].direction' 
-            :style="{'width': '20px', 'height': '20px', 'transform': 'rotate('+ (-dataValues[dT].value - 90) +'deg)'}" 
-            :title="dataValues[dT].value + 'º'"><span>&#10140;</span>
+            :style="{'width': '20px', 'height': '20px', 'pointer-events': 'all', 'transform': 'rotate('+ (dataValues[dT].value - 180 - 90) +'deg)'}" 
+            :title="dataValues[dT].value.toFixed(2) + 'º'"><span>&#10140;</span>
           </div>
           <!-- Value -->
           <span v-else-if='!dataValues[dT].loading'> {{dataValues[dT].valueStr}} {{dataValues[dT].units}}</span>
@@ -245,8 +245,8 @@
         // Get data
         this.dataRows.forEach((rr, rIndex) => {
           let layerName = rr.direction ? rr.layer : rr.name;
-          // Icon row and custom SVG does not load data
-          if (layerName !== undefined && rr.usesCustomSVG != true){
+          // Icon row does not load data
+          if (layerName !== undefined){
             this.dataRetriever.getDataAtPoint(layerName, date.toISOString(), lat, long, 'h', rr.direction)
               .then(value => {
                 if (value == undefined){
@@ -270,11 +270,6 @@
                 this.dataValues[rr.name].value = 'x';
                 this.dataValues[rr.name].loading = false;
               })
-              .finally(() => {
-                //this.createCustomSVG();
-                // Prepare event to update the simulation
-                //this.allPromisesFinished();
-              });
           } // end of if
           
 
@@ -356,90 +351,7 @@
 
 
 
-      // Create a SVG that represents the swell composition
-      createCustomSVG: function(){
-        let matrix = [];
-        this.dataRows.forEach(dr => {
-          
-          // Wave sign. height, WW, SW1, SW2
-          let index = undefined;
-          if (dr.name == 'Wave significant height')
-            index = 0;
-          else if (dr.name == 'Wind wave significant height')
-            index = 1;
-          else if (dr.name == 'Primary swell wave significant height')
-            index = 2;
-          else if (dr.name == 'Secondary swell wave significant height')
-            index = 3;
-          else if (dr.name == 'Wave direction')
-            index = 4;
-          else if (dr.name == 'Wind wave direction')
-            index = 5;
-          else if (dr.name == 'Primary swell wave direction')
-            index = 6;
-          else if (dr.name == 'Secondary swell wave direction')
-            index = 7;
-        
-          // Store values in matrix
-          if (index !== undefined){
-            // Create data matrix to use later
-            matrix[index] = [];
-            for (let i = 0; i < this.numDays; i++){
-              let value = parseFloat(dr.data[i].value);
-              if (isNaN(value) || value == undefined)
-                return;
-              matrix[index][i] = value;
-            }
-          } else {
-            return;
-          }
-        });
 
-        // Create SVG
-        this.dataRows.forEach(dr => {
-          // Uses custom SVG
-          if (dr.usesCustomSVG){
-            for (let i = 0; i < this.numDays; i++){
-              let wsh = matrix[0][i];
-              let wwshNorm = matrix[1][i] / wsh;
-              let sw1Norm = matrix[2][i] / wsh;
-              let sw2Norm = matrix[3][i] / wsh;
-              let wDir = matrix[4][i];
-              let wwDir = matrix[5][i];
-              let sw1Dir = matrix[6][i];
-              let sw2Dir = matrix[7][i];
-
-              // Check that all data is available to create SVG
-              for (let j = 0; j < 8; j++){
-                if (isNaN(matrix[j][i]) || matrix[j][i] == undefined)
-                  return;
-              }
-
-              // https://sparkbox.com/foundry/how_to_code_an_SVG_pie_chart
-              let size = 40;
-              let svgStr = `
-                <svg height="26" width="26" viewBox="0 0 26 26" class="clickable" style="width:${size}px; height:${size}px" class="width:${size}px;height:${size}px" >
-                  <circle r="10" cx="13" cy="13" fill="var(--lightBlue)" />
-                  <polygon points="8, 4.5, 13, 0, 18, 4.5" fill="var(--lightBlue)" transform="rotate(-${wDir}, 13, 13)" />
-                  
-                  <circle r="4" cx="13" cy="13" fill="transparent" stroke="khaki" stroke-width="8" stroke-dasharray="calc(${wwshNorm}*8*3.142) calc(8*3.142)" transform="rotate(-${90 + wwshNorm*180 + wwDir}, 13, 13)" />
-                  <polygon points="${13 - 4 * Math.min(1, wwshNorm*6)}, 6.5, 13, 2, ${13 + 4 * Math.min(1, wwshNorm*6)}, 6.5" fill="khaki" transform="rotate(-${wwDir}, 13, 13)" />
-
-                  <circle r="2.5" cx="13" cy="13" fill="transparent" stroke="var(--blue)" stroke-width="5" stroke-dasharray="calc(${sw1Norm}*5*3.142) calc(5*3.142)" transform="rotate(-${90 + sw1Norm*180 + sw1Dir}, 13, 13)" />
-                  <polygon points="${13 - 3 * Math.min(1, sw1Norm*6)}, 9.5, 13, 6, ${13 + 3 * Math.min(1, sw1Norm*6)}, 9.5" fill="var(--blue)" transform="rotate(-${sw1Dir}, 13, 13)" />
-
-                  <circle r="1.5" cx="13" cy="13" fill="transparent" stroke="var(--darkBlue)" stroke-width="3" stroke-dasharray="calc(${sw2Norm}*3*3.142) calc(3*3.142)" transform="rotate(-${90 + sw2Norm*180 + sw2Dir}, 13, 13)" />
-
-                  
-                </svg>
-                `
-              
-              dr.data[i].svg = svgStr;
-              dr.data[i].loading = false;
-            }
-          }
-        });
-      },
 
 
       updateTable: async function(inputDate, long, lat){
