@@ -144,7 +144,10 @@ export default es = {
     Los datos provienen de modelos y no de observaciones in situ.`,
     generatedCMEMS: "Generado con E.U. Copernicus Marine Service Information: ",
     datesModify: "Cambia las fechas",
-  }, 
+  },
+
+  "More data": "+ Datos",
+  "Regenerate ocean": "↻ Regenerar simulación",
 
   timeControl: {
     "timeSliderTip": "Arrastra para seleccionar la fecha",

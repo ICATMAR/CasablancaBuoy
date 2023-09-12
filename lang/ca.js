@@ -131,6 +131,9 @@ export default ca = {
     datesModify: "Canvia les dates",
   }, 
 
+  "More data": "+ Dades",
+  "Regenerate ocean": "↻ Regenerar simulació",
+
   timeControl: {
     "timeSliderTip": "Arrossega per seleccionar la data",
     "dailyMax": "Màxim diari (OBSEA)",

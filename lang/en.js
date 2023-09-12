@@ -141,6 +141,8 @@ export default en = {
     datesModify: "Change the dates",
   }, 
 
+  "More data": "+ Data",
+  "Regenerate ocean": "↻ Regenerate simulation",
 
   timeControl: {
     "timeSliderTip": "Drag to select the date",
