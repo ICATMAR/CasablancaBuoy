@@ -523,7 +523,7 @@
   
   <style scoped>
   #widgetExternalData {
-    z-index: 11;
+    z-index: 8;
     user-select: none;
 
     /* padding-top: 0px !important; */
