@@ -205,19 +205,25 @@ class OceanEntity {
     if (!this.oceanTile)
       return;
     index = index || 0;
+    let uniformParams;
+    if (index == 0)
+      uniformParams = this.oceanTile.material.uniforms.u_wave1Params;
+    else if (index == 1)
+      uniformParams = this.oceanTile.material.uniforms.u_wave2Params;
     if (varName == 'height'){
       this.swellParameters[index].Hm0 = value;
-      this.oceanTile.material.uniforms.u_wave1Params.value.y = value;// steepness, waveHeight, directionx, directionz
+      uniformParams.value.y = value;// steepness, waveHeight, directionx, directionz
     } else if (varName == 'direction'){
       this.swellParameters[index].Mdir = value;
       value += 90;
       let dirX = Math.cos(value * Math.PI / 180);
       let dirZ = Math.sin(value * Math.PI / 180);
-      this.oceanTile.material.uniforms.u_wave1Params.value.z = dirX;
-      this.oceanTile.material.uniforms.u_wave1Params.value.w = dirZ;
+      
+      uniformParams.value.z = dirX;
+      uniformParams.value.w = dirZ;
     } else if (varName == 'steepness'){
       this.swellParameters[index].Steepness = value;
-      this.oceanTile.material.uniforms.u_wave1Params.value.x = value;
+      uniformParams.value.x = value;
     }
   }
   // Update wave significant height
