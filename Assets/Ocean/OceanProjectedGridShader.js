@@ -201,7 +201,6 @@ export const OceanProjectedGridVertShader = /* glsl */ `
 
     // Normal
     vec3 normal = normalize(cross(binormal, tangent));
-    normal = (modelMatrix * vec4(normal, 0.0)).xyz; 
     v_Normal = normalize(normal.xyz); 
 
     // World position

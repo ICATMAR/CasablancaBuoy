@@ -18,7 +18,7 @@ export class OceanGrid {
     // Create grid geometry
     this.size = 5;
     // Public
-    this.gridGeom = this.createPlaneGeometry(numVertices);
+    this.gridGeom = this.createPlaneGeometry(numVertices, 20);
     this.distanceFrontCamera = this.size / Math.tan(this.cameraUser.fov*Math.PI/180); // HACK WARN TODO: CHECK THIS FORMULA
 
 
