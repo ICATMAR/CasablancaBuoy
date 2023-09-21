@@ -12,6 +12,7 @@ export class OceanGrid {
   constructor (cameraUser, numVertices) {
 
     this.cameraUser = cameraUser;
+    
     // Create camera grid
     this.cameraGrid = new THREE.PerspectiveCamera(cameraUser.fov, cameraUser.aspect, cameraUser.near, cameraUser.far);
   
@@ -21,12 +22,8 @@ export class OceanGrid {
     this.gridGeom = this.createPlaneGeometry(numVertices, 20);
     this.distanceFrontCamera = this.size / Math.tan(this.cameraUser.fov*Math.PI/180); // HACK WARN TODO: CHECK THIS FORMULA
 
-
-    // Grid material?
-
-    // Grid object - mesh
-
     // Compression on the height of the plane geometry (useful when frustrum above horizon)
+    // WARN --> IN THIS SIMULATION IT IS NOT USED, WHY?
     this.yHeightScale = 1;
 
     // Memory management
@@ -112,6 +109,7 @@ export class OceanGrid {
       this.intersectionPoint.copy(this.cameraUser.position).add(ray.multiplyScalar(t));
 
       // Check if intersection point is behind the camera
+      this.rayCameraUserToRowCentralVertex.subVectors(this.rowCentralVertex, this.cameraUser.position);
       this.rayCameraUserToIntersectPoint.subVectors(this.intersectionPoint, this.cameraUser.position);
       let dotResult = this.rayCameraUserToRowCentralVertex.dot(this.rayCameraUserToIntersectPoint);
       // Intersect point is behind the camera
@@ -124,8 +122,8 @@ export class OceanGrid {
       }
       // Intersect point is further away than camera frustrum, i.e., it is approximating the horizon
       else if (this.intersectionPoint.length() > this.cameraUser.far) {
-        // HACK, for some reason, the intersection point is on the opposite position
-        this.intersectionPoint.multiplyScalar(-1);
+        // Limit the intersection point to camera.far
+        this.intersectionPoint.normalize().multiplyScalar(this.cameraUser.far);
         this.calculateCameraGridMatrix(this.intersectionPoint, this.rowCentralVertex);
       }
       // Intersect point is in front of camera and inside frustrum
@@ -137,11 +135,12 @@ export class OceanGrid {
 
     // Rare case when the ray is looking at the horizon
     else {
+      debugger;
       // Find intersection between frustrum and XZ plane
       this.intersectionPoint.copy(this.rayCameraUserToRowCentralVertex).normalize().multiplyScalar(this.cameraUser.far); // Extend ray to end of frustrum (cameraUser.far)
       this.intersectionPoint.y = 0;
       // HACK - COUNTER HACK
-      this.intersectionPoint.multiplyScalar(-1);
+      //this.intersectionPoint.multiplyScalar(-1);
       // Calculate cameraGrid position and orientation
       this.calculateCameraGridMatrix(this.intersectionPoint, this.rowCentralVertex);
     }
@@ -151,8 +150,8 @@ export class OceanGrid {
   // Camera grid must be moved
   calculateCameraGridMatrix = function(intersectionPoint, rowCentralVertex){
     // Find camera position using row central vertex, intersection point and distance from camera to row central vertex
-    let distanceCamToVertex = this.cameraUser.position.distanceTo(this.rowCentralVertex);
-    this.camGridPosition.subVectors(intersectionPoint, rowCentralVertex).normalize().multiplyScalar(distanceCamToVertex);
+    let distanceCamToVertex = this.cameraUser.position.distanceTo(rowCentralVertex);
+    this.camGridPosition.subVectors(rowCentralVertex, intersectionPoint).normalize().multiplyScalar(distanceCamToVertex);
     this.camGridPosition.add(rowCentralVertex);
 
     this.cameraGrid.position.copy(this.camGridPosition);
@@ -205,6 +204,7 @@ export class OceanGrid {
       } 
 
       // Check if intersection point is behind the camera
+      this.rayCameraUserToRowCentralVertex.subVectors(this.oppositeRowCentralVertex, this.cameraUser.position);
       this.rayCameraUserToIntersectPoint.subVectors(this.secondIntersectionPoint, this.cameraUser.position);
       let dotResult = this.rayCameraUserToRowCentralVertex.dot(this.rayCameraUserToIntersectPoint);
       // Intersect point is behind the camera
@@ -213,12 +213,12 @@ export class OceanGrid {
         return;
       }
       else {
+        // WARNING -- > ONLY COMES HERE WHEN INTERSECTIONPOINT.LENGTH IS BIGGER THAN FAR. REMOVED THIS
         // CONTINUE SCRIPT
         // CALCULATE CAMERA LOOKAT AND oceanGrid HEIGHT (RANGE)
-        // HACK: intersect point is in the opposite position in the XZ plane?
-        intersectionPoint.multiplyScalar(-1);
         // Extend intersect point to horizon
         intersectionPoint.normalize().multiplyScalar(this.cameraUser.far);
+        
         // Calculate top and bottom central vertices of ocean grid
         this.gridTopCentralVertex.subVectors(intersectionPoint, this.cameraGrid.position).normalize().multiplyScalar(this.distanceFrontCamera).add(this.cameraGrid.position);
         this.gridBottomCentralVertex.subVectors(this.secondIntersectionPoint, this.cameraGrid.position).normalize().multiplyScalar(this.distanceFrontCamera).add(this.cameraGrid.position);
