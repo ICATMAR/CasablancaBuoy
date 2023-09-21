@@ -114,8 +114,8 @@ export const OceanProjectedGridVertShader = /* glsl */ `
     // Grid reprojection
     // Scale the vertices to fall inside the viewport
     vec3 scaledPosition = position;
-    scaledPosition.x = position.x * u_cameraViewportScale.x;
-    scaledPosition.y = position.y * u_cameraViewportScale.y;
+    scaledPosition.x = position.x * u_cameraViewportScale.x; // TODO EXTRA SCALING IF BIG WAVES?
+    scaledPosition.y = position.y * u_cameraViewportScale.y; // TODO EXTRA SCALING (* 1.5?) IF BIG WAVES?
 
     // Move vertices in front of the camera
     vec3 worldPosFrontCamera = vec3(modelMatrix * vec4(scaledPosition, 1.0));
