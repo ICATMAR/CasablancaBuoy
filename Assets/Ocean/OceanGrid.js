@@ -5,8 +5,10 @@ import * as THREE from 'three';
 // Contains the geometry and the methods to find out the cameraGrid matrix (position and orientation)
 // It updates the cameraGrid, the position of the mesh-grid and the uniforms
 // of the mesh-grid material related to the reprojection of vertices.
+// The repositioning of the camera grid was based on the tutorial http://habib.wikidot.com/projected-grid-ocean-shader-full-html-version
 export class OceanGrid {
 
+  // TODO: IS VISIBLE USING CAMERA PROJECTION
   constructor (cameraUser, numVertices) {
 
     this.cameraUser = cameraUser;
@@ -56,7 +58,7 @@ export class OceanGrid {
     console.log("Number of vertices: " + divisions * divisions * extraYFactor);
     
     // Randomize grid vertex positions to avoid aliasing
-    let vertices = gpuGridGeom.attributes.position.array;
+    let vertices = gridGeom.attributes.position.array;
     for (let i = 0; i < (vertices.length/3) - 1; i++){
       let x = vertices[i*3];
       let y = vertices[i*3 + 1];
@@ -65,7 +67,7 @@ export class OceanGrid {
         let step = 0.5 * size/divisions;
         let randNum = (Math.random() - 1) * 2;
         vertices[i*3] = x + randNum * step;
-        vertices[i*3 + 1] = y + randNum * step / extraYsubdivisionFactor; // More divisions in this axis
+        vertices[i*3 + 1] = y + randNum * step / extraYFactor; // More divisions in this axis
       }
     }
 
@@ -79,7 +81,7 @@ export class OceanGrid {
 
     // Create the central top or bottom vertex
     // When cameraUser is below XZ plane, the central vertex of the last row should be taken
-    if (cameraUser.position.y >= 0)
+    if (this.cameraUser.position.y >= 0)
       this.tempVec4.set(0, this.size/2, 0, 1); // Top row central vertex
     else{
       this.tempVec4.set(0, -this.size/2, 0, 1); // Bottom row central vertex
@@ -93,8 +95,8 @@ export class OceanGrid {
     this.cameraUser.translateZ(this.distanceFrontCamera);
     this.cameraUser.updateMatrix();
     // Homogeneous division if needed
-    if (tempVec4.w != 0)
-      tempVec4.divideScalar(tempVec4.w);
+    if (this.tempVec4.w != 0)
+      this.tempVec4.divideScalar(this.tempVec4.w);
 
     // Assing to top/bottom central vertex
     this.rowCentralVertex.set(this.tempVec4.x, this.tempVec4.y, this.tempVec4.z);
@@ -107,7 +109,7 @@ export class OceanGrid {
     if (ray.y !== 0){
       // Calculate intersection with XZ plane and ray
       let t = (0 - this.cameraUser.position.y) / ray.y;
-      this.intersectionPoint.copy(cameraUser.position).add(ray.multiplyScalar(t));
+      this.intersectionPoint.copy(this.cameraUser.position).add(ray.multiplyScalar(t));
 
       // Check if intersection point is behind the camera
       this.rayCameraUserToIntersectPoint.subVectors(this.intersectionPoint, this.cameraUser.position);
@@ -121,10 +123,10 @@ export class OceanGrid {
         this.calculateCameraGridMatrix(this.intersectionPoint, this.rowCentralVertex);
       }
       // Intersect point is further away than camera frustrum, i.e., it is approximating the horizon
-      else if (this.intersectPoint.length() > this.cameraUser.far) {
+      else if (this.intersectionPoint.length() > this.cameraUser.far) {
         // HACK, for some reason, the intersection point is on the opposite position
-        this.intersectPoint.multiplyScalar(-1);
-        this.calculateCameraGridMatrix(this.intersectPoint, this.rowCentralVertex);
+        this.intersectionPoint.multiplyScalar(-1);
+        this.calculateCameraGridMatrix(this.intersectionPoint, this.rowCentralVertex);
       }
       // Intersect point is in front of camera and inside frustrum
       else {
@@ -139,7 +141,7 @@ export class OceanGrid {
       this.intersectionPoint.copy(this.rayCameraUserToRowCentralVertex).normalize().multiplyScalar(this.cameraUser.far); // Extend ray to end of frustrum (cameraUser.far)
       this.intersectionPoint.y = 0;
       // HACK - COUNTER HACK
-      this.intersectPoint.multiplyScalar(-1);
+      this.intersectionPoint.multiplyScalar(-1);
       // Calculate cameraGrid position and orientation
       this.calculateCameraGridMatrix(this.intersectionPoint, this.rowCentralVertex);
     }
@@ -194,7 +196,7 @@ export class OceanGrid {
     if (ray.y !== 0){
       // Calculate intersection with XZ plane and ray
       let t = (0 - this.cameraUser.position.y) / ray.y;
-      this.secondIntersectionPoint.copy(cameraUser.position).add(ray.multiplyScalar(t));
+      this.secondIntersectionPoint.copy(this.cameraUser.position).add(ray.multiplyScalar(t));
 
       // Intersect point is further away than camera frustrum, i.e., it is approximating the horizon
       if (this.secondIntersectionPoint.length() > this.cameraUser.far) {
@@ -214,12 +216,12 @@ export class OceanGrid {
         // CONTINUE SCRIPT
         // CALCULATE CAMERA LOOKAT AND oceanGrid HEIGHT (RANGE)
         // HACK: intersect point is in the opposite position in the XZ plane?
-        intersectPoint.multiplyScalar(-1);
+        intersectionPoint.multiplyScalar(-1);
         // Extend intersect point to horizon
-        intersectPoint.normalize().multiplyScalar(cameraUser.far);
+        intersectionPoint.normalize().multiplyScalar(this.cameraUser.far);
         // Calculate top and bottom central vertices of ocean grid
-        this.gridTopCentralVertex.subVectors(intersectPoint, this.cameraGrid.position).normalize().multiplyScalar(this.distanceFrontCamera).add(this.cameraGrid.position);
-        this.gridBottomCentralVertex.subVectors(this.secondIntersectPoint, this.cameraGrid.position).normalize().multiplyScalar(this.distanceFrontCamera).add(this.cameraGrid.position);
+        this.gridTopCentralVertex.subVectors(intersectionPoint, this.cameraGrid.position).normalize().multiplyScalar(this.distanceFrontCamera).add(this.cameraGrid.position);
+        this.gridBottomCentralVertex.subVectors(this.secondIntersectionPoint, this.cameraGrid.position).normalize().multiplyScalar(this.distanceFrontCamera).add(this.cameraGrid.position);
         
         let yRange = this.gridBottomCentralVertex.distanceTo(this.gridTopCentralVertex);
         this.yHeightScale = yRange / 4.5; // HACK -> I believe it should be divided by this.size
@@ -266,7 +268,7 @@ export class OceanGrid {
   // PUBLIC
   update = function(oceanMesh){
     // Update camera grid
-    updateCameraGrid();
+    this.updateCameraGrid();
 
     // Move plane in front of camera
     this.updateObjectMatrixAccordingToCamera(oceanMesh, this.cameraGrid);
@@ -274,7 +276,7 @@ export class OceanGrid {
     oceanMesh.updateMatrix();
 
     // Update uniforms
-    updateUniforms(oceanMesh.material);
+    this.updateUniforms(oceanMesh.material);
 
   }
 

@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { GLTFLoader } from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
 import {OceanVertShader, OceanFragShader} from '/CasablancaBuoy/Assets/Ocean/OceanShader.js';
+
+import { OceanGrid } from '/CasablancaBuoy/Assets/Ocean/OceanGrid.js';
+import {OceanProjectedGridVertShader, OceanProjectedGridFragShader} from '/CasablancaBuoy/Assets/Ocean/OceanProjectedGridShader.js';
+
 import { OceanParameters } from '/CasablancaBuoy/Assets/Ocean/OceanParams.js';
 
 class OceanEntity {
@@ -73,6 +77,52 @@ class OceanEntity {
 		// 	<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 		// </video>
 
+
+    // ************************************************ // 
+    
+    // Create geometry
+    this.gridEntity = new OceanGrid(scene.camera, 300000);
+    
+
+    // Create ocean material
+    // Define material and shaders
+    let oceanProjectedGridMaterial = new THREE.ShaderMaterial({
+    blending: THREE.NormalBlending,
+    transparent: true,
+    // lights: true, // https://github.com/mrdoob/three.js/issues/16656
+    uniforms: {
+      u_time: { value: this.time },
+      u_fogUnderwaterColor: { value: new THREE.Vector3(scene.fog.color.r, scene.fog.color.g, scene.fog.color.b)},
+      u_fogDensity: {value: scene.fog.density},
+      u_paramsTexture: {value: paramsTexture},
+      u_imgSize: {value: new THREE.Vector2(imgSize, imgSize)},
+      u_steepnessFactor: { value: 0.2 },
+      // u_wavelength: { value: 7.0 },
+      // u_direction: { value: new THREE.Vector2(1, 0) },
+      u_wave1Params: { value: new THREE.Vector4(0.1, 0.1, 0.0, 1.0) }, // steepness, waveHeight, directionx, directionz
+      u_wave2Params: { value: new THREE.Vector4(0.05, 0.2, 0.5, 1.0) }, // steepness, waveHeight, directionx, directionz
+      u_normalTexture: {value: normalTexture}, // TODO: WHAT IF THE TEXTURE TAKES TOO LONG TO LOAD?
+
+      // Projected grid parameters
+      u_cameraModelMatrix: {value: this.gridEntity.cameraGrid.matrix},
+      u_cameraGridPosition: {value: this.gridEntity.cameraGrid.position},
+      u_cameraViewportScale: {value: new THREE.Vector2(1, 1)},
+    },
+    vertexShader: OceanProjectedGridVertShader,
+    fragmentShader: OceanProjectedGridFragShader,
+  });
+
+  oceanProjectedGridMaterial.side = THREE.DoubleSide;
+
+  // Create mesh
+  this.oceanTile = new THREE.Mesh( this.gridEntity.gridGeom, oceanProjectedGridMaterial );
+  this.oceanTile.frustrumCulled = false; // DELETE AT SOME POINT
+
+  scene.add(this.oceanTile);
+
+  this.isLoaded = true;
+// ************************************************ // 
+  return
     
 
     // Load ocean mesh
@@ -347,84 +397,10 @@ class OceanEntity {
 
 
 
-// TODO: improve the HTML interface and javascript architecture
-getWaveParametersHTML = function(id) {
-  // // Get wave height from slider
-  // let el = document.getElementById("sliderWaveHeight" + id);
-  // el.addEventListener("change", (ee) => {
-  //   let waveHeight = parseFloat(ee.target.value);
-  //   this.customWaveParameters[parseInt(id) - 1][1] = parseFloat(ee.target.value);
-  //   // Info
-  //   let el = document.getElementById("infoWaveHeight" + id);
-  //   el.innerHTML = waveHeight + " m";
-
-  // });
-  // let waveHeight = parseFloat(el.value);
-  // el = document.getElementById("infoWaveHeight" + id);
-  // el.innerHTML = waveHeight + " m";
-
-
-  // // Get wind direction from slider
-  // el = document.getElementById("sliderSwellDirection" + id);
-  // el.addEventListener("change", (ee) => {
-  //   let swellDir = parseFloat(ee.target.value);
-  //   swellDir = -swellDir - 90;
-  //   let dirZ = Math.cos(swellDir * Math.PI / 180);
-  //   let dirX = Math.sin(swellDir * Math.PI / 180);
-  //   this.customWaveParameters[parseInt(id) - 1][2] = dirX;
-  //   this.customWaveParameters[parseInt(id) - 1][3] = dirZ;
-  //   // Info
-  //   let el = document.getElementById("infoSwellDirection" + id);
-  //   el.innerHTML = parseFloat(ee.target.value) + " degrees";
-  // });
-  // let swellDir = parseFloat(el.value);
-  // el = document.getElementById("infoSwellDirection" + id);
-  // el.innerHTML = swellDir + " degrees";
-  
-
-  // // Direction correction
-  // swellDir = -swellDir - 90;
-  // let dirZ = Math.cos(swellDir * Math.PI / 180);
-  // let dirX = Math.sin(swellDir * Math.PI / 180);
-
-
-  // // Get steepness from slider
-  // el = document.getElementById("sliderWaveSteepness" + id);
-  // let steepness = parseFloat(el.value);
-  // el.addEventListener("change", (ee) => {
-  //   let steepness = parseFloat(ee.target.value);
-  //   this.customWaveParameters[parseInt(id) - 1][0] = steepness;
-  //   // Info
-  //   let el = document.getElementById("infoWaveSteepness" + id);
-  //   el.innerHTML = steepness + " steep";
-  // });
-  // el = document.getElementById("infoWaveSteepness" + id);
-  // el.innerHTML = steepness + " steep";
-  
-
-
-  // return [steepness, waveHeight, dirX, dirZ];
-}
 
 
 
-getOceanParameters = function(){
-{/* <input id="seaSteepness" type="range" max="1" min="0" value="1" step="0.01" /> */}
-    // <div id="infoSeaSteepness"></div>
-  // Get sea steepness factor slider
-  // let el = document.getElementById("sliderOceanSteepness");
-  // el.addEventListener("change", (ee) =>{
-  //   let steepFactor = parseFloat(ee.target.value);
-  //   this.oceanSteepness = steepFactor;
-  //   let el = document.getElementById("infoSeaSteepness");
-  //   el.innerHTML = steepFactor;
-  // })
-  // let steepFactor = parseFloat(el.value);
-  // el = document.getElementById("infoSeaSteepness");
-  // el.innerHTML = steepFactor;
 
-  // return steepFactor;
-}
 
 
 
@@ -441,6 +417,8 @@ getOceanParameters = function(){
     if (this.oceanTile != undefined) {
       let oceanTile = this.oceanTile;
       oceanTile.material.uniforms.u_time.value = this.time; // dt
+
+      this.gridEntity.update(oceanTile);
 
       // let oceanSteepness = this.oceanSteepness;
       // oceanTile.material.uniforms.u_steepnessFactor.value = oceanSteepness;
