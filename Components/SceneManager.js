@@ -70,8 +70,8 @@ class SceneManager{
     let stats = new Stats();
     this.stats = stats;
     document.body.appendChild(stats.dom);
-    stats.dom.style.right = '0px';
-    stats.dom.style.left = null;
+    stats.dom.style.right = null;
+    stats.dom.style.left = '0px';
     stats.isVisible = false;
     stats.showPanel(false);
     

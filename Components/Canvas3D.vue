@@ -38,7 +38,7 @@ export default {
     window.eventBus.on('InstrumentsMenu_baseButtonClicked', () => {
       this.sceneManager.focusOnBase();
     });
-    window.eventBus.on('InstrumentsMenu_fpsButtonClicked', () => {
+    window.eventBus.on('AppManager_fpsButtonClicked', () => {
       this.sceneManager.showHideFPS();
     });
 

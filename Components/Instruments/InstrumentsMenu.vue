@@ -73,7 +73,7 @@ export default {
     },
     // Show/hide FPS panel
     fpsButtonClicked: function(e){
-      window.eventBus.emit('InstrumentsMenu_fpsButtonClicked')
+      window.eventBus.emit('AppManager_fpsButtonClicked')
     }
   },
   components: {

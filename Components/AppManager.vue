@@ -34,6 +34,8 @@
 
     <!-- RIGHT ICONS -->
     <div class="top-right-icons-container">
+      <!-- FPS button -->
+      <div class="clickable icon-str" @click="fpsClicked">fps</div>
       <!-- github button -->
       <a href="https://github.com/ICATMAR/CasablancaBuoy" :title="$i18n.t('githubButton')" target="_blank">
         <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true" class="clickable github-logo">
@@ -86,6 +88,9 @@ export default {
     //onclick: function(e){},
     infoIconClicked: function(){
       window.eventBus.emit('OpenCentralPanel', 'infoPanel');
+    },
+    fpsClicked: function() {
+      window.eventBus.emit('AppManager_fpsButtonClicked');
     }
   },
   components: {
