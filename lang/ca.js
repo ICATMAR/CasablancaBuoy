@@ -70,24 +70,24 @@ export default ca = {
 
   infoPanel: {
     title: "Sobre l'aplicació",
-    p1: `Aquesta aplicació és una simulació en 3D de les condicions meteorològiques i oceanogràfiques 
-    de la boia instal·lada al costat de la plataforma petrolífera fora d'operació Casablanca.
-     L'objectiu d'aquesta aplicació és transferir el coneixement i la informació adquirida 
-    per la boia. Aquesta aplicació està sent desenvolupada per l'
-        `,
+    p1: `Aquesta aplicació és una simulació en 3D de les condicions meteorològiques i oceanogràfiques de 
+    la boia "Casablanca". La boia està instal·lada a prop de la plataforma petrolífera 
+    "Casablanca" de REPSOL. L'objectiu de aplicació és transferir el coneixement i la 
+    informació adquirida per la boia. Aquesta aplicació està sent desenvolupada per l'`,
     ICATMAR: 'ICATMAR (Institut Català de Recerca per la Governança del Mar)',
+    p1_2: ` amb l'objectiu de transferir la informació adquirida per la boia. El codi obert es pot trobar al `,
+
     SARTI_UPC: 'grup SARTI de la Universitat Politècnica de Catalunya (UPC)',
     BlueNetCat: 'Xarxa Marítima de Catalunya (BlueNetCat)',
-    p1_2: `. L'aplicació va ser desenvolupada dins de l'eix de Dades de la `,
     p1_3: `2020-2022 amb la col·laboració del `,
     p1_4: `. Agraïments sincers al Grup de les Tecnologies de la Interacció (GTI) de la Universitat Pompeu Fabra pel
     suport tècnic i a l'Emilio García per les consultes teòriques. El codi de l'aplicació es pot trobar al `,
     github: `repositori github.`,
 
-    aboutObsea: `Sobre Casablanca`,
-    p2: `La plataforma petrolífera Casablanca de Repsol va deixar de ser operativa l'any 2021, després de més
-    de 40 anys d'activitat. Ara mateix es fa servir de suport per a projectes de recerca entre d'altres. 
-    La instal·lació de la boia oceanogràfica es va fer a principis de Juliol del 2023.`,
+    about: `Sobre Casablanca`,
+    p2: `La plataforma d'extracció de petroli "Casablanca" de REPSOL va deixar de ser operativa l'any 2021, 
+    després de més de 40 anys d'activitat. S'ha col·laborat amb REPSOL amb l'instal·lació de la boia oceanogràfica.
+    El desplegament es va fer a principis de Juliol del 2023.`,
 
 
     contact: "Contacte",
@@ -95,8 +95,10 @@ export default ca = {
       Per a consultes sobre les dades, poseu-vos en contacte amb l'Emili García (emilio at icm.csic.es ).`,
 
     funding: "Finançament",
-    p4: ` està finançada per CCCC`,
-
+    p4: `El codi parteix d'una aplicació semblant desenvolupada dins de l'eix de Dades de la `,
+    p4_1: ` que va ser cofinanciada per la Generalitat de Catalunya i els fons FEDER (ref: 2018 XARDI 00005, 2020-2022) amb la 
+    col·laboració del `,
+    p4_2: `. La implementació final està finançada l'`,
   },
 
 
