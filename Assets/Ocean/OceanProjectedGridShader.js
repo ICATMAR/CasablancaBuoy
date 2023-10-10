@@ -159,7 +159,7 @@ export const OceanProjectedGridVertShader = /* glsl */ `
 
 
     // Gerstner Waves
-    modPos += GerstnerWave(u_wave1Params, intersectionPoint, tangent, binormal); 
+    modPos += GerstnerWave(u_wave1Params, modPos, tangent, binormal); 
     // Attenuation
     modPos.y *= distanceFactor;
     tangent.x /= distanceFactor;
@@ -167,7 +167,7 @@ export const OceanProjectedGridVertShader = /* glsl */ `
     tangent = normalize(tangent);
     binormal = normalize(binormal);
 
-    modPos += GerstnerWave(u_wave2Params, intersectionPoint, tangent, binormal);
+    modPos += GerstnerWave(u_wave2Params, modPos, tangent, binormal);
     // Attenuation
     modPos.y *= distanceFactor;
     tangent.x /= distanceFactor;
@@ -188,7 +188,7 @@ export const OceanProjectedGridVertShader = /* glsl */ `
         // Direction
         params.b = params.b - 0.5;
         params.a = params.a - 0.5;
-        modPos += GerstnerWave(params, intersectionPoint, tangent, binormal);
+        modPos += GerstnerWave(params, modPos, tangent, binormal);
         // Attenuation
         modPos.y *= distanceFactor;
         tangent.x /= distanceFactor;
