@@ -411,7 +411,7 @@ class OceanEntity {
 
   // Update
   update(dt){
-    this.time += dt*1.2;
+    this.time += dt;
 
     // Update shader parameters
     if (this.oceanTile != undefined) {
