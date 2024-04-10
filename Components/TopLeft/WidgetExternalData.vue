@@ -242,9 +242,81 @@
       getData: async function(date, lat, long){
         let totalDataRows = this.dataRows.length;
         let count = 0;
+
+        this.dataValues = {
+          // Height
+          "Wave significant height": {
+            value: 0.9,
+            valueStr: "0.9",
+            loading: false,
+            units: "m",
+          },
+          "Wind wave significant height": {
+            value: 0.2,
+            valueStr: "0.2",
+            loading: false,
+            units: "m",
+          },
+          "Primary swell wave significant height": {
+            value: 0.7,
+            valueStr: "0.7",
+            loading: false,
+            units: "m",
+          },
+          "Secondary swell wave significant height": {
+            value: 0.2,
+            valueStr: "0.2",
+            loading: false,
+            units: "m",
+          },
+
+          // Period
+          "Wave period": {
+            value: 4.1,
+            valueStr: "4.1",
+            loading: false,
+            units: "s",
+          },
+
+
+          "Wave direction": {
+            value: 93,
+            valueStr: "93",
+            loading: false,
+            units: "º",
+            direction: true
+          },
+          "Wind wave direction": {
+            value: 166,
+            valueStr: "166",
+            loading: false,
+            units: "º",
+            direction: true
+          },
+          "Primary swell wave direction": {
+            value: 65,
+            valueStr: "65",
+            loading: false,
+            units: "º",
+            direction: true
+          },
+          "Secondary swell wave direction": {
+            value: 102,
+            valueStr: "102",
+            loading: false,
+            units: "º",
+            direction: true
+          },
+        }
+
+        this.allPromisesFinished();
+        return;
+
         // Get data
         this.dataRows.forEach((rr, rIndex) => {
           let layerName = rr.direction ? rr.layer : rr.name;
+
+          debugger;
           // Icon row does not load data
           if (layerName !== undefined){
             this.dataRetriever.getDataAtPoint(layerName, date.toISOString(), lat, long, 'h', rr.direction)
