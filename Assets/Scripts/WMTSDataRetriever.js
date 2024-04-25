@@ -77,6 +77,33 @@ dataTypes = {
       // CRS instead of SRS
     },
   },
+  "Sea bottom temperature": {
+    // Reanalysis comes from a different base URL. Only monthly and daily
+    // 'https://my.cmems-du.eu/thredds/wms/med-cmcc-tem-rean-m?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities'
+    // https://my.cmems-du.eu/thredds/wms/med-cmcc-tem-rean-d?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
+    name: 'Sea bottom temperature',
+    altNames: ['Sea bottom temperature', 'SBT'],
+    doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
+    url: 'med-cmcc-tem-rean', // Forecast has different format
+    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
+    version: '1.1.1',
+    layerName: 'bottomT',
+    timeScales: ['d', 'd3', 'm'], // In reanalysis, not hourly available: 'h', 'h3', 'h6', 'h12', 
+    range: [10, 25],
+    units: 'ºC',
+    style: "boxfill/occam",
+    forecast: {
+      url: 'cmems_mod_med_phy-tem_anfc_4.2km_P',
+      timeScales: ['h', 'd', 'm'],//['1D-m', '1M-m', 'T1H-m', 'T1HTS-m', 'T15M-i'],
+      timeScaleKeys: {'h': 'T1H-m', 'd': '1D-m', 'm': '1M-m'},
+      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
+      version: '1.1.1',
+      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS7",
+      timeScaleCorrection:
+        {h: {min: 30}, d: {min: 0, h: 12}},
+      // CRS instead of SRS
+    },
+  },
   "Sea temperature anomaly": {
     // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=6&tilerow=23&tilecol=31&layer=SST_MED_SST_L4_NRT_OBSERVATIONS_010_004/SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b/sst_anomaly
     // https://wmts.marine.copernicus.eu/teroWmts/SST_MED_SST_L4_NRT_OBSERVATIONS_010_004/SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b?request=GetCapabilities&service=WMS
@@ -103,33 +130,6 @@ dataTypes = {
     //   timeScaleCorrection:
     //     {d: {min: 0, h: 12}},
     // }
-  },
-  "Sea bottom temperature": {
-    // Reanalysis comes from a different base URL. Only monthly and daily
-    // 'https://my.cmems-du.eu/thredds/wms/med-cmcc-tem-rean-m?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities'
-    // https://my.cmems-du.eu/thredds/wms/med-cmcc-tem-rean-d?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
-    name: 'Sea bottom temperature',
-    altNames: ['Sea bottom temperature', 'SBT'],
-    doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS6",
-    url: 'med-cmcc-tem-rean', // Forecast has different format
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
-    layerName: 'bottomT',
-    timeScales: ['d', 'd3', 'm'], // In reanalysis, not hourly available: 'h', 'h3', 'h6', 'h12', 
-    range: [10, 25],
-    units: 'ºC',
-    style: "boxfill/occam",
-    forecast: {
-      url: 'cmems_mod_med_phy-tem_anfc_4.2km_P',
-      timeScales: ['h', 'd', 'm'],//['1D-m', '1M-m', 'T1H-m', 'T1HTS-m', 'T15M-i'],
-      timeScaleKeys: {'h': 'T1H-m', 'd': '1D-m', 'm': '1M-m'},
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
-      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS7",
-      timeScaleCorrection:
-        {h: {min: 30}, d: {min: 0, h: 12}},
-      // CRS instead of SRS
-    },
   },
   "Salinity": {
     // https://my.cmems-du.eu/thredds/wms/med-cmcc-sal-rean-m?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
