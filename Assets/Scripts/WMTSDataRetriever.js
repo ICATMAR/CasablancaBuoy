@@ -94,15 +94,17 @@ dataTypes = {
     units: 'ºC',
     style: "boxfill/occam",
     forecast: {
-      url: 'cmems_mod_med_phy-tem_anfc_4.2km_P',
+      datasetURL: 'cmems_mod_med_phy-tem_anfc_4.2km{timeScale}-m_202311',
+      productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
+      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
       timeScales: ['h', 'd', 'm'],//['1D-m', '1M-m', 'T1H-m', 'T1HTS-m', 'T15M-i'],
-      timeScaleKeys: {'h': 'T1H-m', 'd': '1D-m', 'm': '1M-m'},
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
+      timeScaleKeys: {'h': '-3D_PT1H', 'd': '_P1D', 'm': '_P1M'},//-3D_PT1H
+      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
       version: '1.0.0',
       doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS7",
-      // timeScaleCorrection:
-      //   {h: {min: 30}, d: {min: 0, h: 12}},
-      // // CRS instead of SRS
+      // timeScaleCorrection: // TODO BY SCRIPT??
+        // {h: {min: 30}, d: {min: 0, h: 12}},
+      // CRS instead of SRS
     },
   },
   "Sea temperature anomaly": {
