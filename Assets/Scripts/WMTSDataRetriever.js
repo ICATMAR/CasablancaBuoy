@@ -54,7 +54,7 @@ dataTypes = {
     name: 'Sea temperature',
     altNames: ['Sea temperature', 'SST', 'Sea Surface Temperature'],
     doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
-    datasetURL: 'med-cmcc-tem-rean', // Forecast has different format,
+    datasetURL: 'med-cmcc-tem-rean-{timeScale}_202012', // Forecast has different format,
     productURL: 'MEDSEA_MULTIYEAR_PHY_006_004/',
     domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
     version: '1.0.0',
@@ -79,16 +79,17 @@ dataTypes = {
   },
   "Sea bottom temperature": {
     // Reanalysis comes from a different base URL. Only monthly and daily
-    // 'https://my.cmems-du.eu/thredds/wms/med-cmcc-tem-rean-m?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities'
-    // https://my.cmems-du.eu/thredds/wms/med-cmcc-tem-rean-d?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
+    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-tem-rean-m_202012?request=GetCapabilities&service=WMS
+    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=6&tilerow=23&tilecol=33&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-tem-rean-m_202012/bottomT
     name: 'Sea bottom temperature',
     altNames: ['Sea bottom temperature', 'SBT'],
     doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
-    url: 'med-cmcc-tem-rean', // Forecast has different format
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
+    datasetURL: 'med-cmcc-tem-rean-{timeScale}_202012', // Forecast has different format
+    productURL: 'MEDSEA_MULTIYEAR_PHY_006_004/',
+    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
+    version: '1.0.0',
     layerName: 'bottomT',
-    timeScales: ['d', 'd3', 'm'], // In reanalysis, not hourly available: 'h', 'h3', 'h6', 'h12', 
+    timeScales: ['d', 'm'], // In reanalysis, not hourly available: 'h', 'h3', 'h6', 'h12', 
     range: [10, 25],
     units: 'ºC',
     style: "boxfill/occam",
@@ -97,11 +98,11 @@ dataTypes = {
       timeScales: ['h', 'd', 'm'],//['1D-m', '1M-m', 'T1H-m', 'T1HTS-m', 'T15M-i'],
       timeScaleKeys: {'h': 'T1H-m', 'd': '1D-m', 'm': '1M-m'},
       domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
+      version: '1.0.0',
       doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS7",
-      timeScaleCorrection:
-        {h: {min: 30}, d: {min: 0, h: 12}},
-      // CRS instead of SRS
+      // timeScaleCorrection:
+      //   {h: {min: 30}, d: {min: 0, h: 12}},
+      // // CRS instead of SRS
     },
   },
   "Sea temperature anomaly": {
