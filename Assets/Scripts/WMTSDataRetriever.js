@@ -1,5 +1,6 @@
 //import preLoadedDataTypes from "/CasablancaBuoy/data/WMSDataTypes.js";
 
+// To test and check the service you an use https://www.arcgis.com/home/webmap/viewer.html and press Modify map
 
 // Scripts that obtain data from the CMEMS WMS API
 export class WMTSDataRetriever{
@@ -10,6 +11,7 @@ activeRequests = [];
 // DATA TYPES ARE STORED ELSEWHERE (WMTSDataTypes.js). If you modify them, reload capabilities in the constructor and store in WMTSDataTypes.js
 dataTypes = {
   "Sea surface velocity": {
+    // CMEMS DOES NOT PROVIDE NOW THE MAGNITUDE, ONLY UO AND VO. I ASKED IF THEY ARE GOING TO ADD IT
     // http://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset={TileMatrixSet}&style={Style}&tilematrix={TileMatrix}&tilerow={TileRow}&tilecol={TileCol}&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-cur-rean-d_202012/uo"
     // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:balance&tilematrix=5&tilerow=12&tilecol=18&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-cur-rean-h_202012/vo
     // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-cur-rean-h_202012?request=GetCapabilities&service=WMS
@@ -17,8 +19,9 @@ dataTypes = {
     name: 'Sea surface velocity',
     altNames: ['Sea surface velocity', 'Current', 'Sea velocity'],
     doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
-    url: 'med-cmcc-cur-rean-{timeScale}_202012',
-    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/',
+    datasetURL: 'med-cmcc-cur-rean-{timeScale}_202012',
+    productURL: 'MEDSEA_MULTIYEAR_PHY_006_004/',
+    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
     version: '1.0.0',
     layerName: '?? asked copernicus', //? layer in WMTS seems to be PRODUCT/DATASET/LAYER
     timeScales: ['h', 'd', 'm'],
@@ -32,10 +35,11 @@ dataTypes = {
     },
     forecast: {
       // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:balance&tilematrix=5&tilerow=12&tilecol=16&layer=MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-cur_anfc_4.2km-2D_PT1H-m_202311/uo
-      url: 'cmems_mod_med_phy-cur_anfc_4.2km{timeScale}_202311',
+      datasetURL: 'cmems_mod_med_phy-cur_anfc_4.2km{timeScale}_202311',
+      productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
+      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
       timeScales: ['15min', 'h', 'd', 'm'],
       timeScaleKeys: {'15min': '_PT15M-i','h': '-3D_PT1H-m', 'd': '_P1D-m', 'm': '_P1M-m'}, //https://data.marine.copernicus.eu/product/MEDSEA_ANALYSISFORECAST_PHY_006_013/services
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
       version: '1.0.0',
       doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8",
       //timeScaleCorrection: // TODO BY SCRIPT??
@@ -45,55 +49,60 @@ dataTypes = {
   },
   "Sea temperature": {
     // Reanalysis comes from a different base URL. Only monthly and daily
-    // 'https://my.cmems-du.eu/thredds/wms/med-cmcc-tem-rean-m?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities'
-    // https://my.cmems-du.eu/thredds/wms/med-cmcc-tem-rean-d?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
+    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-tem-rean-d_202012?request=GetCapabilities&service=WMS
+    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=5&tilerow=12&tilecol=16&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-tem-rean-d_202012/thetao
     name: 'Sea temperature',
     altNames: ['Sea temperature', 'SST', 'Sea Surface Temperature'],
     doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
-    url: 'med-cmcc-tem-rean', // Forecast has different format,
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
+    datasetURL: 'med-cmcc-tem-rean', // Forecast has different format,
+    productURL: 'MEDSEA_MULTIYEAR_PHY_006_004/',
+    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
+    version: '1.0.0',
     layerName: 'thetao',
-    timeScales: ['d', 'd3', 'm'], // In reanalysis, not hourly available: 'h', 'h3', 'h6', 'h12', 
+    timeScales: ['d', 'm'], // In reanalysis, not hourly available: 'h', 'h3', 'h6', 'h12', 
     range: [10, 35],
     units: 'ºC',
     style: "boxfill/occam",
     forecast: {
-      url: 'cmems_mod_med_phy-tem_anfc_4.2km_P',
+      datasetURL: 'cmems_mod_med_phy-tem_anfc_4.2km{timeScale}-m_202311',
+      productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
+      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
       timeScales: ['h', 'd', 'm'],//['1D-m', '1M-m', 'T1H-m', 'T1HTS-m', 'T15M-i'],
-      timeScaleKeys: {'h': 'T1H-m', 'd': '1D-m', 'm': '1M-m'},
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
+      timeScaleKeys: {'h': '-3D_PT1H', 'd': '_P1D', 'm': '_P1M'},//-3D_PT1H
+      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
+      version: '1.0.0',
       doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS7",
-      timeScaleCorrection:
-        {h: {min: 30}, d: {min: 0, h: 12}},
+      // timeScaleCorrection: // TODO BY SCRIPT??
+        // {h: {min: 30}, d: {min: 0, h: 12}},
       // CRS instead of SRS
     },
   },
   "Sea temperature anomaly": {
-    // https://nrt.cmems-du.eu/thredds/wms/SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=TRUE&LAYERS=sst_anomaly&STYLES=boxfill/ncview&LOGSCALE=false&SRS=EPSG:4326&BBOX=2.8125,38.671875,3.515625,39.375&WIDTH=256&HEIGHT=256&COLORSCALERANGE=-5,5&BELOWMINCOLOR=0x0000ff&ABOVEMAXCOLOR=0xff0001&TIME=2022-08-24T00:00:00.000Z
-    // https://nrt.cmems-du.eu/thredds/wms/SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
+    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=6&tilerow=23&tilecol=31&layer=SST_MED_SST_L4_NRT_OBSERVATIONS_010_004/SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b/sst_anomaly
+    // https://wmts.marine.copernicus.eu/teroWmts/SST_MED_SST_L4_NRT_OBSERVATIONS_010_004/SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b?request=GetCapabilities&service=WMS
     name: 'Sea temperature anomaly',
     altNames: ['Sea temperature anomaly', 'Sea surface temperature anomaly', 'SSTA'],
     doi: "https://doi.org/10.48670/moi-00172",
-    url: 'SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d', 
-    domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-    version: '1.3.0',
-    urlLocked: true,
+    datasetURL: 'SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b',
+    productURL: 'SST_MED_SST_L4_NRT_OBSERVATIONS_010_004', 
+    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
     layerName: 'sst_anomaly',
+    version: '1.0.0',
+    urlLocked: true,
     timeScales: ['d'], 
     range: [-5, 5],
     units: 'ºC',
     style: "boxfill/redblue",
-    forecast: {
-      url: 'SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d', 
-      timeScales: ['d'],
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.3.0',
-      doi: "https://doi.org/10.48670/moi-00172",
-      timeScaleCorrection:
-        {d: {min: 0, h: 12}},
-    }
+    // TODO: If there is no forecast, try the service anyway
+    // forecast: {
+    //   url: 'SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d', 
+    //   timeScales: ['d'],
+    //   domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
+    //   version: '1.3.0',
+    //   doi: "https://doi.org/10.48670/moi-00172",
+    //   timeScaleCorrection:
+    //     {d: {min: 0, h: 12}},
+    // }
   },
   "Sea bottom temperature": {
     // Reanalysis comes from a different base URL. Only monthly and daily
