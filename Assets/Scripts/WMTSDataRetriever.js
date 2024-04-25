@@ -32,14 +32,14 @@ dataTypes = {
     },
     forecast: {
       // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:balance&tilematrix=5&tilerow=12&tilecol=16&layer=MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-cur_anfc_4.2km-2D_PT1H-m_202311/uo
-      url: 'cmems_mod_med_phy-cur_anfc_4.2km_P',
-      timeScales: ['h', 'd', 'm'],//['1D-m', '1M-m', 'T1H-m', 'T1HTS-m', 'T15M-i'],
-      timeScaleKeys: {'h': 'T1H-m', 'd': '1D-m', 'm': '1M-m'},
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
+      url: 'cmems_mod_med_phy-cur_anfc_4.2km{timeScale}_202311',
+      timeScales: ['15min', 'h', 'd', 'm'],
+      timeScaleKeys: {'15min': '_PT15M-i','h': '-3D_PT1H-m', 'd': '_P1D-m', 'm': '_P1M-m'}, //https://data.marine.copernicus.eu/product/MEDSEA_ANALYSISFORECAST_PHY_006_013/services
+      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
+      version: '1.0.0',
       doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8",
-      timeScaleCorrection:
-        {h: {min: 30},d: {min: 0, h: 12}},
+      //timeScaleCorrection: // TODO BY SCRIPT??
+      //  {h: {min: 30},d: {min: 0, h: 12}},
       // CRS instead of SRS
     },
   },
