@@ -22,7 +22,7 @@ export class WMTSDataRetriever {
       wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105?request=GetCapabilities&service=WMS',
       doi: "https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012",
       timeScales: ['h'],
-      datasets: ['VHM0', 'VHM0_WW', 'VHM0_SW1', 'VHM0_SW2',
+      dataSets: ['VHM0', 'VHM0_WW', 'VHM0_SW1', 'VHM0_SW2',
                 'VTM02', 'VTM01_WW', 'VTM01_SW1', 'VTM01_SW2',
                 'VMDR', 'VMDR_WW', 'VMDR_SW1', 'VMDR_SW2'],
     },
@@ -40,7 +40,7 @@ export class WMTSDataRetriever {
       wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017?request=GetCapabilities&service=WMS',
       doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
       timeScales: ['h'],
-      datasets: ['VHM0', 'VHM0_WW', 'VHM0_SW1', 'VHM0_SW2',
+      dataSets: ['VHM0', 'VHM0_WW', 'VHM0_SW1', 'VHM0_SW2',
                 'VTM02', 'VTM01_WW', 'VTM01_SW1', 'VTM01_SW2',
                 'VMDR', 'VMDR_WW', 'VMDR_SW1', 'VMDR_SW2'],
     },
@@ -55,7 +55,7 @@ export class WMTSDataRetriever {
       wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004?request=GetCapabilities&service=WMS',
       doi: 'https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1I',
       timeScales: ['h', 'd', 'm'],
-      datasets: ['uo', 'vo', 'wo', 'so', 'thetao', 'bottomT']
+      dataSets: ['uo', 'vo', 'wo', 'so', 'thetao', 'bottomT']
     },
     "Mediterranean Sea Physics Analysis and Forecast": {
       /*
@@ -68,7 +68,7 @@ export class WMTSDataRetriever {
       wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_PHY_006_013?request=GetCapabilities&service=WMS',
       doi: 'https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8',
       timeScales: ['h', 'd', 'm'],
-      datasets: ['uo', 'vo', 'wo', 'so', 'thetao', 'bottomT']
+      dataSets: ['uo', 'vo', 'wo', 'so', 'thetao', 'bottomT']
     },
   };
 
@@ -156,7 +156,7 @@ export class WMTSDataRetriever {
 
 
 
-  dataSets = {};
+  dataSets = [];
   
 
 
@@ -221,6 +221,7 @@ export class WMTSDataRetriever {
       dataSet.id = id;
       dataSet.name = ll.querySelector('Name').textContent;
       dataSet.unit = dataSet.unit || ll.querySelector('Unit').textContent;
+      if (dataSet.unit == 'degree'){ dataSet.unit = 'º'; dataSet.range = [0, 360]; }
       // Assign product properties
       dataSet.doi = product.doi;
       dataSet.productName = product.name;
@@ -257,10 +258,10 @@ export class WMTSDataRetriever {
             if (new Date(endTmst) < new Date())
               dataSet.endTmst = endTmst;
             let timeInterval = timeStr.split('/')[2];
-            this.printLog(timeStr);
             dataSet.timeScale = timeInterval == 'PT1H' ? 'h' : timeInterval == 'P1D' ? 'd' : '';
-            if (dataSet.timeScale == '')
-              debugger;
+            if (dataSet.timeScale == ''){
+              this.printLog("Skipped " + dataSet.name + " at " + timeInterval)
+            }
           } else {
             // Calculate time interval
             let timeDiff = Math.abs(new Date(values[0].textContent).getTime() - new Date(values[1].textContent).getTime()) / (1000*60*60*24);
@@ -268,7 +269,8 @@ export class WMTSDataRetriever {
             if (timeDiff > 25 && timeDiff < 32)
               dataSet.timeScale = 'm';
             else {
-              debugger;
+              dataSet.timeScale = '';
+              this.printLog("Skipped " + dataSet.name + " at " + timeDiff + " days")
             }
             // Store dates
             dataSet.dates = [];
@@ -283,13 +285,20 @@ export class WMTSDataRetriever {
             let endTmst = dataSet.dates[dataSet.dates.length - 1];
             if (new Date(endTmst) < new Date())
               dataSet.endTmst = endTmst;
-            debugger;
           }
           
         }
       });
 
-
+      
+      if (dataSet.timeScale != ''){
+        if (product.dataSets.includes(dataSet.id)){
+          this.dataSets.push(dataSet);
+          this.printLog(dataSet.name +  " at " + dataSet.timeScale);
+        }
+      }
+      
+      
       
       
       
