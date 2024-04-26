@@ -70,6 +70,20 @@ export class WMTSDataRetriever {
       timeScales: ['h', 'd', 'm'],
       dataSets: ['uo', 'vo', 'wo', 'so', 'thetao', 'bottomT']
     },
+    "Mediterranean Sea Biogechemistry Reanalysis": {
+      /*
+      Available datasets 
+        nppv, o2 - Primary Production and Oxygen
+        dissic, ph, talk - Dissolved Inorganic Carbon, pH and Alkalinity
+        fpco2, spco2 - Surface partial pressure of CO2 and Surface CO2 flux
+        nh4, no3, po4 - Nitrate, Phosphate and Ammonium
+        chl, phyc - Phytoplankton Carbon Biomass and Chlorophyll
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_BGC_006_008?request=GetCapabilities&service=WMS',
+      doi: 'https://doi.org/10.25423/cmcc/medsea_multiyear_bgc_006_008_medbfm3',
+      timeScales: ['d', 'm'],
+      dataSets: ['chl']
+    },
   };
 
   // Custom dataType definitions
@@ -151,6 +165,11 @@ export class WMTSDataRetriever {
       shortName: 'Salinity',
       range: [32, 41],
       unit: '‰',
+    },
+    'chl': {
+      shortName: 'Chlorophyll',
+      range: [0.01, 0.3],
+      unit: 'mg/m³',
     }
   }
 
@@ -290,7 +309,7 @@ export class WMTSDataRetriever {
         }
       });
 
-      
+      // Store selected dataSets (defined in products variable);
       if (dataSet.timeScale != ''){
         if (product.dataSets.includes(dataSet.id)){
           this.dataSets.push(dataSet);
