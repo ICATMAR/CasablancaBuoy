@@ -166,16 +166,18 @@ dataTypes = {
     },
   },
   "Wave significant height": {
-    // https://my.cmems-du.eu/thredds/wms/med-hcmr-wav-rean-h?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
-    // https://my.cmems-du.eu/thredds/wms/med-hcmr-wav-rean-h?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=TRUE&LAYERS=VHM0&STYLES=boxfill/ncview&LOGSCALE=false&SRS=EPSG:4326&BBOX=-22.5,22.5,0,45&WIDTH=512&HEIGHT=512&COLORSCALERANGE=0,10&BELOWMINCOLOR=0x0000ff&ABOVEMAXCOLOR=0xff0001&TIME=2007-02-20T22:00:00.000Z
+    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105?request=GetCapabilities&service=WMS
+    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=6&tilerow=23&tilecol=33&layer=MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105/VHM0
     name: 'Wave significant height',
     altNames: ['Wave significant height', 'Waves', 'WSH'],
-    doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4', //'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3',
-    url: 'med-hcmr-wav-rean',// Forecast 'med-hcmr-wav-an-fc',
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
+    doi: 'https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012',
+    datasetURL: 'med-hcmr-wav-rean-h_202105', // Forecast has different format
+    productURL: 'MEDSEA_MULTIYEAR_WAV_006_012/',
+    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
+    version: '1.0.0',
     layerName: 'VHM0', // 'VMDR' for direction in degrees
-    timeScales: ['h', 'h3', 'h6', 'h12'],
+    timeScales: ['h'],
+    urlLocked: true,
     range: [0, 6],
     units: 'm',
     style: "boxfill/alg",//occam_pastel-30",
@@ -185,22 +187,29 @@ dataTypes = {
       type: 'wave'
     },
     forecast: {
-      url: 'med-hcmr-wav-an-fc',
+      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017/cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311?request=GetCapabilities&service=WMS
+      datasetURL: 'cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311', 
+      productURL: 'MEDSEA_ANALYSISFORECAST_WAV_006_017/',
+      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
       domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
-      timeScales: ['h', 'h3', 'h6', 'h12'],
+      version: '1.0.0',
+      timeScales: ['h'],
+      urlLocked: true,
+      doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
       // CRS instead of SRS
     },
   },
   "Wind wave significant height": {
     name: 'Wind wave significant height',
     altNames: ['Wind wave significant height', 'Wind waves', 'WWSH'],
-    doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3',
-    url: 'med-hcmr-wav-rean',// Forecast 'med-hcmr-wav-an-fc',
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
+    doi: 'https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012',
+    datasetURL: 'med-hcmr-wav-rean-h_202105', // Forecast has different format
+    productURL: 'MEDSEA_MULTIYEAR_WAV_006_012/',
+    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
+    version: '1.0.0',
     layerName: 'VHM0_WW', // 'VMDR' for direction in degrees
-    timeScales: ['h', 'h3', 'h6', 'h12'],
+    timeScales: ['h'],
+    urlLocked: true,
     range: [0, 6],
     units: 'm',
     style: "boxfill/sst_36", //occam_pastel-30",
@@ -210,10 +219,15 @@ dataTypes = {
       type: 'whiteWave'
     },
     forecast: {
-      url: 'med-hcmr-wav-an-fc',
+      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017/cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311?request=GetCapabilities&service=WMS
+      datasetURL: 'cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311', 
+      productURL: 'MEDSEA_ANALYSISFORECAST_WAV_006_017/',
+      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
       domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
-      timeScales: ['h', 'h3', 'h6', 'h12'],
+      version: '1.0.0',
+      timeScales: ['h'],
+      urlLocked: true,
+      doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
       // CRS instead of SRS
     },
   },
