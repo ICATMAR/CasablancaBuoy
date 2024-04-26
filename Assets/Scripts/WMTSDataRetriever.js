@@ -90,7 +90,7 @@ dataTypes = {
     domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
     version: '1.0.0',
     layerName: 'bottomT',
-    timeScales: ['d', 'm'], // In reanalysis, not hourly available: 'h', 'h3', 'h6', 'h12', 
+    timeScales: ['d', 'm'], // In reanalysis, not hourly available ('h') 
     range: [10, 25],
     units: 'ºC',
     style: "boxfill/occam",
@@ -137,28 +137,31 @@ dataTypes = {
     // }
   },
   "Salinity": {
-    // https://my.cmems-du.eu/thredds/wms/med-cmcc-sal-rean-m?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
-    // https://my.cmems-du.eu/thredds/wms/med-cmcc-sal-rean-d?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
+    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-sal-rean-m_202012?request=GetCapabilities&service=WMS
+    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=6&tilerow=23&tilecol=33&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-sal-rean-m_202012/so
     name: 'Salinity',
     altNames: ['Salinity', 'Sal', 'Sea surface salinity'],
-    doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS6",
-    url: 'med-cmcc-sal-rean',// Forecast 'med-cmcc-sal-an-fc', 
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
+    doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
+    datasetURL: 'med-cmcc-sal-rean-{timeScale}_202012', // Forecast has different format
+    productURL: 'MEDSEA_MULTIYEAR_PHY_006_004/',
+    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
+    version: '1.0.0',
     layerName: 'so',
-    timeScales: ['d', 'd3', 'm'], // In reanalysis, only daily and monthly; 'h', 'h3', 'h6', 'h12', 
+    timeScales: ['d', 'm'], // In reanalysis, not hourly available ('h') 
     range: [32, 41],
     units: '‰',
     style: "boxfill/occam",
     forecast: {
-      url: 'cmems_mod_med_phy-sal_anfc_4.2km_P',
-      timeScales: ['h', 'd', 'm'],//['1D-m', '1M-m', 'T1H-m', 'T1HTS-m', 'T15M-i'],
+      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-sal_anfc_4.2km-3D_PT1H-m_202311?request=GetCapabilities&service=WMS
+      datasetURL: 'cmems_mod_med_phy-tem_anfc_4.2km{timeScale}-m_202311',
+      productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
+      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
+      timeScales: ['h', 'd', 'm'],
       timeScaleKeys: {'h': 'T1H-m', 'd': '1D-m', 'm': '1M-m'},
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
-      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS7",
-      timeScaleCorrection:
-        {h: {min: 30}, d: {min: 0, h: 12}},
+      version: '1.0.0',
+      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8",
+      // timeScaleCorrection: // TODO BY SCRIPT
+      //   {h: {min: 30}, d: {min: 0, h: 12}},
       // CRS instead of SRS
     },
   },
