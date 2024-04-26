@@ -45,17 +45,36 @@ export class WMTSDataRetriever {
                 'VMDR', 'VMDR_WW', 'VMDR_SW1', 'VMDR_SW2'],
     },
     "Mediterranean Sea Physics Reanalysis": {
+      /*
+      Available datasets 
+        uo, vo, wo - Current
+        so, - Salinity
+        zos - Sea Surface Height
+        thetao, bottomT - Potential temperature
+      */
       wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004?request=GetCapabilities&service=WMS',
       doi: 'https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1I',
       timeScales: ['h', 'd', 'm'],
-      datasets: []
+      datasets: ['uo', 'vo', 'wo', 'so', 'thetao', 'bottomT']
     },
-
+    "Mediterranean Sea Physics Analysis and Forecast": {
+      /*
+      Available datasets 
+        uo, vo, wo - Current
+        so, - Salinity
+        zos - Sea Surface Height
+        thetao, bottomT - Potential temperature
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_PHY_006_013?request=GetCapabilities&service=WMS',
+      doi: 'https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8',
+      timeScales: ['h', 'd', 'm'],
+      datasets: ['uo', 'vo', 'wo', 'so', 'thetao', 'bottomT']
+    },
   };
 
 
   // One could use standard dictionaries / vocabularies?
-  // These are useful for the interface
+  // These are useful for the interface, UI
   customDefinitions = {
     'VHM0': {
       shortName: 'Wave height',
@@ -80,10 +99,11 @@ export class WMTSDataRetriever {
     'VMDR': {
       shortName: 'Wave direction',
       altNames: ['Mean wave direction', 'MDIR'],
-      units: 'º',
+      unit: 'º',
       range: [0, 360],
     },
     'VHM0_WW': { // Wind wave height
+      range: [0, 6],
       animation: {
         layerNames: ['VHM0_WW', 'VMDR_WW'], // Intensity, Angle
         format: 'value_angle',
@@ -91,6 +111,7 @@ export class WMTSDataRetriever {
       },
     },
     'VHM0_SW1': { // Swell 1 wave height
+      range: [0, 6],
       animation: {
         layerNames: ['VHM0_SW1', 'VMDR_SW1'], // Intensity, Angle
         format: 'value_angle',
@@ -98,38 +119,45 @@ export class WMTSDataRetriever {
       },
     },
     'VHM0_SW2': { // Swell 2 wave height
+      range: [0, 6],
       animation: {
         layerNames: ['VHM0_SW2', 'VMDR_SW2'], // Intensity, Angle
         format: 'value_angle',
         type: 'wave'
       },
     },
-  }
-
-
-
-  dataTypes = {
-    "Wave significant height": {
-      name: 'Wave significant height',
-      altNames: ['Wave significant height', 'WSH', 'VMH0', 'HM0', 'Hs'],
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-      productURL: 'MEDSEA_MULTIYEAR_WAV_006_012/',
-      dataSetURL: 'med-hcmr-wav-rean-h_202105',
-      urlLocked: true,
-      doi: 'https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012',
-      layerName: 'Sea surface wave significant height',
-      timeScales: ['h'],
-      // Forecast
-      forecast: {
-        domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-        productURL: 'MEDSEA_ANALYSISFORECAST_WAV_006_017/',
-        dataSetURL: 'cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311',
-        urlLocked: true,
-        doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
-        timeScales: ['h'],
-      }
+    'uo': {
+      range: [0, 1.5],
+      units: 'm/s',
     },
+    'vo': {
+      range: [0, 1.5],
+      units: 'm/s',
+    },
+    'wo': {
+      range: [0, 1.5],
+      units: 'm/s',
+    },
+    'thetao': {
+      shortName: 'Water temperature',
+      unit: 'ºC',
+    },
+    'bottomT': {
+      range: [10, 25],
+      shortName: 'Bottom temperature',
+      unit: 'ºC'
+    },
+    'salinity': {
+      shortName: 'Salinity',
+      range: [32, 41],
+      unit: '‰',
+    }
   }
+
+
+
+  dataTypes = {}
+  
 
 
 
@@ -151,29 +179,44 @@ export class WMTSDataRetriever {
     let loading = 0;
     let loaded = 0;
     // Iterate data types
-    Object.keys(this.dataTypes).forEach(dataTypeKey => {
-      let dataType = this.dataTypes[dataTypeKey];
-      dataType.timeScaleCorrection = {}; // Introduce new field for time corrections (daily forecast sometimes has 12h instead of 00h)
- 
-      // Iterate over timescales (some datatypes can be hourly, daily or monthly)
-      for (let i = 0; i < dataType.timeScales.length; i++) {
-        let currTimeScale = dataType.timeScales[i];
+    Object.keys(this.products).forEach(productKey => {
+      let product = this.products[productKey];
 
-        // Get Capabilities
-        loading++;
-        this.loadWMTSLayerCapabilities(dataType, currTimeScale)
-          .then(() => {
-            this.printLog(dataType);
-            // Callback when all capabilities have been loaded
-            loaded++;
-            this.printLog("Total left to load: " + (loading - loaded));
-          });
-      }
+      // Get Capabilities
+      loading++;
+      this.loadWMTSProduct(product)
+        .then(() => {
+          this.printLog(this.dataTypes);
+          // Callback when all capabilities have been loaded
+          loaded++;
+          this.printLog("Total left to load: " + (loading - loaded));
+        });
     });
 
   }
 
+  // Fetch the WMS capabilities and assign to dataType
+  loadWMTSProduct = async function(product){
+    product.wmtsURL;
+    // Fetch
+    let rawText = await fetch(capabilitiesURL).then(r => r.text());
+    let parser = new DOMParser();
+    let rawXML = parser.parseFromString(rawText, 'application/xml');
+    product.xml = rawXML;
+    // Show available layers
+    this.printLog('------------- New product loaded-----------\nAvailable products:');
+    rawXML.querySelectorAll('Layer').forEach(ll => {
+      this.printLog(ll.querySelector('Name').innerHTML);
+    });
 
+    // Iterate available datasets and compare to selected datasets from product
+    rawXML.querySelectorAll('Layer').forEach(ll => {
+      this.printLog(ll.querySelector('Name').innerHTML);
+      debugger;
+    });
+
+
+  }
 
   // Fetch the WMS capabilities and assign to dataType
   loadWMTSLayerCapabilities = async function(dataType, currTimeScale){
