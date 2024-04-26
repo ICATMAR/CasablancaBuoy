@@ -8,6 +8,149 @@ export class WMTSDataRetriever {
   // Store GetCapabilities XML per product
   productsXML = {};
 
+  products = {
+    "Mediterranean Sea Waves Analysis and Forecast": {
+      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017?request=GetCapabilities&service=WMS
+      /*
+      Available variables
+      VCMX, VMXL, VPED, VTPK
+      VHM0, VHM0_SW1, VHM0_SW2, VHM0_WW
+      VMDR, VMDR_SW1, VMDR_SW2, VMDR_WW
+      VSDX, VSDY
+      VTM01_SW1, VTM01_SW2 ,VTM01_WW ,VTM02
+      VTM10
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017?request=GetCapabilities&service=WMS',
+      doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
+      timeScales: ['h'],
+      datasets: {
+        // Height
+        'VHM0': { // Mean wave height
+          animation: {
+            layerNames: ['VHM0', 'VMDR'], // Intensity, Angle
+            format: 'value_angle',
+            type: 'wave'
+          },
+        },
+        'VHM0_WW': { // Wind wave height
+          animation: {
+            layerNames: ['VHM0_WW', 'VMDR_WW'], // Intensity, Angle
+            format: 'value_angle',
+            type: 'whiteWave'
+          },
+        },
+        'VHM0_SW1': { // Swell 1 wave height
+          animation: {
+            layerNames: ['VHM0_SW1', 'VMDR_SW1'], // Intensity, Angle
+            format: 'value_angle',
+            type: 'wave'
+          },
+        },
+        'VHM0_SW2': { // Swell 2 wave height
+          animation: {
+            layerNames: ['VHM0_SW2', 'VMDR_SW2'], // Intensity, Angle
+            format: 'value_angle',
+            type: 'wave'
+          },
+        },
+        // Period
+        'VTM02': {}, // Mean wave period
+        'VTM01_SW1': {}, // Swell 1 wave period
+        'VTM01_SW2': {}, // Swell 2 wave period
+        'VTM01_WW': {}, // Wind wave period
+        // Direction
+        'VMDR': {}, 
+        'VMDR_SW1': {},
+        'VMDR_SW2': {},
+        'VMDR_WW': {},
+      },
+    },
+    "Mediterranean Sea Waves Reanalysis": {
+      /*
+        Available variables
+        VPED, VTPK
+        VHM0, VHM0_SW1, VHM0_SW2, VHM0_WW
+        VMDR, VMDR_SW1, VMDR_SW2, VMDR_WW
+        VSDX, VSDY
+        VTM01_SW1, VTM01_SW2, VTM01_WW, VTM02
+        VTM10
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105?request=GetCapabilities&service=WMS',
+      doi: "https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012",
+      timeScales: ['h'],
+      datasets: {
+        // Height
+        'VHM0': { // Mean wave height
+          animation: {
+            layerNames: ['VHM0', 'VMDR'], // Intensity, Angle
+            format: 'value_angle',
+            type: 'wave'
+          },
+        },
+        'VHM0_WW': { // Wind wave height
+          animation: {
+            layerNames: ['VHM0_WW', 'VMDR_WW'], // Intensity, Angle
+            format: 'value_angle',
+            type: 'whiteWave'
+          },
+        },
+        'VHM0_SW1': { // Swell 1 wave height
+          animation: {
+            layerNames: ['VHM0_SW1', 'VMDR_SW1'], // Intensity, Angle
+            format: 'value_angle',
+            type: 'wave'
+          },
+        },
+        'VHM0_SW2': { // Swell 2 wave height
+          animation: {
+            layerNames: ['VHM0_SW2', 'VMDR_SW2'], // Intensity, Angle
+            format: 'value_angle',
+            type: 'wave'
+          },
+        },
+        // Period
+        'VTM02': {}, // Mean wave period
+        'VTM01_SW1': {}, // Swell 1 wave period
+        'VTM01_SW2': {}, // Swell 2 wave period
+        'VTM01_WW': {}, // Wind wave period
+        // Direction
+        'VMDR': {}, 
+        'VMDR_SW1': {},
+        'VMDR_SW2': {},
+        'VMDR_WW': {},
+      },
+    }
+  };
+
+
+  // One could use standard dictionaries / vocabularies?
+  // These are useful for the interface
+  customDefinitions = {
+    'VHM0': {
+      shortName: 'Wave height',
+      altNames: ['Hs', 'Hm0', 'Wave significant height', 'Spectral significant wave height (Hm0)'],
+      range: [0,6],
+    },
+    'VTM02': {
+      shortName: 'Wave period',
+      altNames: ['Tm02', 'Ts', 'Spectral moments (0,2) wave period'],
+      range: [0, 18],
+    },
+    'VHM0_WW': {
+      shortName: 'Wind wave height',
+      altNames: ['Wind wave significant height', 'Wind waves', 'WWSH'],
+      range: [0,6],
+    },
+    'VMDR': {
+      shortName: 'Wave direction',
+      altNames: ['Mean wave direction', 'MDIR'],
+      units: 'º',
+      range: [0, 360],
+    }
+  }
+
+
+
   dataTypes = {
     "Wave significant height": {
       name: 'Wave significant height',
@@ -30,48 +173,6 @@ export class WMTSDataRetriever {
       }
     },
   }
-
-  // dataTypes = {
-  //   "Wave significant height": {
-  //     // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105?request=GetCapabilities&service=WMS
-  //     // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&layer=MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105/VHM0&tilematrixset=EPSG:4326&tilematrix=2&tilerow=1&tilecol=4
-
-
-  //     /*
-  //     https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile
-  //     &layer=[url]/
-  //     [layerName]
-  //     &tilematrixset=EPSG:4326
-  //     &tilematrix=2&tilerow=1&tilecol=4
-      
-  //     */
-  //     name: 'Wave significant height',
-  //     altNames: ['Wave significant height', 'Waves', 'WSH'],
-  //     doi: 'https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012',
-  //     url: 'med-hcmr-wav-rean',// Forecast 'med-hcmr-wav-an-fc',
-  //     domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-  //     version: '1.0.0',
-  //     layerName: 'VHM0', // 'VMDR' for direction in degrees
-  //     timeScales: ['h'],
-  //     range: [0, 6],
-  //     units: 'm',
-  //     style: "boxfill/alg",//occam_pastel-30",
-  //     animation: {
-  //       layerNames: ['VHM0', 'VMDR'], // Intensity, Angle
-  //       format: 'value_angle',
-  //       type: 'wave'
-  //     },
-  //     // // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017/cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311?request=GetCapabilities&service=WMS
-  //     forecast: {
-  //       productURL: 'MEDSEA_ANALYSISFORECAST_WAV_006_017/cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311',
-  //       doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
-  //       domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-  //       version: '1.0.0',
-  //       timeScales: ['h'],
-  //       // CRS instead of SRS
-  //     },
-  //   }
-  // }
 
 
 
