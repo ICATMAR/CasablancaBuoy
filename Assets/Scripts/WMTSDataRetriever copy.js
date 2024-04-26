@@ -247,6 +247,8 @@ export class WMTSDataRetriever {
       dataSet.productProvider = product.xml.getElementsByTagNameNS("http://www.opengis.net/ows/1.1", "ProviderName")[0].textContent;
       // Dataset template
       dataSet.template = ll.querySelector('ResourceURL').attributes.template.textContent;
+      // Add date to template
+      dataSet.template += '&time={Time}';
 
       // Find if the product belongs to a time scale
       // Iterate through Dimensions (elevation, time)
