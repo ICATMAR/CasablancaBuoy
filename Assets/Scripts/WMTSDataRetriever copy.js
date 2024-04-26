@@ -72,7 +72,7 @@ export class WMTSDataRetriever {
     },
   };
 
-
+  // Custom dataType definitions
   // One could use standard dictionaries / vocabularies?
   // These are useful for the interface, UI
   customDefinitions = {
@@ -128,15 +128,15 @@ export class WMTSDataRetriever {
     },
     'uo': {
       range: [0, 1.5],
-      units: 'm/s',
+      unit: 'm/s',
     },
     'vo': {
       range: [0, 1.5],
-      units: 'm/s',
+      unit: 'm/s',
     },
     'wo': {
       range: [0, 1.5],
-      units: 'm/s',
+      unit: 'm/s',
     },
     'thetao': {
       shortName: 'Water temperature',
@@ -156,7 +156,7 @@ export class WMTSDataRetriever {
 
 
 
-  dataTypes = {}
+  dataSets = {};
   
 
 
@@ -181,12 +181,13 @@ export class WMTSDataRetriever {
     // Iterate data types
     Object.keys(this.products).forEach(productKey => {
       let product = this.products[productKey];
+      product.name = productKey;
 
       // Get Capabilities
       loading++;
       this.loadWMTSProduct(product)
         .then(() => {
-          this.printLog(this.dataTypes);
+          this.printLog(this.dataSets);
           // Callback when all capabilities have been loaded
           loaded++;
           this.printLog("Total left to load: " + (loading - loaded));
@@ -195,24 +196,103 @@ export class WMTSDataRetriever {
 
   }
 
-  // Fetch the WMS capabilities and assign to dataType
+  // Fetch the WMS capabilities and assign to dataSet
   loadWMTSProduct = async function(product){
-    product.wmtsURL;
+    
     // Fetch
-    let rawText = await fetch(capabilitiesURL).then(r => r.text());
+    let rawText = await fetch(product.wmtsURL).then(r => r.text());
     let parser = new DOMParser();
     let rawXML = parser.parseFromString(rawText, 'application/xml');
     product.xml = rawXML;
     // Show available layers
     this.printLog('------------- New product loaded-----------\nAvailable products:');
     rawXML.querySelectorAll('Layer').forEach(ll => {
-      this.printLog(ll.querySelector('Name').innerHTML);
+      this.printLog(ll.querySelector('Name').textContent);
     });
 
     // Iterate available datasets and compare to selected datasets from product
     rawXML.querySelectorAll('Layer').forEach(ll => {
-      this.printLog(ll.querySelector('Name').innerHTML);
-      debugger;
+      let id = ll.querySelector('Id').textContent;
+      // Get custom dataSet definitions
+      let custDef = this.customDefinitions[id] || {};
+      // Copy properties to dataSet object
+      let dataSet = JSON.parse(JSON.stringify(custDef));
+      // Assign properties from WMTS or from custom definitions
+      dataSet.id = id;
+      dataSet.name = ll.querySelector('Name').textContent;
+      dataSet.unit = dataSet.unit || ll.querySelector('Unit').textContent;
+      // Assign product properties
+      dataSet.doi = product.doi;
+      dataSet.productName = product.name;
+      dataSet.productProvider = product.xml.getElementsByTagNameNS("http://www.opengis.net/ows/1.1", "ProviderName")[0].textContent;
+      // Dataset template
+      dataSet
+
+      // Find if the product belongs to a time scale
+      // Iterate through Dimensions (elevation, time)
+      ll.querySelectorAll("Dimension").forEach(dd => {
+        // Elevation
+        if (dd.getElementsByTagName("ows:Identifier")[0].textContent == "elevation") {
+          // Get elevation values
+          let values = dd.querySelectorAll("Value");
+          if (values.length > 1) {
+            let elevationArray = [];
+            values.forEach(vv => {
+              elevationArray.push(vv.textContent);
+            });
+            dataSet.elevation = elevationArray;
+          } else if (values[0].textContent != '0'){
+            debugger;
+          }          
+        }
+        // Time dimension
+        if (dd.getElementsByTagName("ows:Identifier")[0].textContent == "time") {
+          // Text content example: '1993-01-01T00:00:00Z/2022-07-31T23:00:00Z/PT1H'
+          let values =  dd.querySelectorAll("Value");
+          if (values.length == 1){
+            let timeStr = values[0].textContent;
+            dataSet.startTmst = timeStr.split('/')[0];
+            // Only store end time if it is not forecast
+            let endTmst = timeStr.split('/')[1];
+            if (new Date(endTmst) < new Date())
+              dataSet.endTmst = endTmst;
+            let timeInterval = timeStr.split('/')[2];
+            this.printLog(timeStr);
+            dataSet.timeScale = timeInterval == 'PT1H' ? 'h' : timeInterval == 'P1D' ? 'd' : '';
+            if (dataSet.timeScale == '')
+              debugger;
+          } else {
+            // Calculate time interval
+            let timeDiff = Math.abs(new Date(values[0].textContent).getTime() - new Date(values[1].textContent).getTime()) / (1000*60*60*24);
+            // Monthly
+            if (timeDiff > 25 && timeDiff < 32)
+              dataSet.timeScale = 'm';
+            else {
+              debugger;
+            }
+            // Store dates
+            dataSet.dates = [];
+            values.forEach(vv => {
+              dataSet.dates.push(vv.textContent);
+            });
+            // Sort dates
+            dataSet.dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+            // Store start and end dates
+            dataSet.startDate = dataSet.dates[0];
+            // Only store end time if it is not forecast
+            let endTmst = dataSet.dates[dataSet.dates.length - 1];
+            if (new Date(endTmst) < new Date())
+              dataSet.endTmst = endTmst;
+            debugger;
+          }
+          
+        }
+      });
+
+
+      
+      
+      
     });
 
 
