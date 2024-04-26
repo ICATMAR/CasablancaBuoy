@@ -64,6 +64,7 @@ dataTypes = {
     units: 'ºC',
     style: "boxfill/occam",
     forecast: {
+      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-tem_anfc_4.2km-3D_PT1H-m_202311?request=GetCapabilities&service=WMS
       datasetURL: 'cmems_mod_med_phy-tem_anfc_4.2km{timeScale}-m_202311',
       productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
       domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
@@ -71,7 +72,7 @@ dataTypes = {
       timeScaleKeys: {'h': '-3D_PT1H', 'd': '_P1D', 'm': '_P1M'},//-3D_PT1H
       domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
       version: '1.0.0',
-      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS7",
+      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8",
       // timeScaleCorrection: // TODO BY SCRIPT??
         // {h: {min: 30}, d: {min: 0, h: 12}},
       // CRS instead of SRS
@@ -94,6 +95,7 @@ dataTypes = {
     units: 'ºC',
     style: "boxfill/occam",
     forecast: {
+      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-tem_anfc_4.2km-3D_PT1H-m_202311?request=GetCapabilities&service=WMS
       datasetURL: 'cmems_mod_med_phy-tem_anfc_4.2km{timeScale}-m_202311',
       productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
       domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
@@ -101,7 +103,7 @@ dataTypes = {
       timeScaleKeys: {'h': '-3D_PT1H', 'd': '_P1D', 'm': '_P1M'},//-3D_PT1H
       domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
       version: '1.0.0',
-      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS7",
+      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8",
       // timeScaleCorrection: // TODO BY SCRIPT??
         // {h: {min: 30}, d: {min: 0, h: 12}},
       // CRS instead of SRS
@@ -123,7 +125,7 @@ dataTypes = {
     range: [-5, 5],
     units: 'ºC',
     style: "boxfill/redblue",
-    // TODO: If there is no forecast, try the service anyway
+    // TODO: If there is no forecast, try the service anyway when requesting data
     // forecast: {
     //   url: 'SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d', 
     //   timeScales: ['d'],
