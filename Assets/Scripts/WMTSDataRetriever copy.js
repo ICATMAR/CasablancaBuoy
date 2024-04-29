@@ -313,6 +313,14 @@ export class WMTSDataRetriever {
             dataSet.timeScale = timeInterval == 'PT1H' ? 'h' : timeInterval == 'P1D' ? 'd' : '';
             if (dataSet.timeScale == ''){
               this.printLog("Skipped " + dataSet.name + " at " + timeInterval)
+            } else {
+              // TODO Time scale corrections
+              // Hourly (min correction)
+              if (dataSet.timeScale == 'h' && endTmst.substring(14, 16) != '00'){
+                debugger;
+              } else if (dataSet.timeScale == 'd' && (endTmst.substring(14, 16) != '00' || endTmst.substring(11, 13) != '00')){
+                debugger;
+              }
             }
           } else {
             // Calculate time interval
@@ -377,9 +385,9 @@ export class WMTSDataRetriever {
       this.printLog("DataSet does not have the timeScale of " + timeScale);
       tScaleDataSets = selDataSets; // Any?
     }
-    // Select oldest if possible (usually reanalysis)
-    tScaleDataSets.sort( (dataSetA, dataSetB) => new Date(dataSetA.startTime) > new Date(dataSetB.startTime));
-
+    // Select oldest first if possible (usually reanalysis)
+    // Sort by date (oldest first)
+    tScaleDataSets.sort( (dataSetA, dataSetB) => new Date(dataSetA.startTmst) - new Date(dataSetB.startTmst));
     // Check if tmst is inside range
     let selectedDataSet;
     for (let i = 0; i < tScaleDataSets.length; i++){
@@ -400,26 +408,68 @@ export class WMTSDataRetriever {
 
     return selectedDataSet;    
   }
+
+
+
+
   
 
-  // Load image given a dataSet and a timestamp
-  getImageAt = function(dataSet, tmst){
-    // Clean timestamp
+  // Get the tmst for the WMTS call. Returns undefined if the dataSet does not contain the date
+  getFormattedTmst = function(dataSet, tmst){
+    // Tmst is before starting date
+    if (new Date(tmst) < new Date(dataSet.startTmst)) {
+      return;
+    }
+    let formattedTmst = undefined;
+    // Time scale
     let timeScale = dataSet.timeScale;
-    let corrTmst = '';
+
+    // Hourly
     if (timeScale == 'h'){
-      corrTmst = tmst.substring(0,14) + '00:00.000Z';
-      if (dataSet.timeScaleCorrection){
-        let tCorr = dataSet.timeScaleCorrection.h;
-        if (tCorr){
-          let minString = String(tCorr.min).padStart(2, '0');
-          corrTmst = corrTmst.substring(0,14) + minString + ':00.000Z';
+      formattedTmst = tmst.substring(0,14) + '00:00.000Z';
+      // TODO timeScaleCorrection if they exist
+    } 
+    // Daily
+    else if (timeScale == 'd'){
+      formattedTmst = tmst.substring(0,11) + '00:00:00.000Z';
+    }
+    // Monthly
+    else if (timeScale == 'm'){
+      // Check if the current month is in the dataSet
+      for (let i = 0; i < dataSet.dates.length; i++){
+        if (dataSet.dates[i].substring(0, 7) == tmst.substring(0,7)){
+          formattedTmst = dataSet.dates[i];
+          break;
         }
       }
     }
-    // TODO daily and monthly
 
-    let templateURL = dataSet.template.replace('{Time}', corrTmst);
+    // Tmst is after end date (forecast does not have an endTmst)
+    if (dataSet.endTmst) {
+      if (new Date(formattedTmst) > new Date(dataSet.endTmst))
+        return;
+    }
+
+    return formattedTmst;
+  }
+  
+
+
+
+
+
+  // Load image given a dataSet and a timestamp
+  getImageAt = function(dataSet, tmst){
+    
+    // Get formatted timestamp of dataSet and check if it has data available on that tmst
+    let formattedTmst = this.getFormattedTmst(dataSet, tmst);
+
+    if (formattedTmst == undefined){
+      this.printLog(dataSet.id + " at " + dataSet.timeScale + " does not contain the timespan with timestamp " + tmst);
+      return document.createElement('span').innerHTML = 'No data for--';
+    }
+
+    let templateURL = dataSet.template.replace('{Time}', formattedTmst);
 
     templateURL = templateURL.replace('{TileMatrixSet}', 'EPSG:3857'); //EPSG:4326, 3857
     templateURL = templateURL.replace('{TileMatrix}', '6');
