@@ -13,7 +13,17 @@
 
   import WMTSDataRetriever from "./WMTSDataRetriever copy.js"
 
-  let wmts = new WMTSDataRetriever(()=>{}, true);
+  let getWMTSData = () => {
+    let dtset = wmts.getDataSet('VHM0', 'h', new Date().toISOString());
+
+    //wmts.getImageAt(dtset, new Date().toISOString());
+
+    console.log(dtset);
+  }
+
+  let wmts = new WMTSDataRetriever(getWMTSData, true);
+
+ 
 
 </script>
 

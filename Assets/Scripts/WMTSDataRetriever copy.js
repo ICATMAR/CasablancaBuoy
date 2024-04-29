@@ -227,7 +227,6 @@ export class WMTSDataRetriever {
 
           // All products loaded
           if (loading - loaded == 0){
-            this.getDataURL('VHM0', 'h', new Date().toISOString());
             onLoadCallback()
           }
         });
@@ -407,106 +406,6 @@ export class WMTSDataRetriever {
 
 
 
-  // Fetch the WMS capabilities and assign to dataType
-  loadWMTSLayerCapabilities = async function(dataType, currTimeScale){
-
-    let productURL = dataType.productURL;
-    let domainURL = dataType.domainURL;
-
-    // Load GetCapabilities of the product if it was not loaded
-    if (this.productsXML[productURL] == undefined) {
-      let capabilitiesURL = domainURL + productURL + '?request=GetCapabilities&service=WMS';
-      // Fetch
-      let rawText = await fetch(capabilitiesURL).then(r => r.text());
-      let parser = new DOMParser();
-      let rawXML = parser.parseFromString(rawText, 'application/xml');
-      // Store xml text for reuse
-      this.productsXML[productURL] = rawXML;
-      // Store some product information (doi, service provider)
-      // TODO: does this only work for copernicus? or services that follow a opengis-ows (http://www.opengis.net/ows/1.1) standard?
-      // Show available layers
-      this.printLog('------------- New product loaded-----------\nAvailable products:');
-      rawXML.querySelectorAll('Layer').forEach(ll => {
-        this.printLog(ll.querySelector('Name').innerHTML);
-      });
-    }
-
-    let productXML = this.productsXML[productURL];
-    // Iterate through layers to find the dataType
-    let layers = productXML.querySelectorAll('Layer');
-    layers.forEach(ll => {
-      // TODO: WHEN REQUESTING A PRODUCT, MULTIPLE DATA SETS WITH THE SAME VARIABLE CAN APPEAR (hourly, daily, monthly)
-      // Check if the layer is the one that was requested and that is is queryable
-      if (ll.querySelector("Name").innerHTML == dataType.layerName && ll.attributes.queryable) {
-
-        debugger;
-        // Variable information (Id, Name, Unit, min, max, colormap, logscale)
-        let varInfo = ll.querySelector('VariableInformation');
-        varInfo.childNodes.forEach(ch => {
-          if (dataType[ch.nodeName] == undefined)
-            dataType[ch.nodeName] = ch.innerHTML;
-        });
-        this.printLog(varInfo);
-
-        // Dimensions (Elevation and Time)
-        ll.querySelectorAll("Dimension").forEach(dd => {
-          this.printLog("Dimension name: " + dd.firstChild);
-
-          // Get id (time, elevation)
-          let idEl = dd.getElementsByTagName("ows:Identifier")[0];
-          if (idEl == undefined)
-            debugger; // No id found
-          
-          let id = idEl.innerHTML;
-          // Elevation
-          if (id == "elevation") {
-            // Get elevation values
-            let tmpStr = dd.querySelector("Value").innerHTML.replace('\n', '[');
-            let elevationArray = JSON.parse(tmpStr + ']');
-            dataType.elevation = elevationArray;
-          }
-          // Time dimension
-          // Latest date and periodicity
-          // For example: 2021-11-30T00:00:00Z/2024-05-03T11:00:00Z/PT1H
-          else if (id == "time"){
-            // Parse time (will depend on month, day)
-            // Some data products provide hourly data at hh:30 and other at hh:00
-            let timeStr = dd.querySelector("Value").innerHTML;
-            // Hourly
-            if (currTimeScale == "h") {
-              // Get the minutes (innerHTML example: '\n   2021-03-29T00:30:00.000Z/2022-02-28T23:30:00.000Z/PT1H')
-              let minutes = timeStr.substring(dd.innerHTML.indexOf('T') + 4, dd.innerHTML.indexOf('T') + 6);
-              dataType.timeScaleCorrection.h = { 'min': parseInt(minutes) };
-            } else {
-              debugger;
-            }
-
-            // Get latest date recorded and store it in dataType
-            let lastDate = dataType.lastDate == undefined ? new Date(1950) : new Date(dataType.lastDate);
-            let timePeriods = timeStr.split(',');
-            let lastTime = timePeriods[timePeriods.length - 1];
-            if (lastTime.includes('/')){ // Time period e.g., 2019-05-16T12:00:00.000Z/2019-07-16T12:00:00.000Z/P30DT12H
-              let endDate = new Date(lastTime.split('/')[1]);
-              if (endDate > lastDate)
-                dataType.lastDate = endDate.toISOString();
-            } else {
-              debugger;
-              if (new Date(lastTime) > lastDate)
-                dataType.lastDate = new Date(lastTime);
-            }
-          } // end of time dimension
-
-          
-        });
-
-        
-        
-
-      }
-    });
-
-
-  }
 
 
   // Verbose
