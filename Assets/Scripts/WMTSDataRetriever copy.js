@@ -402,6 +402,34 @@ export class WMTSDataRetriever {
   }
   
 
+  // Load image given a dataSet and a timestamp
+  getImageAt = function(dataSet, tmst){
+    // Clean timestamp
+    let timeScale = dataSet.timeScale;
+    let corrTmst = '';
+    if (timeScale == 'h'){
+      corrTmst = tmst.substring(0,14) + '00:00.000Z';
+      if (dataSet.timeScaleCorrection){
+        let tCorr = dataSet.timeScaleCorrection.h;
+        if (tCorr){
+          let minString = String(tCorr.min).padStart(2, '0');
+          corrTmst = corrTmst.substring(0,14) + minString + ':00.000Z';
+        }
+      }
+    }
+    // TODO daily and monthly
+
+    let templateURL = dataSet.template.replace('{Time}', corrTmst);
+
+    templateURL = templateURL.replace('{TileMatrixSet}', 'EPSG:3857'); //EPSG:4326, 3857
+    templateURL = templateURL.replace('{TileMatrix}', '6');
+    templateURL = templateURL.replace('{TileRow}', '23');
+    templateURL = templateURL.replace('{TileCol}', '32');
+
+    let img = document.createElement('img');
+    img.src = templateURL;
+    return img;
+  }
 
 
 

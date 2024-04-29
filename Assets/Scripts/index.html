@@ -14,11 +14,28 @@
   import WMTSDataRetriever from "./WMTSDataRetriever copy.js"
 
   let getWMTSData = () => {
-    let dtset = wmts.getDataSet('VHM0', 'h', new Date().toISOString());
 
-    //wmts.getImageAt(dtset, new Date().toISOString());
+    wmts.dataSets.forEach(dataSet => {
+      let container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style["flex-direction"] = 'row';
 
-    console.log(dtset);
+      let text = document.createElement('span');
+      text.innerHTML = dataSet.id + ", " + dataSet.timeScale +  ", " + (dataSet.endTmst || 'now') ;
+      let img = wmts.getImageAt(dataSet, new Date().toISOString());
+
+      container.append(img);
+      container.append(text);
+      document.body.append(container);
+    })
+
+    // let dtset = wmts.getDataSet('VHM0', 'h', new Date().toISOString());
+
+    // let img = wmts.getImageAt(dtset, new Date().toISOString());
+
+    // document.body.append(img);
+
+    // console.log(dtset);
   }
 
   let wmts = new WMTSDataRetriever(getWMTSData, true);
