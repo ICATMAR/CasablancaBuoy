@@ -1,6 +1,8 @@
 // import preLoadedDataTypes from "/CasablancaBuoy/Assets/Scripts/WMTSDataTypes.js";
 
-// Scripts that obtain data from the CMEMS WMS API
+// Scripts that obtain data from the CMEMS WMTS API
+// https://help.marine.copernicus.eu/en/articles/6478168-how-to-use-wmts-to-visualize-data#h_2523403b15
+
 export class WMTSDataRetriever {
 
   // Requests - keep track of what is requested
@@ -102,7 +104,18 @@ export class WMTSDataRetriever {
     },
     'VTM02': {
       shortName: 'Wave period',
-      altNames: ['Tm02', 'Ts', 'Spectral moments (0,2) wave period'],
+      range: [0, 18],
+    },
+    'VTM01_WW': {
+      shortName: 'Wave period',
+      range: [0, 18],
+    },
+    'VTM01_SW1': {
+      shortName: 'Wave period',
+      range: [0, 18],
+    },
+    'VTM01_SW2': {
+      shortName: 'Wave period',
       range: [0, 18],
     },
     'VHM0_WW': {
@@ -153,7 +166,8 @@ export class WMTSDataRetriever {
       unit: 'm/s',
     },
     'thetao': {
-      shortName: 'Water temperature',
+      shortName: 'Surface temperature',
+      range: [10, 35],
       unit: 'ºC',
     },
     'bottomT': {
@@ -161,7 +175,7 @@ export class WMTSDataRetriever {
       shortName: 'Bottom temperature',
       unit: 'ºC'
     },
-    'salinity': {
+    'so': {
       shortName: 'Salinity',
       range: [32, 41],
       unit: '‰',
@@ -210,10 +224,21 @@ export class WMTSDataRetriever {
           // Callback when all capabilities have been loaded
           loaded++;
           this.printLog("Total left to load: " + (loading - loaded));
+
+          // All products loaded
+          if (loading - loaded == 0){
+            this.getDataURL('VHM0', 'h', new Date().toISOString());
+            onLoadCallback()
+          }
         });
     });
 
   }
+
+
+
+
+
 
   // Fetch the WMS capabilities and assign to dataSet
   loadWMTSProduct = async function(product){
@@ -238,6 +263,9 @@ export class WMTSDataRetriever {
       let dataSet = JSON.parse(JSON.stringify(custDef));
       // Assign properties from WMTS or from custom definitions
       dataSet.id = id;
+      if (!product.dataSets.includes(dataSet.id)) {
+        return;
+      }
       dataSet.name = ll.querySelector('Name').textContent;
       dataSet.unit = dataSet.unit || ll.querySelector('Unit').textContent;
       if (dataSet.unit == 'degree'){ dataSet.unit = 'º'; dataSet.range = [0, 360]; }
@@ -249,6 +277,10 @@ export class WMTSDataRetriever {
       dataSet.template = ll.querySelector('ResourceURL').attributes.template.textContent;
       // Add date to template
       dataSet.template += '&time={Time}';
+      // Add style range and color map
+      if (dataSet.range == undefined)
+        debugger;
+      dataSet.template = dataSet.template.replace('{Style}', 'range:'+ dataSet.range[0] +'/'+ dataSet.range[1] +',cmap:gray');
 
       // Find if the product belongs to a time scale
       // Iterate through Dimensions (elevation, time)
@@ -320,13 +352,60 @@ export class WMTSDataRetriever {
       }
       
       
-      
-      
-      
     });
 
-
   }
+
+
+
+  // Get the best dataSet according to the id, timeScale and timestamp
+  getDataSet = function(id, timeScale, tmst){
+    // No data sets loaded
+    if (this.dataSets.length == 0){
+      this.printLog("*** --- No dataSets have been loaded");
+      return;
+    }
+
+    // Get dataSets with the id
+    let selDataSets = this.dataSets.filter((dataSet) => dataSet.id == id);
+    if (selDataSets.length == 0){
+      this.printLog("There are no dataSets with id: " + id);
+      return;
+    }
+    // Get dataSets in the timeScale
+    let tScaleDataSets = selDataSets.filter((dataSet) => dataSet.timeScale == timeScale);
+    if (tScaleDataSets.length == 0){
+      this.printLog("DataSet does not have the timeScale of " + timeScale);
+      tScaleDataSets = selDataSets; // Any?
+    }
+    // Select oldest if possible (usually reanalysis)
+    tScaleDataSets.sort( (dataSetA, dataSetB) => new Date(dataSetA.startTime) > new Date(dataSetB.startTime));
+
+    // Check if tmst is inside range
+    let selectedDataSet;
+    for (let i = 0; i < tScaleDataSets.length; i++){
+      // If no endTmst, it is forecast
+      if (tScaleDataSets[i].endTmst == undefined){
+        selectedDataSet = tScaleDataSets[i];
+        break;
+      }
+      // tmst is inside range
+      if (new Date(tScaleDataSets[i].startTmst) < new Date(tmst) && new Date(tScaleDataSets[i].endTmst) > new Date(tmst)){
+        selectedDataSet = tScaleDataSets[i].startTmst;
+        break;
+      }
+    }
+    if (selectedDataSet == undefined){
+      this.printLog("No dataSet contains the selected timestamp");
+    }
+
+    return selectedDataSet;    
+  }
+  
+
+
+
+
 
   // Fetch the WMS capabilities and assign to dataType
   loadWMTSLayerCapabilities = async function(dataType, currTimeScale){
