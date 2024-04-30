@@ -3,6 +3,10 @@
 // Scripts that obtain data from the CMEMS WMTS API
 // https://help.marine.copernicus.eu/en/articles/6478168-how-to-use-wmts-to-visualize-data#h_2523403b15
 
+// Examples
+// https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:4326&style=range:0/6,cmap:gray&tilematrix=5&tilerow=8&tilecol=32&layer=MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105/VHM0&time=2025-04-30T09:00:00.000Z
+// https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=range:0/6,cmap:gray&tilematrix=6&tilerow=23&tilecol=32&layer=MEDSEA_ANALYSISFORECAST_WAV_006_017/cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311/VHM0&time=2024-04-30T09:00:00.000Z
+
 export class WMTSDataRetriever {
 
   // Requests - keep track of what is requested
@@ -417,9 +421,9 @@ export class WMTSDataRetriever {
   // Get the tmst for the WMTS call. Returns undefined if the dataSet does not contain the date
   getFormattedTmst = function(dataSet, tmst){
     // Tmst is before starting date
-    if (new Date(tmst) < new Date(dataSet.startTmst)) {
-      return;
-    }
+    // if (new Date(tmst) < new Date(dataSet.startTmst)) {
+    //   return;
+    // }
     let formattedTmst = undefined;
     // Time scale
     let timeScale = dataSet.timeScale;
@@ -445,10 +449,10 @@ export class WMTSDataRetriever {
     }
 
     // Tmst is after end date (forecast does not have an endTmst)
-    if (dataSet.endTmst) {
-      if (new Date(formattedTmst) > new Date(dataSet.endTmst))
-        return;
-    }
+    // if (dataSet.endTmst) {
+    //   if (new Date(formattedTmst) > new Date(dataSet.endTmst))
+    //     return;
+    // }
 
     return formattedTmst;
   }
