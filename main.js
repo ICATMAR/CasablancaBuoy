@@ -12,8 +12,8 @@ window.SceneManager = SceneManager;
 // window.DataManager = DataManager;
 
 // WMS Data Retriever
-import WMSDataRetriever from '/CasablancaBuoy/data/WMSDataRetriever.js';
-window.WMSDataRetriever = WMSDataRetriever;
+import WMTSDataRetriever from '/CasablancaBuoy/Assets/Scripts/WMTSDataRetriever.js';
+window.WMTSDataRetriever = WMTSDataRetriever;
 
 // Declare translations
 const i18n = VueI18n.createI18n({

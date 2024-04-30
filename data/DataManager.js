@@ -1,5 +1,5 @@
 import OBSEADataRetriever from "/CasablancaBuoy/data/OBSEADataRetriever.js";
-import WMSDataRetriever from "/CasablancaBuoy/data/WMSDataRetriever.js";
+import WMTSDataRetriever from "/CasablancaBuoy/Scripts/Assets/WMTSDataRetriever.js";
 
 // Manages where to get the data from (API, WMS, or static files)
 class DataManager{
@@ -13,7 +13,7 @@ class DataManager{
 
     // Constructor
     this.OBSEADataRetriever = new OBSEADataRetriever();
-    this.WMSDataRetriever = new WMSDataRetriever();
+    this.WMTSDataRetriever = new WMTSDataRetriever();
 
     // TODO: files should only be loaded on demand (more than 20Mb of data, no need to download)
     //        - Load files on demand
@@ -76,11 +76,11 @@ class DataManager{
     if (dataValue == undefined){
       console.log(dataType.name + " not found in OBSEA api. Trying WMS.");
       // Get data type
-      dataType = this.WMSDataRetriever.getDataType(dataTypeName);
+      dataType = this.WMTSDataRetriever.getDataSet(dataTypeName);
       if (dataType !== undefined)
         // Need to fix the timestamp, maybe here?
         // Get timescale and add something like (daily) to the data point
-        dataValue = await this.WMSDataRetriever.getDataAtPoint(dataTypeName, timestamp, this.lat, this.long, 'h'); // TODO, NOT ALL HAVE 'h' timings
+        dataValue = await this.WMTSDataRetriever.getDataAtPoint(dataTypeName, timestamp, this.lat, this.long, 'h'); // TODO, NOT ALL HAVE 'h' timings
     }
 
     // TODO; EMIT DATA VALUE? STORE IT HERE? SEND IT WHEN ALL ARE LOADED? EMIT AND UPDATE ALL VALUES?

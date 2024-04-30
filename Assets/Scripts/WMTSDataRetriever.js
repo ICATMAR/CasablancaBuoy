@@ -122,10 +122,15 @@ export class WMTSDataRetriever {
       shortName: 'Wave period',
       range: [0, 18],
     },
-    'VHM0_WW': {
+    'VHM0_WW': {// Wind wave height
       shortName: 'Wind wave height',
-      altNames: ['Wind wave significant height', 'Wind waves', 'WWSH'],
+      altNames: ['Wind wave significant height', "Spectral significant wind wave height", 'Wind waves', 'WWSH'],
       range: [0,6],
+      animation: {
+        layerNames: ['VHM0_WW', 'VMDR_WW'], // Intensity, Angle
+        format: 'value_angle',
+        type: 'whiteWave'
+      },
     },
     'VMDR': {
       shortName: 'Wave direction',
@@ -133,16 +138,10 @@ export class WMTSDataRetriever {
       unit: 'º',
       range: [0, 360],
     },
-    'VHM0_WW': { // Wind wave height
-      range: [0, 6],
-      animation: {
-        layerNames: ['VHM0_WW', 'VMDR_WW'], // Intensity, Angle
-        format: 'value_angle',
-        type: 'whiteWave'
-      },
-    },
+
     'VHM0_SW1': { // Swell 1 wave height
       range: [0, 6],
+      altNames: ["Primary swell wave significant height"],
       animation: {
         layerNames: ['VHM0_SW1', 'VMDR_SW1'], // Intensity, Angle
         format: 'value_angle',
@@ -151,6 +150,7 @@ export class WMTSDataRetriever {
     },
     'VHM0_SW2': { // Swell 2 wave height
       range: [0, 6],
+      altNames: ["Secondary swell wave significant height"],
       animation: {
         layerNames: ['VHM0_SW2', 'VMDR_SW2'], // Intensity, Angle
         format: 'value_angle',
@@ -231,7 +231,8 @@ export class WMTSDataRetriever {
 
           // All products loaded
           if (loading - loaded == 0){
-            onLoadCallback()
+            if (onLoadCallback)
+              onLoadCallback()
           }
         });
     });
@@ -520,6 +521,7 @@ export class WMTSDataRetriever {
     let dataSet = this.getDataSet(id, timeScale, tmst);
     
     if (dataSet == undefined){
+      console.log(dataName);
       console.log(this.dataSets.filter(dt => dt.id == id));
       return; //document.createElement('span').innerHTML = 'No data for ' + dataName + " at " + timeScale + " - req: ";
     }
