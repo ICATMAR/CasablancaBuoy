@@ -472,7 +472,7 @@ export class WMTSDataRetriever {
 
     if (formattedTmst == undefined){
       this.printLog(dataSet.id + " at " + dataSet.timeScale + " does not contain the timespan with timestamp " + tmst);
-      return document.createElement('span').innerHTML = 'No data for--';
+      return; //document.createElement('span').innerHTML = 'No data for--';
     }
 
     let templateURL = dataSet.template.replace('{Time}', formattedTmst);
@@ -514,14 +514,14 @@ export class WMTSDataRetriever {
     // var date = '2010-01-12T12:00:00.000Z';
     // var timeScale = 'd';
     //TODO: This will change to GetFeatureInfo in July 2024
-  getDataAtPoint = function(dataName, tmst, lat, long, timeScale, direction){
+  getDataAtPoint = async function(dataName, tmst, lat, long, timeScale, direction){
   
     let id = this.getDataSetIdFromDataName(dataName);
     let dataSet = this.getDataSet(id, timeScale, tmst);
     
     if (dataSet == undefined){
       console.log(this.dataSets.filter(dt => dt.id == id));
-      return document.createElement('span').innerHTML = 'No data for ' + dataName + " at " + timeScale + " - req: ";
+      return; //document.createElement('span').innerHTML = 'No data for ' + dataName + " at " + timeScale + " - req: ";
     }
 
     // If we want the direction
@@ -537,7 +537,7 @@ export class WMTSDataRetriever {
     let formattedTmst = this.getFormattedTmst(dataSet, tmst);
     if (formattedTmst == undefined){
       console.error(dataSet.id + " at " + dataSet.timeScale + " does not contain the timespan with timestamp " + tmst);
-      return document.createElement('span').innerHTML = 'No data for--';
+      return;//document.createElement('span').innerHTML = 'No data for--';
     }
     // Construct WMTS url
     let templateURL = dataSet.template.replace('{Time}', formattedTmst);
@@ -552,20 +552,14 @@ export class WMTSDataRetriever {
     templateURL = templateURL.replace('{TileCol}', tileCol);
     templateURL = templateURL.replace('{TileRow}', tileRow);
 
-    let img = document.createElement('img');
-    img.src = templateURL;
-    img.title = dataSet.id + " at " + dataSet.timeScale;
-    return img;
-    
-    // TODO direction
 
     // If no direction is requested
-    // if (direction == undefined){
-    //   // Get value from URL
-    //   return await this.getPreciseValueFromURL(url, dataInfo.range);
-    // }
+    if (direction == undefined){
+      // Get value from URL
+      return await this.getValueAtPointFromURL(templateURL, dataSet.range, long, lat, tileMatrix);//this.getPreciseValueFromURL(templateURL, dataInfo.range);
+    }
 
-
+    // TODO
 
     // // If direction is requested
     // let animData = dataInfo.animation;
@@ -591,14 +585,96 @@ export class WMTSDataRetriever {
 
 
   // Calculate tile row and column
-  lon2tile4326 = function(lon, tilematrix){
-    return Math.floor((lon + 180) / 180 * Math.pow(2, tilematrix));
+  lon2tile4326 = function(lon, tileMatrix){
+    return Math.floor((lon + 180) / 180 * Math.pow(2, tileMatrix));
   }
-  lat2tile4326 = function(lat, tilematrix){
-    return Math.floor((90 - lat)/180 * Math.pow(2, tilematrix));  
+  lat2tile4326 = function(lat, tileMatrix){
+    return Math.floor((90 - lat)/180 * Math.pow(2, tileMatrix));  
   }
 
 
+
+
+
+
+  // Returns the value from a WMTS URL
+  getValueAtPointFromURL = async function(url, range, lon, lat, tileMatrix, mustBePrecise){
+    let img = await this.getTileFromURL(url);
+    // Remove image from active requests
+    this.activeRequests = this.activeRequests.filter( el => el.src != url); // Memory garbage? TODO?
+
+    if (mustBePrecise != true){
+      let value = await this.getNormValueFromImage(img, lon, lat, tileMatrix);
+      if (value == undefined) {
+        this.printWarn("No data at " + url);
+        return;
+      }
+      // Put in range of the data type (normValue * (max-min) + min)
+      value = value * (range[1] - range[0]) + range[0];
+      return value;
+    }
+    return 
+  }
+
+
+
+  // Create a canvas with size 1 and extract the pixel value
+  getNormValueFromImage = function(img, lon, lat, tileMatrix){
+    let canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    // TODO: canvas must have image width and height
+    // TODO: get image data should target the pixel index
+    
+    // TODO: getting the column and row decimals would probably help. There is a smarter way to do this
+    let tileCol = this.lon2tile4326(lon, tileMatrix);
+    let tileRow = this.lat2tile4326(lat, tileMatrix);
+    let tileSize = 180 / Math.pow(2 , tileMatrix);
+    // Get index columns
+    let lonLeft = tileCol * tileSize - 180;
+    let indexCol = ((lon - lonLeft) / tileSize) * canvas.width;
+    // Get index rows
+    let latTop = 90 - tileRow * tileSize;
+    let indexRow = ((latTop - lat) / tileSize) * canvas.height;
+    
+    let ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0); // Instead of painting the whole image, maybe paint just a pixel?
+    let pixels = ctx.getImageData(Math.floor(indexCol), Math.floor(indexRow), 1, 1);
+    let pixel = pixels.data[0];
+    // Alpha
+    let alpha = pixels.data[3];
+    if (alpha == 0)
+      return undefined;
+    return pixel/255;
+  }
+
+
+  
+  // Create an image element and load the image
+  // HACK: errors are not catched when fetching image urls. If errors are catched, the data does not load
+  getTileFromURL = function(url){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.addEventListener('load', () => resolve(img));
+      img.addEventListener('error', reject); // If reject(img), image does not load
+      img.src = url;
+      this.activeRequests.push(img);
+      //this.printLog(url);
+    })
+  }
+
+
+
+
+
+
+  // Cancels active requests
+  cancelActiveRequests = function(){
+    this.activeRequests.forEach(el => el.src = "");
+    this.activeRequests = [];
+  }
 
 
   // Verbose

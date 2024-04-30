@@ -21,10 +21,20 @@
       container.style["flex-direction"] = 'row';
 
       let text = document.createElement('span');
-      let tmst = '2022-05-31T00:00:00Z'; // (dataSet.endTmst || 'now') new Date().toISOString()
+      let tmst = new Date().toISOString();// '2022-05-31T00:00:00Z'; // (dataSet.endTmst || 'now') new Date().toISOString()
       text.innerHTML = dataSet.id + ", " + dataSet.timeScale +  ", " +  tmst;
       //let img = wmts.getImageAt(dataSet, new Date().toISOString());
-      let img = wmts.getDataAtPoint(dataSet.id, tmst, 41.3, 2.2, dataSet.timeScale);
+      let img = wmts.getDataAtPoint(dataSet.id, tmst, 41.3, 2.2, dataSet.timeScale).then(value => {
+        if (value != undefined){
+          try{
+            console.log(dataSet.name + " " + value.toFixed(2) + " " + dataSet.unit + " at " + dataSet.timeScale);
+          }
+          catch{
+            debugger;
+          }
+          
+          }
+      });
 
       container.append(img);
       container.append(text);
