@@ -421,9 +421,10 @@ export class WMTSDataRetriever {
   // Get the tmst for the WMTS call. Returns undefined if the dataSet does not contain the date
   getFormattedTmst = function(dataSet, tmst){
     // Tmst is before starting date
-    // if (new Date(tmst) < new Date(dataSet.startTmst)) {
-    //   return;
-    // }
+    // WAITING ON CMEMS RESPONSE --> THE DATES FROM GETCAPABILITIES ARE NOT RIGHT
+    if (new Date(tmst) < new Date(dataSet.startTmst)) {
+      return;
+    }
     let formattedTmst = undefined;
     // Time scale
     let timeScale = dataSet.timeScale;
@@ -449,10 +450,11 @@ export class WMTSDataRetriever {
     }
 
     // Tmst is after end date (forecast does not have an endTmst)
-    // if (dataSet.endTmst) {
-    //   if (new Date(formattedTmst) > new Date(dataSet.endTmst))
-    //     return;
-    // }
+    // WAITING ON CMEMS RESPONSE --> THE DATES FROM GETCAPABILITIES ARE NOT RIGHT
+    if (dataSet.endTmst) {
+      if (new Date(formattedTmst) > new Date(dataSet.endTmst))
+        return;
+    }
 
     return formattedTmst;
   }
