@@ -21,8 +21,10 @@
       container.style["flex-direction"] = 'row';
 
       let text = document.createElement('span');
-      text.innerHTML = dataSet.id + ", " + dataSet.timeScale +  ", " + (dataSet.endTmst || 'now') ;
-      let img = wmts.getImageAt(dataSet, new Date().toISOString());
+      let tmst = '2022-05-31T00:00:00Z'; // (dataSet.endTmst || 'now') new Date().toISOString()
+      text.innerHTML = dataSet.id + ", " + dataSet.timeScale +  ", " +  tmst;
+      //let img = wmts.getImageAt(dataSet, new Date().toISOString());
+      let img = wmts.getDataAtPoint(dataSet.id, tmst, 41.3, 2.2, dataSet.timeScale);
 
       container.append(img);
       container.append(text);

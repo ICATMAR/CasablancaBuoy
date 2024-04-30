@@ -344,7 +344,7 @@ export class WMTSDataRetriever {
             // Sort dates
             dataSet.dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
             // Store start and end dates
-            dataSet.startDate = dataSet.dates[0];
+            dataSet.startTmst = dataSet.dates[0];
             // Only store end time if it is not forecast
             let endTmst = dataSet.dates[dataSet.dates.length - 1];
             if (new Date(endTmst) < new Date())
@@ -376,7 +376,6 @@ export class WMTSDataRetriever {
       this.printLog("*** --- No dataSets have been loaded");
       return;
     }
-
     // Get dataSets with the id
     let selDataSets = this.dataSets.filter((dataSet) => dataSet.id == id);
     if (selDataSets.length == 0){
@@ -387,7 +386,8 @@ export class WMTSDataRetriever {
     let tScaleDataSets = selDataSets.filter((dataSet) => dataSet.timeScale == timeScale);
     if (tScaleDataSets.length == 0){
       this.printLog("DataSet does not have the timeScale of " + timeScale);
-      tScaleDataSets = selDataSets; // Any?
+      return;
+      tScaleDataSets = selDataSets; // Take other timeScales?
     }
     // Select oldest first if possible (usually reanalysis)
     // Sort by date (oldest first)
@@ -402,12 +402,12 @@ export class WMTSDataRetriever {
       }
       // tmst is inside range
       if (new Date(tScaleDataSets[i].startTmst) < new Date(tmst) && new Date(tScaleDataSets[i].endTmst) > new Date(tmst)){
-        selectedDataSet = tScaleDataSets[i].startTmst;
+        selectedDataSet = tScaleDataSets[i];
         break;
       }
     }
     if (selectedDataSet == undefined){
-      this.printLog("No dataSet contains the selected timestamp");
+      this.printLog("No dataSet with id="+ id +" contains the selected timestamp: " + tmst + " at a timeScale of " + timeScale);
     }
 
     return selectedDataSet;    
@@ -488,6 +488,115 @@ export class WMTSDataRetriever {
   }
 
 
+
+  // DataSets can have different names (Hs, Hm0, Significant Wave Height, VHM0...)
+  // This helper permits to ask for the dataSet without knowing the specific id
+  getDataSetIdFromDataName = function(dataName){
+    for (let i = 0; i < this.dataSets.length; i++){
+      let dataSet = this.dataSets[i];
+      if (dataSet.shortName == dataName)
+        return dataSet.id;
+      else if (dataSet.id == dataName)
+        return dataSet.id;
+      else if (dataSet.altNames)
+        if (dataSet.altNames.includes(dataName))
+          return dataSet.id;
+      else if (dataSet.name == dataName)
+        return dataSet.id;
+    }
+  }
+
+  // Get data at a specific point
+    // Input variables
+    // var dataName = "Sea temperature";
+    // var lat = 41;
+    // var long = 2.9;
+    // var date = '2010-01-12T12:00:00.000Z';
+    // var timeScale = 'd';
+    //TODO: This will change to GetFeatureInfo in July 2024
+  getDataAtPoint = function(dataName, tmst, lat, long, timeScale, direction){
+  
+    let id = this.getDataSetIdFromDataName(dataName);
+    let dataSet = this.getDataSet(id, timeScale, tmst);
+    
+    if (dataSet == undefined){
+      console.log(this.dataSets.filter(dt => dt.id == id));
+      return document.createElement('span').innerHTML = 'No data for ' + dataName + " at " + timeScale + " - req: ";
+    }
+
+    // If we want the direction
+    if (direction) {
+      // Check if direction exists (animation)
+      if (dataSet.animation == undefined) {
+        console.error("Data set " + dataName + " does not have direction information.");
+        return;
+      }
+    }
+
+    // Get formatted timestamp of dataSet and check if it has data available on that tmst
+    let formattedTmst = this.getFormattedTmst(dataSet, tmst);
+    if (formattedTmst == undefined){
+      console.error(dataSet.id + " at " + dataSet.timeScale + " does not contain the timespan with timestamp " + tmst);
+      return document.createElement('span').innerHTML = 'No data for--';
+    }
+    // Construct WMTS url
+    let templateURL = dataSet.template.replace('{Time}', formattedTmst);
+    // Projection
+    templateURL = templateURL.replace('{TileMatrixSet}', 'EPSG:4326'); //EPSG:4326, 3857
+    // Tile matrix
+    let tileMatrix = 6;
+    templateURL = templateURL.replace('{TileMatrix}', tileMatrix);
+    // Find tile
+    let tileCol = this.lon2tile4326(long, tileMatrix);
+    let tileRow = this.lat2tile4326(lat, tileMatrix);
+    templateURL = templateURL.replace('{TileCol}', tileCol);
+    templateURL = templateURL.replace('{TileRow}', tileRow);
+
+    let img = document.createElement('img');
+    img.src = templateURL;
+    img.title = dataSet.id + " at " + dataSet.timeScale;
+    return img;
+    
+    // TODO direction
+
+    // If no direction is requested
+    // if (direction == undefined){
+    //   // Get value from URL
+    //   return await this.getPreciseValueFromURL(url, dataInfo.range);
+    // }
+
+
+
+    // // If direction is requested
+    // let animData = dataInfo.animation;
+    // // Angle format
+    // if (animData.format == 'value_angle'){
+    //   url = WMTSDataRetriever.setWMSParameter(url, 'LAYERS', animData.layerNames[1]);
+    //   url = WMTSDataRetriever.setWMSParameter(url, 'COLORSCALERANGE', String([-360,360]));
+
+    //   // Get value from URL
+    //   let value = await this.getPreciseValueFromURL(url, [-360, 360]);
+    //   return value;
+    // } 
+    // // East-North format
+    // else if (animData.format == 'east_north'){
+
+    //   // Calculate angle
+    //   // TODO: could call an async function where east and north are requested at the same time
+    //   return await this.getEastNorthValues(url, animData.layerNames, dataInfo.range);
+    // }
+
+  }
+
+
+
+  // Calculate tile row and column
+  lon2tile4326 = function(lon, tilematrix){
+    return Math.floor((lon + 180) / 180 * Math.pow(2, tilematrix));
+  }
+  lat2tile4326 = function(lat, tilematrix){
+    return Math.floor((90 - lat)/180 * Math.pow(2, tilematrix));  
+  }
 
 
 
