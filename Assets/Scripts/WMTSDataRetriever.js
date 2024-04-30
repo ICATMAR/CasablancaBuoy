@@ -1,383 +1,206 @@
-//import preLoadedDataTypes from "/CasablancaBuoy/data/WMSDataTypes.js";
+// import preLoadedDataTypes from "/CasablancaBuoy/Assets/Scripts/WMTSDataTypes.js";
 
-// To test and check the service you an use https://www.arcgis.com/home/webmap/viewer.html and press Modify map
+// Scripts that obtain data from the CMEMS WMTS API
+// https://help.marine.copernicus.eu/en/articles/6478168-how-to-use-wmts-to-visualize-data#h_2523403b15
 
-// Scripts that obtain data from the CMEMS WMS API
-export class WMTSDataRetriever{
+// Examples
+// https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:4326&style=range:0/6,cmap:gray&tilematrix=5&tilerow=8&tilecol=32&layer=MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105/VHM0&time=2025-04-30T09:00:00.000Z
+// https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=range:0/6,cmap:gray&tilematrix=6&tilerow=23&tilecol=32&layer=MEDSEA_ANALYSISFORECAST_WAV_006_017/cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311/VHM0&time=2024-04-30T09:00:00.000Z
 
-// Variables:
-// Requests - keep track of what is requested
-activeRequests = [];
-// DATA TYPES ARE STORED ELSEWHERE (WMTSDataTypes.js). If you modify them, reload capabilities in the constructor and store in WMTSDataTypes.js
-dataTypes = {
-  "Sea surface velocity": {
-    // CMEMS DOES NOT PROVIDE NOW THE MAGNITUDE, ONLY UO AND VO. I ASKED IF THEY ARE GOING TO ADD IT
-    // http://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset={TileMatrixSet}&style={Style}&tilematrix={TileMatrix}&tilerow={TileRow}&tilecol={TileCol}&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-cur-rean-d_202012/uo"
-    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:balance&tilematrix=5&tilerow=12&tilecol=18&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-cur-rean-h_202012/vo
-    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-cur-rean-h_202012?request=GetCapabilities&service=WMS
-    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-cur-rean-d_202012?request=GetCapabilities&service=WMS
-    name: 'Sea surface velocity',
-    altNames: ['Sea surface velocity', 'Current', 'Sea velocity'],
-    doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
-    datasetURL: 'med-cmcc-cur-rean-{timeScale}_202012',
-    productURL: 'MEDSEA_MULTIYEAR_PHY_006_004/',
-    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-    version: '1.0.0',
-    layerName: '?? asked copernicus', //? layer in WMTS seems to be PRODUCT/DATASET/LAYER
-    timeScales: ['h', 'd', 'm'],
-    range: [0, 1.5],
-    units: 'm/s',
-    style: "boxfill/occam",//"vector/occam",
-    animation: {
-      layerNames: ['uo', 'vo'], // East, North
-      format: 'east_north',
-      type: 'velocity'
+export class WMTSDataRetriever {
+
+  // Requests - keep track of what is requested
+  activeRequests = [];
+  // Store GetCapabilities XML per product
+  productsXML = {};
+
+  products = {
+    "Mediterranean Sea Waves Reanalysis": {
+      /*
+        Available datasets
+        VPED, VTPK
+        VHM0, VHM0_SW1, VHM0_SW2, VHM0_WW
+        VMDR, VMDR_SW1, VMDR_SW2, VMDR_WW
+        VSDX, VSDY
+        VTM01_SW1, VTM01_SW2, VTM01_WW, VTM02
+        VTM10
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105?request=GetCapabilities&service=WMS',
+      doi: "https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012",
+      timeScales: ['h'],
+      dataSets: ['VHM0', 'VHM0_WW', 'VHM0_SW1', 'VHM0_SW2',
+                'VTM02', 'VTM01_WW', 'VTM01_SW1', 'VTM01_SW2',
+                'VMDR', 'VMDR_WW', 'VMDR_SW1', 'VMDR_SW2'],
     },
-    forecast: {
-      // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:balance&tilematrix=5&tilerow=12&tilecol=16&layer=MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-cur_anfc_4.2km-2D_PT1H-m_202311/uo
-      datasetURL: 'cmems_mod_med_phy-cur_anfc_4.2km{timeScale}_202311',
-      productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-      timeScales: ['15min', 'h', 'd', 'm'],
-      timeScaleKeys: {'15min': '_PT15M-i','h': '-3D_PT1H-m', 'd': '_P1D-m', 'm': '_P1M-m'}, //https://data.marine.copernicus.eu/product/MEDSEA_ANALYSISFORECAST_PHY_006_013/services
-      version: '1.0.0',
-      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8",
-      //timeScaleCorrection: // TODO BY SCRIPT??
-      //  {h: {min: 30},d: {min: 0, h: 12}},
-      // CRS instead of SRS
+    "Mediterranean Sea Waves Analysis and Forecast": {
+      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017?request=GetCapabilities&service=WMS
+      /*
+      Available datasets
+      VCMX, VMXL, VPED, VTPK
+      VHM0, VHM0_SW1, VHM0_SW2, VHM0_WW
+      VMDR, VMDR_SW1, VMDR_SW2, VMDR_WW
+      VSDX, VSDY
+      VTM01_SW1, VTM01_SW2 ,VTM01_WW ,VTM02
+      VTM10
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017?request=GetCapabilities&service=WMS',
+      doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
+      timeScales: ['h'],
+      dataSets: ['VHM0', 'VHM0_WW', 'VHM0_SW1', 'VHM0_SW2',
+                'VTM02', 'VTM01_WW', 'VTM01_SW1', 'VTM01_SW2',
+                'VMDR', 'VMDR_WW', 'VMDR_SW1', 'VMDR_SW2'],
     },
-  },
-  "Sea temperature": {
-    // Reanalysis comes from a different base URL. Only monthly and daily
-    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-tem-rean-d_202012?request=GetCapabilities&service=WMS
-    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=5&tilerow=12&tilecol=16&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-tem-rean-d_202012/thetao
-    name: 'Sea temperature',
-    altNames: ['Sea temperature', 'SST', 'Sea Surface Temperature'],
-    doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
-    datasetURL: 'med-cmcc-tem-rean-{timeScale}_202012', // Forecast has different format,
-    productURL: 'MEDSEA_MULTIYEAR_PHY_006_004/',
-    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-    version: '1.0.0',
-    layerName: 'thetao',
-    timeScales: ['d', 'm'], // In reanalysis, not hourly available: 'h', 'h3', 'h6', 'h12', 
-    range: [10, 35],
-    units: 'ºC',
-    style: "boxfill/occam",
-    forecast: {
-      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-tem_anfc_4.2km-3D_PT1H-m_202311?request=GetCapabilities&service=WMS
-      datasetURL: 'cmems_mod_med_phy-tem_anfc_4.2km{timeScale}-m_202311',
-      productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-      timeScales: ['h', 'd', 'm'],//['1D-m', '1M-m', 'T1H-m', 'T1HTS-m', 'T15M-i'],
-      timeScaleKeys: {'h': '-3D_PT1H', 'd': '_P1D', 'm': '_P1M'},//-3D_PT1H
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-      version: '1.0.0',
-      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8",
-      // timeScaleCorrection: // TODO BY SCRIPT??
-        // {h: {min: 30}, d: {min: 0, h: 12}},
-      // CRS instead of SRS
-    },
-  },
-  "Sea bottom temperature": {
-    // Reanalysis comes from a different base URL. Only monthly and daily
-    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-tem-rean-m_202012?request=GetCapabilities&service=WMS
-    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=6&tilerow=23&tilecol=33&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-tem-rean-m_202012/bottomT
-    name: 'Sea bottom temperature',
-    altNames: ['Sea bottom temperature', 'SBT'],
-    doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
-    datasetURL: 'med-cmcc-tem-rean-{timeScale}_202012', // Forecast has different format
-    productURL: 'MEDSEA_MULTIYEAR_PHY_006_004/',
-    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-    version: '1.0.0',
-    layerName: 'bottomT',
-    timeScales: ['d', 'm'], // In reanalysis, not hourly available ('h') 
-    range: [10, 25],
-    units: 'ºC',
-    style: "boxfill/occam",
-    forecast: {
-      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-tem_anfc_4.2km-3D_PT1H-m_202311?request=GetCapabilities&service=WMS
-      datasetURL: 'cmems_mod_med_phy-tem_anfc_4.2km{timeScale}-m_202311',
-      productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-      timeScales: ['h', 'd', 'm'],//['1D-m', '1M-m', 'T1H-m', 'T1HTS-m', 'T15M-i'],
-      timeScaleKeys: {'h': '-3D_PT1H', 'd': '_P1D', 'm': '_P1M'},//-3D_PT1H
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-      version: '1.0.0',
-      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8",
-      // timeScaleCorrection: // TODO BY SCRIPT??
-        // {h: {min: 30}, d: {min: 0, h: 12}},
-      // CRS instead of SRS
-    },
-  },
-  "Sea temperature anomaly": {
-    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=6&tilerow=23&tilecol=31&layer=SST_MED_SST_L4_NRT_OBSERVATIONS_010_004/SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b/sst_anomaly
-    // https://wmts.marine.copernicus.eu/teroWmts/SST_MED_SST_L4_NRT_OBSERVATIONS_010_004/SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b?request=GetCapabilities&service=WMS
-    name: 'Sea temperature anomaly',
-    altNames: ['Sea temperature anomaly', 'Sea surface temperature anomaly', 'SSTA'],
-    doi: "https://doi.org/10.48670/moi-00172",
-    datasetURL: 'SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b',
-    productURL: 'SST_MED_SST_L4_NRT_OBSERVATIONS_010_004', 
-    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-    layerName: 'sst_anomaly',
-    version: '1.0.0',
-    urlLocked: true,
-    timeScales: ['d'], 
-    range: [-5, 5],
-    units: 'ºC',
-    style: "boxfill/redblue",
-    // TODO: If there is no forecast, try the service anyway when requesting data
-    // forecast: {
-    //   url: 'SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d', 
-    //   timeScales: ['d'],
-    //   domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-    //   version: '1.3.0',
-    //   doi: "https://doi.org/10.48670/moi-00172",
-    //   timeScaleCorrection:
-    //     {d: {min: 0, h: 12}},
-    // }
-  },
-  "Salinity": {
-    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-sal-rean-m_202012?request=GetCapabilities&service=WMS
-    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=6&tilerow=23&tilecol=33&layer=MEDSEA_MULTIYEAR_PHY_006_004/med-cmcc-sal-rean-m_202012/so
-    name: 'Salinity',
-    altNames: ['Salinity', 'Sal', 'Sea surface salinity'],
-    doi: "https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1",
-    datasetURL: 'med-cmcc-sal-rean-{timeScale}_202012', // Forecast has different format
-    productURL: 'MEDSEA_MULTIYEAR_PHY_006_004/',
-    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-    version: '1.0.0',
-    layerName: 'so',
-    timeScales: ['d', 'm'], // In reanalysis, not hourly available ('h') 
-    range: [32, 41],
-    units: '‰',
-    style: "boxfill/occam",
-    forecast: {
-      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-sal_anfc_4.2km-3D_PT1H-m_202311?request=GetCapabilities&service=WMS
-      datasetURL: 'cmems_mod_med_phy-tem_anfc_4.2km{timeScale}-m_202311',
-      productURL: 'MEDSEA_ANALYSISFORECAST_PHY_006_013/',
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
+    "Mediterranean Sea Physics Reanalysis": {
+      /*
+      Available datasets 
+        uo, vo, wo - Current
+        so, - Salinity
+        zos - Sea Surface Height
+        thetao, bottomT - Potential temperature
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_PHY_006_004?request=GetCapabilities&service=WMS',
+      doi: 'https://doi.org/10.25423/CMCC/MEDSEA_MULTIYEAR_PHY_006_004_E3R1I',
       timeScales: ['h', 'd', 'm'],
-      timeScaleKeys: {'h': 'T1H-m', 'd': '1D-m', 'm': '1M-m'},
-      version: '1.0.0',
-      doi: "https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8",
-      // timeScaleCorrection: // TODO BY SCRIPT
-      //   {h: {min: 30}, d: {min: 0, h: 12}},
-      // CRS instead of SRS
+      dataSets: ['uo', 'vo', 'wo', 'so', 'thetao', 'bottomT']
     },
-  },
-  "Wave significant height": {
-    // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105?request=GetCapabilities&service=WMS
-    // https://wmts.marine.copernicus.eu/teroWmts/?service=WMTS&version=1.0.0&request=GetTile&tilematrixset=EPSG:3857&style=cmap:thermal&tilematrix=6&tilerow=23&tilecol=33&layer=MEDSEA_MULTIYEAR_WAV_006_012/med-hcmr-wav-rean-h_202105/VHM0
-    name: 'Wave significant height',
-    altNames: ['Wave significant height', 'Waves', 'WSH'],
-    doi: 'https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012',
-    datasetURL: 'med-hcmr-wav-rean-h_202105', // Forecast has different format
-    productURL: 'MEDSEA_MULTIYEAR_WAV_006_012/',
-    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-    version: '1.0.0',
-    layerName: 'VHM0', // 'VMDR' for direction in degrees
-    timeScales: ['h'],
-    urlLocked: true,
-    range: [0, 6],
-    units: 'm',
-    style: "boxfill/alg",//occam_pastel-30",
-    animation: {
-      layerNames: ['VHM0', 'VMDR'], // Intensity, Angle
-      format: 'value_angle',
-      type: 'wave'
+    "Mediterranean Sea Physics Analysis and Forecast": {
+      /*
+      Available datasets 
+        uo, vo, wo - Current
+        so, - Salinity
+        zos - Sea Surface Height
+        thetao, bottomT - Potential temperature
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_PHY_006_013?request=GetCapabilities&service=WMS',
+      doi: 'https://doi.org/10.25423/CMCC/MEDSEA_ANALYSISFORECAST_PHY_006_013_EAS8',
+      timeScales: ['h', 'd', 'm'],
+      dataSets: ['uo', 'vo', 'wo', 'so', 'thetao', 'bottomT']
     },
-    forecast: {
-      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017/cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311?request=GetCapabilities&service=WMS
-      datasetURL: 'cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311', 
-      productURL: 'MEDSEA_ANALYSISFORECAST_WAV_006_017/',
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.0.0',
-      timeScales: ['h'],
-      urlLocked: true,
-      doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
-      // CRS instead of SRS
+    "Mediterranean Sea Biogechemistry Reanalysis": {
+      /*
+      Available datasets 
+        nppv, o2 - Primary Production and Oxygen
+        dissic, ph, talk - Dissolved Inorganic Carbon, pH and Alkalinity
+        fpco2, spco2 - Surface partial pressure of CO2 and Surface CO2 flux
+        nh4, no3, po4 - Nitrate, Phosphate and Ammonium
+        chl, phyc - Phytoplankton Carbon Biomass and Chlorophyll
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_BGC_006_008?request=GetCapabilities&service=WMS',
+      doi: 'https://doi.org/10.25423/cmcc/medsea_multiyear_bgc_006_008_medbfm3',
+      timeScales: ['d', 'm'],
+      dataSets: ['chl']
     },
-  },
-  "Wind wave significant height": {
-    name: 'Wind wave significant height',
-    altNames: ['Wind wave significant height', 'Wind waves', 'WWSH'],
-    doi: 'https://doi.org/10.25423/cmcc/medsea_multiyear_wav_006_012',
-    datasetURL: 'med-hcmr-wav-rean-h_202105', // Forecast has different format
-    productURL: 'MEDSEA_MULTIYEAR_WAV_006_012/',
-    domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-    version: '1.0.0',
-    layerName: 'VHM0_WW', // 'VMDR' for direction in degrees
-    timeScales: ['h'],
-    urlLocked: true,
-    range: [0, 6],
-    units: 'm',
-    style: "boxfill/sst_36", //occam_pastel-30",
-    animation: {
-      layerNames: ['VHM0_WW', 'VMDR_WW'], // Intensity, Angle
-      format: 'value_angle',
-      type: 'whiteWave'
+  };
+
+  // Custom dataType definitions
+  // One could use standard dictionaries / vocabularies?
+  // These are useful for the interface, UI
+  customDefinitions = {
+    'VHM0': {
+      shortName: 'Wave height',
+      altNames: ['Hs', 'Hm0', 'Wave significant height', 'Spectral significant wave height (Hm0)'],
+      range: [0,6],
+      animation: {
+        layerNames: ['VHM0', 'VMDR'], // Intensity, Angle
+        format: 'value_angle',
+        type: 'wave'
+      },
     },
-    forecast: {
-      // https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_WAV_006_017/cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311?request=GetCapabilities&service=WMS
-      datasetURL: 'cmems_mod_med_wav_anfc_4.2km_PT1H-i_202311', 
-      productURL: 'MEDSEA_ANALYSISFORECAST_WAV_006_017/',
-      domainURL: 'https://wmts.marine.copernicus.eu/teroWmts/',
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.0.0',
-      timeScales: ['h'],
-      urlLocked: true,
-      doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam4',
-      // CRS instead of SRS
+    'VTM02': {
+      shortName: 'Wave period',
+      range: [0, 18],
     },
-  },
-  "Wave period": {
-    name: 'Wave period',
-    altNames: ['Wave period', 'Period'],
-    doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3',
-    scientificName: 'Sea surface wave mean period from variance spectral density inverse frequency moment',
-    url: 'med-hcmr-wav-rean',// Forecast 'med-hcmr-wav-an-fc',
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
-    layerName: 'VTM10', // Check out other period measures
-    timeScales: ['h', 'h3', 'h6', 'h12'],
-    range: [0, 18],
-    units: 's',
-    style: "boxfill/sst_36", //occam_pastel-30",
-    forecast: {
-      url: 'med-hcmr-wav-an-fc',
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
-      timeScales: ['h', 'h3', 'h6', 'h12'],
-      // CRS instead of SRS
+    'VTM01_WW': {
+      shortName: 'Wave period',
+      range: [0, 18],
     },
-  },
-  // WIND WAVE PERIOD MISSING
-  // SWELL
-  "Primary swell wave significant height": {
-    name: 'Primary swell wave significant height',
-    altNames: ['Primary swell wave significant height', 'Primary swell waves', 'VHM0_SW1'],
-    doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3',
-    url: 'med-hcmr-wav-rean',// Forecast 'med-hcmr-wav-an-fc',
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
-    layerName: 'VHM0_SW1', // 'VMDR' for direction in degrees
-    timeScales: ['h', 'h3', 'h6', 'h12'],
-    range: [0, 6],
-    units: 'm',
-    style: "boxfill/sst_36", //occam_pastel-30",
-    animation: {
-      layerNames: ['VHM0_SW1', 'VMDR_SW1'], // Intensity, Angle
-      format: 'value_angle',
-      type: 'whiteWave'
+    'VTM01_SW1': {
+      shortName: 'Wave period',
+      range: [0, 18],
     },
-    forecast: {
-      url: 'med-hcmr-wav-an-fc',
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
-      timeScales: ['h', 'h3', 'h6', 'h12'],
-      // CRS instead of SRS
+    'VTM01_SW2': {
+      shortName: 'Wave period',
+      range: [0, 18],
     },
-  },
-  "Secondary swell wave significant height": {
-    name: 'Secondary swell wave significant height',
-    altNames: ['Secondary swell wave significant height', 'Secondary swell waves', 'VHM0_SW2'],
-    doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_wav_006_017_medwam3',
-    url: 'med-hcmr-wav-rean',// Forecast 'med-hcmr-wav-an-fc',
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
-    layerName: 'VHM0_SW2', // 'VMDR' for direction in degrees
-    timeScales: ['h', 'h3', 'h6', 'h12'],
-    range: [0, 6],
-    units: 'm',
-    style: "boxfill/sst_36", //occam_pastel-30",
-    animation: {
-      layerNames: ['VHM0_SW2', 'VMDR_SW2'], // Intensity, Angle
-      format: 'value_angle',
-      type: 'whiteWave'
+    'VHM0_WW': {
+      shortName: 'Wind wave height',
+      altNames: ['Wind wave significant height', 'Wind waves', 'WWSH'],
+      range: [0,6],
     },
-    forecast: {
-      url: 'med-hcmr-wav-an-fc',
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
-      timeScales: ['h', 'h3', 'h6', 'h12'],
-      // CRS instead of SRS
+    'VMDR': {
+      shortName: 'Wave direction',
+      altNames: ['Mean wave direction', 'MDIR'],
+      unit: 'º',
+      range: [0, 360],
     },
-  },
-  'Chlorophyll': {
-    // https://my.cmems-du.eu/thredds/wms/med-ogs-pft-rean-d?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
-    // https://my.cmems-du.eu/thredds/wms/med-ogs-pft-rean-m?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities
-    name: 'Chlorophyll',
-    altNames: ['Chlorophyll', 'Chl'],
-    doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_bgc_006_014_medbfm3',
-    url: 'med-ogs-pft-rean',// Forecast: 'med-ogs-pft-an-fc',
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    version: '1.1.1',
-    layerName: 'chl',
-    timeScales: ['d', 'd3', 'm'],
-    range: [0.01, 0.3],
-    units: 'mg/m3',
-    style: 'boxfill/occam',
-    forecast: {
-      url: 'cmems_mod_med_bgc-pft_anfc_4.2km_P',
-      timeScales: ['d', 'm'],//['1D-m', '1M-m'],
-      timeScaleKeys: {'d': '1D-m', 'm': '1M-m'},
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
-      doi: "https://doi.org/10.25423/cmcc/medsea_analysisforecast_bgc_006_014_medbfm4",
-      timeScaleCorrection:
-        {d: {min: 0, h: 12}},
-      // CRS instead of SRS
+    'VHM0_WW': { // Wind wave height
+      range: [0, 6],
+      animation: {
+        layerNames: ['VHM0_WW', 'VMDR_WW'], // Intensity, Angle
+        format: 'value_angle',
+        type: 'whiteWave'
+      },
     },
-    // https://nrt.cmems-du.eu/thredds/wms/med-ogs-pft-an-fc-d?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&TILED=true&COLORSCALERANGE=0.028321734%2C2.3005204&ELEVATION=-1.0182366371154785&LAYERS=chl&STYLES=boxfill/rainbow&TIME=2021-10-06T12%3A00%3A00.000Z&WIDTH=256&HEIGHT=256&CRS=EPSG%3A4326&BBOX=28.125%2C16.875%2C33.75%2C22.5
-  },
-  "Wind": { // https://doi.org/10.48670/moi-00184, https://doi.org/10.48670/moi-00185
-    name: 'Wind',
-    altNames: ['Wind'],
-    doi: 'https://doi.org/10.48670/moi-00185',
-    url: 'cmems_obs-wind_glo_phy_my_l4_0.125deg_PT1H',
-    domainURL: 'https://my.cmems-du.eu/thredds/wms/',
-    urlLocked: true,
-    version: '1.1.1',
-    layerName: 'wind',
-    timeScales: ['h'],
-    range: [0, 30],
-    units: 'm/s',
-    style: "boxfill/occam",//"vector/occam",
-    animation: {
-      layerNames: ['eastward_wind', 'northward_wind'], // East, North
-      format: 'east_north',
-      type: 'wind'
+    'VHM0_SW1': { // Swell 1 wave height
+      range: [0, 6],
+      animation: {
+        layerNames: ['VHM0_SW1', 'VMDR_SW1'], // Intensity, Angle
+        format: 'value_angle',
+        type: 'wave'
+      },
     },
-    forecast: {
-      url: 'cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H',
-      domainURL: 'https://nrt.cmems-du.eu/thredds/wms/',
-      version: '1.1.1',
-      doi: 'https://doi.org/10.48670/moi-00305',
-      timeScales: ['h'],
-      urlLocked: true,
-      timeScaleCorrection:
-        {d: {min: 0, h: 12}},
-      // CRS instead of SRS
+    'VHM0_SW2': { // Swell 2 wave height
+      range: [0, 6],
+      animation: {
+        layerNames: ['VHM0_SW2', 'VMDR_SW2'], // Intensity, Angle
+        format: 'value_angle',
+        type: 'wave'
+      },
     },
-  },
-}
+    'uo': {
+      range: [0, 1.5],
+      unit: 'm/s',
+    },
+    'vo': {
+      range: [0, 1.5],
+      unit: 'm/s',
+    },
+    'wo': {
+      range: [0, 1.5],
+      unit: 'm/s',
+    },
+    'thetao': {
+      shortName: 'Surface temperature',
+      range: [10, 35],
+      unit: 'ºC',
+    },
+    'bottomT': {
+      range: [10, 25],
+      shortName: 'Bottom temperature',
+      unit: 'ºC'
+    },
+    'so': {
+      shortName: 'Salinity',
+      range: [32, 41],
+      unit: '‰',
+    },
+    'chl': {
+      shortName: 'Chlorophyll',
+      range: [0.01, 0.3],
+      unit: 'mg/m³',
+    }
+  }
 
 
 
-  // Create object with CMEMS product urls
-  // https://resources.marine.copernicus.eu/products
-  timeScales = ["h", "h6", "d", "m"]; // TODO: Note 1: the dataTypes have certain timeScales that are defined by me, not by the product. 
-  // For example, wind has only h6 (intervals of 6h), whereas others can have hourly intervals.
-  // They also have the timescale h6, not because the service provides it, but because I decide to show this interval in the front end.
+  dataSets = [];
+  
+
+
 
 
   // CONSTRUCTOR
   constructor(onLoadCallback, verbose){
-    // Loading control
-    let loading = 0;
-    let loaded = 0;
-
     // Verbose
     if (verbose){
       this.printLog = this.printLogConsole;
@@ -386,470 +209,287 @@ dataTypes = {
       this.printLog = ()=> {};
       this.printWarn = ()=> {};
     }
-
-    // Preloaded data types
-    // Comment this three lines to update the WMSDataTypes
-    this.dataTypes = JSON.parse(preLoadedDataTypes);
-    if (onLoadCallback !== undefined) onLoadCallback();
-    return
-
-    // Iterate over data types and connect with the WMS service
-    // Adds the time intervals to the dataTypes.
-    // Adds elevation parameter if available. This might be useful to make plots time-depth
-    let dataTypes = this.dataTypes;
-    let timeScales = this.timeScales;
-    Object.keys(dataTypes).forEach(dataTypeKey => {
-      let dataType = dataTypes[dataTypeKey];
-      dataType.timeScaleCorrection = {}; // Introduce new field for time corrections (daily forecast sometimes has 12h instead of 00h)
- 
-      // Iterate over timescales
-      for (let i = 0; i < timeScales.length; i++) {
-        let currTimeScale = timeScales[i];
-        // Skip if time scale is not present in datatype
-        if (dataType.timeScales.includes(currTimeScale)){
-          let oPURL = dataType.url;
-          if (!dataType.urlLocked) // Wind product does not use the '-timeScale' url format
-            oPURL += "-" + currTimeScale[0]; // TODO: currTimeScale[0] instead of currTimeScale is a HACK for TODO Note 1
-          // Get Capabilities
-          loading++;
-          this.loadWMSCapabilities(dataType, dataType.domainURL + oPURL, currTimeScale)
-            .then(() => {
-              // Callback when all capabilities have been loaded
-              loaded++;
-              if (loading - loaded == 0){
-                debugger;
-                if (onLoadCallback !== undefined)
-                  onLoadCallback();
-                
-                  console.log(JSON.stringify(dataTypes));
-              }
-              console.log("Total left to load: " + (loading - loaded));
-              
-            });
-        } else {
-          console.log("Skipping " + dataType.url + " in " + timeScales[i]);
-        }
-        
-      } // End of timeScales loop
-      
-    }) // End of data types loop
-    console.log(dataTypes);
-
     
-  } // End of constructor
 
+    // Load WMTS
+    // Loading control
+    let loading = 0;
+    let loaded = 0;
+    // Iterate data types
+    Object.keys(this.products).forEach(productKey => {
+      let product = this.products[productKey];
+      product.name = productKey;
 
-  // Fetch the WMS capabilities and assign to dataType
-  loadWMSCapabilities = async function (dataType, baseURL, currTimeScale){
-    let capabilitiesURL = baseURL + "?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities";
-    // fetch
-    //this.printLog(capabilitiesURL);
-    let response = await fetch(capabilitiesURL);
-    let data = await response.text();
+      // Get Capabilities
+      loading++;
+      this.loadWMTSProduct(product)
+        .then(() => {
+          this.printLog(this.dataSets);
+          // Callback when all capabilities have been loaded
+          loaded++;
+          this.printLog("Total left to load: " + (loading - loaded));
 
-    const parser = new DOMParser();
-    let xml = parser.parseFromString(data, "application/xml");
-    let layers = xml.querySelectorAll('Layer');
-
-    // Iterate through layers
-    layers.forEach(ll => {
-      // Get layer by its name
-      if (ll.querySelector("Name").innerHTML == dataType.layerName && ll.attributes.queryable) {
-        this.printLog("Layer name: " + ll.querySelector("Name").innerHTML + ", Variable name: " + dataType.name);        
-        // Iterate through Dimensions (elevation, time)
-        ll.querySelectorAll("Dimension").forEach(dd => {
-          this.printLog("Dimension name: " + dd.attributes.name.nodeValue);
-          // Elevation
-          if (dd.attributes.name.nodeValue == "elevation") {
-            // Get elevation values
-            let tmpStr = dd.innerHTML.replace('\n', '[');
-            let elevationArray = JSON.parse(tmpStr + ']');
-            dataType.elevation = elevationArray;
-            // Time dimension
-          } else if (dd.attributes.name.nodeValue == "time") {
-
-            // Parse time (will depend on month, day)
-            if (currTimeScale == "h") {
-              let tmpStr = dd.innerHTML.replace('\n', '');
-              // Get the minutes (innerHTML example: '\n   2021-03-29T00:30:00.000Z/2022-02-28T23:30:00.000Z/PT1H')
-              let minutes = dd.innerHTML.substring(dd.innerHTML.indexOf('T') + 4, dd.innerHTML.indexOf('T') + 6);
-              dataType.timeScaleCorrection.h = { 'min': parseInt(minutes) };
-            } else if (currTimeScale == "d") {
-              let minutes = dd.innerHTML.substring(dd.innerHTML.indexOf('T') + 4, dd.innerHTML.indexOf('T') + 6);
-              let hours = dd.innerHTML.substring(dd.innerHTML.indexOf('T') + 1, dd.innerHTML.indexOf('T') + 3);
-              dataType.timeScaleCorrection.d = { 'min': parseInt(minutes), 'h': parseInt(hours) };
-            } else if (currTimeScale == "m") {
-              // Store all months available
-              let mTimeDesc = dd.innerHTML.replace(/[\n ]/g, '').split(','); // Remove [] and ' ', and split by time periods
-              // Can be
-              // 2019-05-16T12:00:00.000Z/2019-07-16T12:00:00.000Z/P30DT12H
-              // 2020-02-15T12:00:00.000Z
-              // Iterate time periods
-              let dates = [];
-              mTimeDesc.forEach(tDesc => {
-                if (tDesc.includes('/')) { // Time interval, e.g., 2019-05-16T12:00:00.000Z/2019-07-16T12:00:00.000Z/P30DT12H
-                  let tInt = tDesc.split('/'); // Time intervals
-                  let startT = new Date(tInt[0]);
-                  let endT = new Date(tInt[1]);
-                  while (startT <= endT) {
-                    dates.push(startT.toISOString());
-                    startT.setMonth(startT.getMonth() + 1);
-                  }
-                } else { // Specific time, e.g., 2020-02-15T12:00:00.000Z
-                  dates.push(tDesc);
-                }
-              });
-              dataType.timeScaleCorrection.m = { 'dates': dates };
-            }
-
-            // Get latest date recorded and store it in dataType
-            let lastDate = dataType.lastDate == undefined ? new Date(1950) : new Date(dataType.lastDate);
-            let timePeriods = dd.innerHTML.replace(/[\n ]/g, '').split(',');
-            let lastTime = timePeriods[timePeriods.length - 1];
-            if (lastTime.includes('/')){ // Time period e.g., 2019-05-16T12:00:00.000Z/2019-07-16T12:00:00.000Z/P30DT12H
-              let endDate = new Date(lastTime.split('/')[1]);
-              if (endDate > lastDate)
-                dataType.lastDate = endDate.toISOString();
-            } else {
-              if (new Date(lastTime) > lastDate)
-                dataType.lastDate = new Date(lastTime);
-            }
-
-
-
-          } else
-            this.printLog("Unknown dimension" + dd.attributes.name.nodeValue);
+          // All products loaded
+          if (loading - loaded == 0){
+            onLoadCallback()
+          }
         });
-      }
     });
+
   }
+
+
+
+
+
+
+  // Fetch the WMS capabilities and assign to dataSet
+  loadWMTSProduct = async function(product){
+    
+    // Fetch
+    let rawText = await fetch(product.wmtsURL).then(r => r.text());
+    let parser = new DOMParser();
+    let rawXML = parser.parseFromString(rawText, 'application/xml');
+    product.xml = rawXML;
+    // Show available layers
+    this.printLog('------------- New product loaded-----------\nAvailable products:');
+    rawXML.querySelectorAll('Layer').forEach(ll => {
+      this.printLog(ll.querySelector('Name').textContent);
+    });
+
+    // Iterate available datasets and compare to selected datasets from product
+    rawXML.querySelectorAll('Layer').forEach(ll => {
+      let id = ll.querySelector('Id').textContent;
+      // Get custom dataSet definitions
+      let custDef = this.customDefinitions[id] || {};
+      // Copy properties to dataSet object
+      let dataSet = JSON.parse(JSON.stringify(custDef));
+      // Assign properties from WMTS or from custom definitions
+      dataSet.id = id;
+      if (!product.dataSets.includes(dataSet.id)) {
+        return;
+      }
+      dataSet.name = ll.querySelector('Name').textContent;
+      dataSet.unit = dataSet.unit || ll.querySelector('Unit').textContent;
+      if (dataSet.unit == 'degree'){ dataSet.unit = 'º'; dataSet.range = [0, 360]; }
+      // Assign product properties
+      dataSet.doi = product.doi;
+      dataSet.productName = product.name;
+      dataSet.productProvider = product.xml.getElementsByTagNameNS("http://www.opengis.net/ows/1.1", "ProviderName")[0].textContent;
+      // Dataset template
+      dataSet.template = ll.querySelector('ResourceURL').attributes.template.textContent;
+      // Add date to template
+      dataSet.template += '&time={Time}';
+      // Add style range and color map
+      if (dataSet.range == undefined)
+        debugger;
+      dataSet.template = dataSet.template.replace('{Style}', 'range:'+ dataSet.range[0] +'/'+ dataSet.range[1] +',cmap:gray');
+
+      // Find if the product belongs to a time scale
+      // Iterate through Dimensions (elevation, time)
+      ll.querySelectorAll("Dimension").forEach(dd => {
+        // Elevation
+        if (dd.getElementsByTagName("ows:Identifier")[0].textContent == "elevation") {
+          // Get elevation values
+          let values = dd.querySelectorAll("Value");
+          if (values.length > 1) {
+            let elevationArray = [];
+            values.forEach(vv => {
+              elevationArray.push(vv.textContent);
+            });
+            dataSet.elevation = elevationArray;
+          } else if (values[0].textContent != '0'){
+            debugger;
+          }          
+        }
+        // Time dimension
+        if (dd.getElementsByTagName("ows:Identifier")[0].textContent == "time") {
+          // Text content example: '1993-01-01T00:00:00Z/2022-07-31T23:00:00Z/PT1H'
+          let values =  dd.querySelectorAll("Value");
+          if (values.length == 1){
+            let timeStr = values[0].textContent;
+            dataSet.startTmst = timeStr.split('/')[0];
+            // Only store end time if it is not forecast
+            let endTmst = timeStr.split('/')[1];
+            if (new Date(endTmst) < new Date())
+              dataSet.endTmst = endTmst;
+            let timeInterval = timeStr.split('/')[2];
+            dataSet.timeScale = timeInterval == 'PT1H' ? 'h' : timeInterval == 'P1D' ? 'd' : '';
+            if (dataSet.timeScale == ''){
+              this.printLog("Skipped " + dataSet.name + " at " + timeInterval)
+            } else {
+              // TODO Time scale corrections
+              // Hourly (min correction)
+              if (dataSet.timeScale == 'h' && endTmst.substring(14, 16) != '00'){
+                debugger;
+              } else if (dataSet.timeScale == 'd' && (endTmst.substring(14, 16) != '00' || endTmst.substring(11, 13) != '00')){
+                debugger;
+              }
+            }
+          } else {
+            // Calculate time interval
+            let timeDiff = Math.abs(new Date(values[0].textContent).getTime() - new Date(values[1].textContent).getTime()) / (1000*60*60*24);
+            // Monthly
+            if (timeDiff > 25 && timeDiff < 32)
+              dataSet.timeScale = 'm';
+            else {
+              dataSet.timeScale = '';
+              this.printLog("Skipped " + dataSet.name + " at " + timeDiff + " days")
+            }
+            // Store dates
+            dataSet.dates = [];
+            values.forEach(vv => {
+              dataSet.dates.push(vv.textContent);
+            });
+            // Sort dates
+            dataSet.dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+            // Store start and end dates
+            dataSet.startDate = dataSet.dates[0];
+            // Only store end time if it is not forecast
+            let endTmst = dataSet.dates[dataSet.dates.length - 1];
+            if (new Date(endTmst) < new Date())
+              dataSet.endTmst = endTmst;
+          }
+          
+        }
+      });
+
+      // Store selected dataSets (defined in products variable);
+      if (dataSet.timeScale != ''){
+        if (product.dataSets.includes(dataSet.id)){
+          this.dataSets.push(dataSet);
+          this.printLog(dataSet.name +  " at " + dataSet.timeScale);
+        }
+      }
+      
+      
+    });
+
+  }
+
+
+
+  // Get the best dataSet according to the id, timeScale and timestamp
+  getDataSet = function(id, timeScale, tmst){
+    // No data sets loaded
+    if (this.dataSets.length == 0){
+      this.printLog("*** --- No dataSets have been loaded");
+      return;
+    }
+
+    // Get dataSets with the id
+    let selDataSets = this.dataSets.filter((dataSet) => dataSet.id == id);
+    if (selDataSets.length == 0){
+      this.printLog("There are no dataSets with id: " + id);
+      return;
+    }
+    // Get dataSets in the timeScale
+    let tScaleDataSets = selDataSets.filter((dataSet) => dataSet.timeScale == timeScale);
+    if (tScaleDataSets.length == 0){
+      this.printLog("DataSet does not have the timeScale of " + timeScale);
+      tScaleDataSets = selDataSets; // Any?
+    }
+    // Select oldest first if possible (usually reanalysis)
+    // Sort by date (oldest first)
+    tScaleDataSets.sort( (dataSetA, dataSetB) => new Date(dataSetA.startTmst) - new Date(dataSetB.startTmst));
+    // Check if tmst is inside range
+    let selectedDataSet;
+    for (let i = 0; i < tScaleDataSets.length; i++){
+      // If no endTmst, it is forecast
+      if (tScaleDataSets[i].endTmst == undefined){
+        selectedDataSet = tScaleDataSets[i];
+        break;
+      }
+      // tmst is inside range
+      if (new Date(tScaleDataSets[i].startTmst) < new Date(tmst) && new Date(tScaleDataSets[i].endTmst) > new Date(tmst)){
+        selectedDataSet = tScaleDataSets[i].startTmst;
+        break;
+      }
+    }
+    if (selectedDataSet == undefined){
+      this.printLog("No dataSet contains the selected timestamp");
+    }
+
+    return selectedDataSet;    
+  }
+
+
+
 
   
 
-  // Get url and parameters for a given data type and date
-  getDataTypeURL = function(dataName, date, timeScale){
-
-
-    // Find data type with that name
-    let dataType = undefined;
-    Object.keys(this.dataTypes).forEach(dKey => {
-      this.dataTypes[dKey].altNames.forEach(altN => {
-        if (altN.toLowerCase() == dataName.toLowerCase())
-          dataType = this.dataTypes[dKey];
-      })
-      //if (dKey == dataName) dataType = this.dataTypes[dKey] 
-    });
-    if (dataType == undefined) {
-      console.error("Data type does not exists: " + dataName);
+  // Get the tmst for the WMTS call. Returns undefined if the dataSet does not contain the date
+  getFormattedTmst = function(dataSet, tmst){
+    // Tmst is before starting date
+    // WAITING ON CMEMS RESPONSE --> THE DATES FROM GETCAPABILITIES ARE NOT RIGHT
+    if (new Date(tmst) < new Date(dataSet.startTmst)) {
       return;
     }
+    let formattedTmst = undefined;
+    // Time scale
+    let timeScale = dataSet.timeScale;
 
-
-    // Check if WMS capabilities were loaded
-    if (dataType.timeScaleCorrection == undefined) {
-      this.printWarn("WMS Capabilities were not yet loaded. Loading now");
-      return;
-      // Get Capabilities
-      //await this.loadWMSCapabilities(dataType, this.domainURL + dataType.url + "-" + currTimeScale, currTimeScale);
-    }
-
-    // Check if the date is smaller than the lastDate of the WMS reanlysis
-    // TODO: check if the timeScalesCorrection is also equivalent for forecast service. If not, we need to GetCapabilities of each forecast
-    let domainURL = dataType.domainURL;
-    let serviceURL = dataType.url;
-    let version = dataType.version; // 1.1.1 or 1.3.0 (then CRS should be instead of SRS)
-    let timeScales = dataType.timeScales;
-    let timeScaleKeys = dataType.timeScaleKeys; // when a correction is needed, i.e. '1D-m' for 'd' daily data
-    let isUsingForecast = false;
-    if (date > dataType.lastDate) {
-      this.printWarn("Using forecast instead of reanalysis CMEMS data.");
-      isUsingForecast = true;
-      domainURL = dataType.forecast.domainURL;
-      serviceURL = dataType.forecast.url;
-      version = dataType.forecast.version;
-      if (dataType.forecast.timeScales)
-        timeScales = dataType.forecast.timeScales;
-      if (dataType.forecast.timeScaleKeys)
-        timeScaleKeys = dataType.forecast.timeScaleKeys
-    }
-
-
-    // Check timescale
-    let tScale = undefined
-    timeScales.forEach(tS => { if (tS == timeScale) tScale = timeScale });
-    if (tScale == undefined) {
-      tScale = timeScales[0];
-      this.printWarn("Time scale petitioned does not exist in the ocean prodcut. Ocean product: " + dataType.name + ". Time scale petitioned: " + timeScale + ". Available time scales: " + dataType.timeScales);
-    }
-
-    var params = {
-      'LAYERS': dataType.layerName,
-      'COLORSCALERANGE': String(dataType.range),
-      //'BBOX': String(long - 0.2) + "," + String(lat - 0.2) + "," + String(long + 0.2) + "," + String(lat + 0.2),
-      //'STYLES': 'boxfill/greyscale', // TODO: check that the gradient from black to white is linear
-      // Other default parameters
-      'SRS': 'EPSG:4326', // Should be CRS if version is 1.3.0
-      'CRS': 'EPSG:4326', // If I add SRC and CRS the problem is solved?
-      'TILED': 'true',
-      'LOGSCALE': 'false',
-      'TRANSPARENT': 'true',
-      'STYLES': dataType.style,
-      'UNITS': dataType.units,
-      //'WIDTH': 1,
-      //'HEIGHT': 1,
-    }
-
-    // Add elevation
-    if (dataType.elevation !== undefined)
-      params['ELEVATION'] = String(dataType.elevation[0]);
-
-    
-    let timeScaleCorrection = dataType.timeScaleCorrection;
-    if (isUsingForecast && dataType.forecast.timeScaleCorrection)
-      timeScaleCorrection = dataType.forecast.timeScaleCorrection;
-
-    // Add time parameter
-    let dateMod = date.substring(0, 11) + '00:00:00.000Z'// Clean date
-    if (tScale.includes('h')){
-      dateMod = date.substring(0,14) + '00:00.000Z';
-      let tCorr = timeScaleCorrection.h;
-      if (tCorr){
-        let minString = String(tCorr.min).padStart(2, '0');
-        dateMod = dateMod.substring(0,14) + minString + ':00.000Z';
-      }
-    } else if (tScale.includes('d') || tScale.includes('1D-m')) {
-      let tCorr = timeScaleCorrection.d;
-      let hString = String(tCorr.h).padStart(2, '0');
-      let minString = String(tCorr.min).padStart(2, '0');
-      dateMod = dateMod.substring(0, 11) + hString + ':' + minString + ':00.000Z';
-    } else if (tScale.includes('m') || tScale.includes('1M-m')){
-      let tCorr = timeScaleCorrection.m;
-      // Find corresponding month
-      let mmyy = dateMod.substring(0, 7);
-      dateMod = tCorr.dates.find((dd) => dd.substring(0, 7) == mmyy);
-    }
-    // SHOULD BE DEPENDANT ON SELECTED TIME SCALE (for now daily? - wave does not have daily, only hourly
-    params['TIME'] = dateMod;
-
-    // Construct WMS url
-    let url = domainURL + serviceURL;
-    if (!dataType.urlLocked){
-      if (timeScaleKeys)
-         url += timeScaleKeys[tScale];
-      else
-        url += '-' + tScale[0];
-    }
-    
-    
-    return {
-      url: url, 
-      version: version,
-      params: params,
-      name: dataType.name, // not necessary?
-      doi: dataType.doi,
-      attributions: '© CMEMS', // TODO
-      animation: dataType.animation,
-      range: dataType.range,
-    }
-  }
-
-
-
-  // Get data at a specific point
-    // Input variables
-    // var dataName = "Sea temperature";
-    // var lat = 41;
-    // var long = 2.9;
-    // var date = '2010-01-12T12:00:00.000Z';
-    // var timeScale = 'd';
-  getDataAtPoint = async function(dataName, date, lat, long, timeScale, direction){
-    
-    let dataInfo = this.getDataTypeURL(dataName, date, timeScale);
-
-    
-    // If we want the direction
-    if (direction) {
-      // Check if direction exists (animation)
-      if (dataInfo.animation == undefined) {
-        console.error("Data type " + dataName + " does not have direction information.");
-        return;
-      }
-    }
-
-
-
-    // https://my.cmems-du.eu/thredds/wms/med-cmcc-cur-rean-d?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png
-    // &TRANSPARENT=TRUE
-    // &LAYERS=sea_water_velocity
-    // &STYLES=boxfill/ncview
-    // &LOGSCALE=false
-    // &SRS=EPSG:4326
-    // &BBOX=0,22.5,22.5,45
-    // &WIDTH=512
-    // &HEIGHT=512
-    // &COLORSCALERANGE=0.008134,0.3748
-    // &BELOWMINCOLOR=0x0000ff
-    // &ABOVEMAXCOLOR=0xff0001
-    // &TIME=2005-03-25T12:00:00.000Z
-    // &ELEVATION=-1.0182366371154785
-
-    dataInfo.params['BBOX'] = String(long - 0.2) + "," + String(lat - 0.2) + "," + String(long + 0.2) + "," + String(lat + 0.2);
-    dataInfo.params['STYLES'] = 'boxfill/greyscale';
-    dataInfo.params['LOGSCALE'] = 'false';
-    dataInfo.params['WIDTH'] = 1;
-    dataInfo.params['HEIGHT'] = 1;
-
-
-
-
-
-    // Construct WMS url
-    let url = dataInfo.url;
-    // WMS Base
-    url += '?SERVICE=WMS' + '&VERSION=' + dataInfo.version + '&REQUEST=GetMap&FORMAT=image/png';
-    // Parameters
-    Object.keys(dataInfo.params).forEach(ppKey => {
-      url = WMTSDataRetriever.setWMSParameter(url, ppKey, dataInfo.params[ppKey]);
-    });
-
-
-    // If no direction is requested
-    if (direction == undefined){
-      // Get value from URL
-      return await this.getPreciseValueFromURL(url, dataInfo.range);
-    }
-
-
-
-    // If direction is requested
-    let animData = dataInfo.animation;
-    // Angle format
-    if (animData.format == 'value_angle'){
-      url = WMTSDataRetriever.setWMSParameter(url, 'LAYERS', animData.layerNames[1]);
-      url = WMTSDataRetriever.setWMSParameter(url, 'COLORSCALERANGE', String([-360,360]));
-
-      // Get value from URL
-      let value = await this.getPreciseValueFromURL(url, [-360, 360]);
-      return value;
+    // Hourly
+    if (timeScale == 'h'){
+      formattedTmst = tmst.substring(0,14) + '00:00.000Z';
+      // TODO timeScaleCorrection if they exist
     } 
-    // East-North format
-    else if (animData.format == 'east_north'){
-
-      // Calculate angle
-      // TODO: could call an async function where east and north are requested at the same time
-      return await this.getEastNorthValues(url, animData.layerNames, dataInfo.range);
+    // Daily
+    else if (timeScale == 'd'){
+      formattedTmst = tmst.substring(0,11) + '00:00:00.000Z';
+    }
+    // Monthly
+    else if (timeScale == 'm'){
+      // Check if the current month is in the dataSet
+      for (let i = 0; i < dataSet.dates.length; i++){
+        if (dataSet.dates[i].substring(0, 7) == tmst.substring(0,7)){
+          formattedTmst = dataSet.dates[i];
+          break;
+        }
+      }
     }
 
-  }
-
-
-
-  // Returns the precise value from a WMS URL
-  getPreciseValueFromURL = async function(url, range){
-    let value = await this.getValueFromURL(url); // Normalized value from 0 to 1
-    if (value == undefined) {
-      this.printWarn("No data at " + url);
-      // TODO: this happens when a dot in timerange is clicked twice. Why?
-      return;
+    // Tmst is after end date (forecast does not have an endTmst)
+    // WAITING ON CMEMS RESPONSE --> THE DATES FROM GETCAPABILITIES ARE NOT RIGHT
+    if (dataSet.endTmst) {
+      if (new Date(formattedTmst) > new Date(dataSet.endTmst))
+        return;
     }
-    // Put in range of the data type (normValue * (max-min) + min)
-    value = value * (range[1] - range[0]) + range[0];
-    // Improve precision
-    // Quantization step is 0.4% (100*1/255). We can improve the precision by reducing the color scale range
-    let quantStep = (range[1] - range[0]) * 1 / 255;
-    url = WMTSDataRetriever.setWMSParameter(url, 'COLORSCALERANGE', [value - quantStep, value + quantStep]);
-    // Get precise value from URL
-    let vPrec = await this.getValueFromURL(url); // Normalized value from 0 to 1
-    // Put in range (normValue * (max-min) + min)
-    vPrec = vPrec * (quantStep * 2) + value - quantStep;
-    // console.log("Quantized value (255 steps): " + value + ", Precise value: " + vPrec);
-    // Return value
-    return vPrec;
+
+    return formattedTmst;
   }
-
-
-  // Returns the value from a WMS URL
-  getValueFromURL = async function(url){
-    let img = await this.getImageFromURL(url);
-    // Remove image from active requests
-    this.activeRequests = this.activeRequests.filter( el => el.src != url); // GC? TODO?
-    return this.getNormValueFromImage(img);
-  }
-
-  // Create an image element and load the image
-  // HACK: errors are not catched when fetching image urls. If errors are catched, the data does not load
-  getImageFromURL = function(url){
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.addEventListener('load', () => resolve(img));
-      img.addEventListener('error', reject); // If reject(img), image does not load
-      img.src = url;
-      this.activeRequests.push(img);
-      //this.printLog(url);
-    })
-  }
-
-  // Create a canvas with size 1 and extract the pixel value
-  getNormValueFromImage = function(img){
-    let canvas = document.createElement('canvas');
-    canvas.width = 1;
-    canvas.height = 1;
-    let ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    let pixels = ctx.getImageData(0, 0, 1, 1);
-    let pixel = pixels.data[0];
-    // Alpha
-    let alpha = pixels.data[3];
-    if (alpha == 0)
-      return undefined;
-    return pixel/255;
-  }
-
-
-  // TODO: PARALLEL ASYNC CALLS
-  // https://ankurpatel.in/blog/call-multiple-async-await-functions-parallel-or-sequential/
-  getEastNorthValues = async function(url, layerNames, range){
-    url = WMTSDataRetriever.setWMSParameter(url, 'LAYERS', layerNames[0]);
-    let east = await this.getPreciseValueFromURL(url, range);
-    url = WMTSDataRetriever.setWMSParameter(url, 'LAYERS', layerNames[1]);
-    let north = await this.getPreciseValueFromURL(url, range);
-    // Return values
-    return Math.atan2(north, east) * (180 / Math.PI);
-  }
-
-
-  // Cancels active requests
-  cancelActiveRequests = function(){
-    this.activeRequests.forEach(el => el.src = "");
-    this.activeRequests = [];
-  }
+  
 
 
 
 
-  // Set WMS parameter
-  static setWMSParameter(wmsURL, paramName, paramContent) {
-    // If parameter does not exist
-    if (wmsURL.indexOf(paramName + "=") == -1) {
-      //console.log("Parameter ", paramName, " does not exist in WMS URL");
-      return wmsURL + '&' + paramName + '=' + paramContent;
+
+  // Load image given a dataSet and a timestamp
+  getImageAt = function(dataSet, tmst){
+    
+    // Get formatted timestamp of dataSet and check if it has data available on that tmst
+    let formattedTmst = this.getFormattedTmst(dataSet, tmst);
+
+    if (formattedTmst == undefined){
+      this.printLog(dataSet.id + " at " + dataSet.timeScale + " does not contain the timespan with timestamp " + tmst);
+      return document.createElement('span').innerHTML = 'No data for--';
     }
-    let currentContent = WMTSDataRetriever.getWMSParameter(wmsURL, paramName);
-    return wmsURL.replace(currentContent, paramContent);
+
+    let templateURL = dataSet.template.replace('{Time}', formattedTmst);
+
+    templateURL = templateURL.replace('{TileMatrixSet}', 'EPSG:3857'); //EPSG:4326, 3857
+    templateURL = templateURL.replace('{TileMatrix}', '6');
+    templateURL = templateURL.replace('{TileRow}', '23');
+    templateURL = templateURL.replace('{TileCol}', '32');
+
+    let img = document.createElement('img');
+    img.src = templateURL;
+    return img;
   }
 
-  // Get WMS parameter
-  static getWMSParameter(wmsURL, paramName) {
-    // If parameter does not exist
-    if (wmsURL.indexOf(paramName + "=") == -1) {
-      console.log("Parameter ", paramName, " does not exist in WMS URL");
-      return '';
-    }
-    let tmpSTR = wmsURL.substr(wmsURL.indexOf(paramName + "="));
-    let endOfContent = tmpSTR.indexOf('&') == -1 ? tmpSTR.length : tmpSTR.indexOf('&');
-    return tmpSTR.substring(paramName.length + 1, endOfContent);
-  }
+
+
+
 
 
   // Verbose
@@ -859,24 +499,9 @@ dataTypes = {
   printLogConsole = function(message){
     console.log(message);
   }
+
 }
 
-
-//
-// Fetch for french data AROME - WINDS AND OTHER ATHMOSPHERIC DATA
-// Possibilities are limited because:
-// - Color cannot be changed (&COLORSCALERANGE=18,20)
-// - There are no grey color styles (only barb wire and isobars for wind for example)
-// TODO: check if it is possible to extract the legend in order to get the values
-// TODO: there is a WCS service that provides values, probably a better option
-
-// https://donneespubliques.meteofrance.fr/?fond=produit&id_produit=131
-// fetch('https://public-api.meteofrance.fr/public/arome/1.0/wms/MF-NWP-HIGHRES-AROME-001-FRANCE-WMS/GetCapabilities?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities', {
-//     headers: {
-//       'apikey': 'eyJ4NXQiOiJZV0kxTTJZNE1qWTNOemsyTkRZeU5XTTRPV014TXpjek1UVmhNbU14T1RSa09ETXlOVEE0Tnc9PSIsImtpZCI6ImdhdGV3YXlfY2VydGlmaWNhdGVfYWxpYXMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJnZXJhcmQubGxvcmFjaEBjYXJib24uc3VwZXIiLCJhcHBsaWNhdGlvbiI6eyJvd25lciI6ImdlcmFyZC5sbG9yYWNoIiwidGllclF1b3RhVHlwZSI6bnVsbCwidGllciI6IlVubGltaXRlZCIsIm5hbWUiOiJEZWZhdWx0QXBwbGljYXRpb24iLCJpZCI6MTExOCwidXVpZCI6IjNlOGU0YjllLTQzOTYtNGM5ZS1iMzZiLTliZWNhOGU5M2FiMCJ9LCJpc3MiOiJodHRwczpcL1wvcG9ydGFpbC1hcGkubWV0ZW9mcmFuY2UuZnI6NDQzXC9vYXV0aDJcL3Rva2VuIiwidGllckluZm8iOnsiNTBQZXJNaW4iOnsidGllclF1b3RhVHlwZSI6InJlcXVlc3RDb3VudCIsImdyYXBoUUxNYXhDb21wbGV4aXR5IjowLCJncmFwaFFMTWF4RGVwdGgiOjAsInN0b3BPblF1b3RhUmVhY2giOnRydWUsInNwaWtlQXJyZXN0TGltaXQiOjAsInNwaWtlQXJyZXN0VW5pdCI6InNlYyJ9fSwia2V5dHlwZSI6IlBST0RVQ1RJT04iLCJwZXJtaXR0ZWRSZWZlcmVyIjoiaHR0cHM6XC9cL2JsdWVuZXRjYXQuZ2l0aHViLmlvXC8qIiwic3Vic2NyaWJlZEFQSXMiOlt7InN1YnNjcmliZXJUZW5hbnREb21haW4iOiJjYXJib24uc3VwZXIiLCJuYW1lIjoiQVJPTUUiLCJjb250ZXh0IjoiXC9wdWJsaWNcL2Fyb21lXC8xLjAiLCJwdWJsaXNoZXIiOiJhZG1pbl9tZiIsInZlcnNpb24iOiIxLjAiLCJzdWJzY3JpcHRpb25UaWVyIjoiNTBQZXJNaW4ifV0sImV4cCI6MTc1MTgwMzE2MiwicGVybWl0dGVkSVAiOiIiLCJpYXQiOjE2NTcxOTUxNjIsImp0aSI6ImYxYWMwMGJlLWQ5M2QtNGE5Ny05MTdlLTk5ZmI3NWI2MjRhMCJ9.GlGBIsE4xSWQlbnIxhkio6silJqGiOa9_E2UrkQ-FdG3NwP59uIHIPo-RqNXPGvHrufCh0CwqN99LAGE_mgXS95oVaMMrOtZoB4rVxp7nJ5GYP4_D6-RsTowasmcg7BRj3LcQTNGCKZDoMPUJSMZTLDTCiqJYR0PaTymjQQhgmK5OWH0hPo5lb2f1wdETwygcDOMDG8jBtdXKQUlOuxgEjuXZPdr65Zv0MYfyLh7g4qOL5dP5d0-gwBzKBnTpI31blItCAJWL0BhPHRE1vHRPzaPvTpLgSREUrJAUPzEAWW9-3uYDgXaOtopKuzJKWSwdfuP7c5vPVJy3I-Shwn64w==',
-//       'Accept': '*/* ',
-//     },
-//   }).then(r => r.text()).then(res => console.log(res))
 
 
 export default WMTSDataRetriever;
