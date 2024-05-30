@@ -99,7 +99,7 @@ export class WMTSDataRetriever {
     'VHM0': {
       shortName: 'Wave height',
       altNames: ['Hs', 'Hm0', 'Wave significant height', 'Spectral significant wave height (Hm0)'],
-      range: [0,6],
+      range: [0,12],
       animation: {
         layerNames: ['VHM0', 'VMDR'], // Intensity, Angle
         format: 'value_angle',
@@ -125,7 +125,7 @@ export class WMTSDataRetriever {
     'VHM0_WW': {// Wind wave height
       shortName: 'Wind wave height',
       altNames: ['Wind wave significant height', "Spectral significant wind wave height", 'Wind waves', 'WWSH'],
-      range: [0,6],
+      range: [0,12],
       animation: {
         layerNames: ['VHM0_WW', 'VMDR_WW'], // Intensity, Angle
         format: 'value_angle',
@@ -140,7 +140,7 @@ export class WMTSDataRetriever {
     },
 
     'VHM0_SW1': { // Swell 1 wave height
-      range: [0, 6],
+      range: [0, 12],
       altNames: ["Primary swell wave significant height"],
       animation: {
         layerNames: ['VHM0_SW1', 'VMDR_SW1'], // Intensity, Angle
@@ -149,7 +149,7 @@ export class WMTSDataRetriever {
       },
     },
     'VHM0_SW2': { // Swell 2 wave height
-      range: [0, 6],
+      range: [0, 12],
       altNames: ["Secondary swell wave significant height"],
       animation: {
         layerNames: ['VHM0_SW2', 'VMDR_SW2'], // Intensity, Angle
@@ -158,11 +158,11 @@ export class WMTSDataRetriever {
       },
     },
     'uo': {
-      range: [0, 1.5],
+      range: [0, 2.5],
       unit: 'm/s',
     },
     'vo': {
-      range: [0, 1.5],
+      range: [0, 2.5],
       unit: 'm/s',
     },
     'wo': {
@@ -171,11 +171,11 @@ export class WMTSDataRetriever {
     },
     'thetao': {
       shortName: 'Surface temperature',
-      range: [10, 35],
+      range: [2, 38],
       unit: 'ºC',
     },
     'bottomT': {
-      range: [10, 25],
+      range: [2, 38],
       shortName: 'Bottom temperature',
       unit: 'ºC'
     },
@@ -575,7 +575,7 @@ export class WMTSDataRetriever {
 
       // Get value from URL // WARN, could it happen that it has to go from -360 to 360?
       let value = await this.getValueAtPointFromURL(templateURL, [0, 360], long, lat, tileMatrix);//this.getPreciseValueFromURL(url, [-360, 360]);
-      value = 360 - value; // Inverted colormap! Darker is 0, white is 1
+      //value = 360 - value; // Inverted colormap! Darker is 0, white is 1 ?
       return value;
     } 
     // East-North format
