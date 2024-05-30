@@ -279,6 +279,9 @@ export class WMTSDataRetriever {
       dataSet.productProvider = product.xml.getElementsByTagNameNS("http://www.opengis.net/ows/1.1", "ProviderName")[0].textContent;
       // Dataset template
       dataSet.template = ll.querySelector('ResourceURL').attributes.template.textContent;
+      if (dataSet.template.includes('http://')){
+        dataSet.template = dataSet.template.replace('http://', 'https://'); // WARN: BUG FROM WMTS?
+      }
       // Add date to template
       dataSet.template += '&time={Time}';
       // Add style range and color map
