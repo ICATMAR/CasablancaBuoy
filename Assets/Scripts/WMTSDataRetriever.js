@@ -81,12 +81,32 @@ export class WMTSDataRetriever {
       Available datasets 
         nppv, o2 - Primary Production and Oxygen
         dissic, ph, talk - Dissolved Inorganic Carbon, pH and Alkalinity
-        fpco2, spco2 - Surface partial pressure of CO2 and Surface CO2 flux
-        nh4, no3, po4 - Nitrate, Phosphate and Ammonium
+        fpco2, spco2 - Surface CO2 flux and Surface partial pressure of CO2
+        nh4, no3, po4 - Ammonium, Nitrate and Phosphate
         chl, phyc - Phytoplankton Carbon Biomass and Chlorophyll
       */
       wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_MULTIYEAR_BGC_006_008?request=GetCapabilities&service=WMS',
       doi: 'https://doi.org/10.25423/cmcc/medsea_multiyear_bgc_006_008_medbfm3',
+      timeScales: ['d', 'm'],
+      dataSets: ['chl']
+    },
+    "Mediterranean Sea Biogechemistry Analysis and Forecast": {
+      /*
+      Available datasets
+        diatoC, diatoChla - Diatoms Carbon Biomass and Diatoms Chlorophyll concentration
+        dinoC, dinoChla - Dinoflagellates Carbon Biomass and Dinoflagellates Chlorophyll concentration
+        nanoC, nanoChla - Nanophytoplankton Carbon Biomass  and Nanophytoplankton Chlorophyll concentration
+        nppv, o2 - Primary Production and Oxygen
+        dissic, ph, talk - Dissolved Inorganic Carbon, pH and Alkalinity
+        fpco2, spco2 - Surface CO2 flux and Surface partial pressure of CO2
+        nh4, no3, po4, si - Ammonium, Nitrate, Phosphate and Silicate
+        kd490 - Diffuse attenuation coefficient of the downwelling irradiance at 490 nm
+        picoC, picoChla - Picophytoplankton Carbon Biomass and Picophytoplankton Chlorophyll concentration
+        zooc - Zooplankton Carbon Biomass
+        phyc, chl - Phytoplankton Carbon Biomass,  and Chlorophyll
+      */
+      wmtsURL: 'https://wmts.marine.copernicus.eu/teroWmts/MEDSEA_ANALYSISFORECAST_BGC_006_014?request=GetCapabilities&service=WMS',
+      doi: 'https://doi.org/10.25423/cmcc/medsea_analysisforecast_bgc_006_014_medbfm4',
       timeScales: ['d', 'm'],
       dataSets: ['chl']
     },
@@ -390,7 +410,7 @@ export class WMTSDataRetriever {
     let tScaleDataSets = selDataSets.filter((dataSet) => dataSet.timeScale == timeScale);
     if (tScaleDataSets.length == 0){
       this.printLog("DataSet does not have the timeScale of " + timeScale);
-      return;
+      console.log("DataSet for "+ id + " does not have timeScale of " + timeScale + ". Using alternatives."); //return;
       tScaleDataSets = selDataSets; // Take other timeScales?
     }
     // Select oldest first if possible (usually reanalysis)
