@@ -33,7 +33,7 @@
                 <span class="visually-hidden">Loading...</span>
               </div>
               <!-- Direction -->
-              <div v-else-if='dR.direction' :style="{'transform': 'rotate('+ (dd.value + 180 - 90) +'deg)'}" :title="dd.value + 'º'"><span>&#10140;</span></div>
+              <div v-else-if='dR.direction' v-show='dd.value != "x"' :style="{'transform': 'rotate('+ (dd.value - 90 + 180) +'deg)'}" :title="dd.value + 'º'"><span>&#10140;</span></div>
               <!-- Image -->
               <span v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></span>
               <!-- SVG -->
@@ -297,8 +297,8 @@ export default {
       numDaysAhead: 4,
       daysString: [],
       currentDateHTML: '',
-      long: 1.345567,
-      lat: 40.704597,
+      long: 4,//1.345567,
+      lat: 42,//40.704597,
       longStr: '1.34',
       latStr: '40.70',
     }
