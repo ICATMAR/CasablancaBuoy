@@ -3,6 +3,7 @@
 
     <h2>{{$t('externalDataCMEMS.title')}}</h2>
     <p> {{$t('externalDataCMEMS.p1')}}</p>
+    <p> {{ $t('Latitude') }}: {{ lat.toFixed(2) }}º, {{ $t('Longitude') }}: {{long.toFixed(2)}}º</p>
 
     <!-- Table -->
     <div class="tableContainer">
@@ -297,8 +298,8 @@ export default {
       numDaysAhead: 4,
       daysString: [],
       currentDateHTML: '',
-      long: 4,//1.345567,
-      lat: 42,//40.704597,
+      long: 1.345567,
+      lat: 40.704597,
       longStr: '1.34',
       latStr: '40.70',
     }
