@@ -561,26 +561,27 @@ export class WMTSDataRetriever {
       return await this.getValueAtPointFromURL(templateURL, dataSet.range, long, lat, tileMatrix);//this.getPreciseValueFromURL(templateURL, dataInfo.range);
     }
 
-    // TODO
 
-    // // If direction is requested
-    // let animData = dataInfo.animation;
-    // // Angle format
-    // if (animData.format == 'value_angle'){
-    //   url = WMTSDataRetriever.setWMSParameter(url, 'LAYERS', animData.layerNames[1]);
-    //   url = WMTSDataRetriever.setWMSParameter(url, 'COLORSCALERANGE', String([-360,360]));
+    // If direction is requested
+    let animData = dataSet.animation;
+    // Angle format
+    if (animData.format == 'value_angle'){
+      // Prepare url. Template uses the dataSet id in the layer info
+      templateURL = templateURL.replace('/' + dataSet.id + '&', '/' + animData.layerNames[1] + '&');  //url = WMTSDataRetriever.setWMSParameter(url, 'LAYERS', animData.layerNames[1]);
+      templateURL = WMTSDataRetriever.setWMTSParameter(templateURL, 'style', 'range:-360/360,cmap:gray'); // url = WMTSDataRetriever.setWMSParameter(url, 'COLORSCALERANGE', String([-360,360]));
 
-    //   // Get value from URL
-    //   let value = await this.getPreciseValueFromURL(url, [-360, 360]);
-    //   return value;
-    // } 
-    // // East-North format
-    // else if (animData.format == 'east_north'){
+      // Get value from URL
+      let value = await this.getValueAtPointFromURL(templateURL, [-360, 360], long, lat, tileMatrix);//this.getPreciseValueFromURL(url, [-360, 360]);
+      return value;
+    } 
+    // East-North format
+    else if (animData.format == 'east_north'){
+      debugger;
 
-    //   // Calculate angle
-    //   // TODO: could call an async function where east and north are requested at the same time
-    //   return await this.getEastNorthValues(url, animData.layerNames, dataInfo.range);
-    // }
+      // Calculate angle
+      // TODO: could call an async function where east and north are requested at the same time
+      return await this.getEastNorthValues(url, animData.layerNames, dataSet.range);
+    }
 
   }
 
@@ -676,6 +677,32 @@ export class WMTSDataRetriever {
   cancelActiveRequests = function(){
     this.activeRequests.forEach(el => el.src = "");
     this.activeRequests = [];
+  }
+
+
+
+
+   // Set WMTS parameter
+   static setWMTSParameter(wmtsURL, paramName, paramContent) {
+    // If parameter does not exist
+    if (wmtsURL.indexOf(paramName + "=") == -1) {
+      //console.log("Parameter ", paramName, " does not exist in WMS URL");
+      return wmtsURL + '&' + paramName + '=' + paramContent;
+    }
+    let currentContent = WMTSDataRetriever.getWMTSParameter(wmtsURL, paramName);
+    return wmtsURL.replace(paramName + '=' + currentContent, paramName + '=' + paramContent);
+  }
+
+  // Get WMTS parameter
+  static getWMTSParameter(wmtsURL, paramName) {
+    // If parameter does not exist
+    if (wmtsURL.indexOf(paramName + "=") == -1) {
+      console.log("Parameter ", paramName, " does not exist in WMS URL");
+      return '';
+    }
+    let tmpSTR = wmtsURL.substr(wmtsURL.indexOf(paramName + "="));
+    let endOfContent = tmpSTR.indexOf('&') == -1 ? tmpSTR.length : tmpSTR.indexOf('&');
+    return tmpSTR.substring(paramName.length + 1, endOfContent);
   }
 
 
