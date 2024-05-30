@@ -191,12 +191,14 @@ export class WMTSDataRetriever {
     },
     'thetao': {
       shortName: 'Surface temperature',
+      altNames: ['Sea surface temperature'],
       range: [2, 38],
       unit: 'ºC',
     },
     'bottomT': {
       range: [2, 38],
       shortName: 'Bottom temperature',
+      altNames: ['Sea bottom temperature'],
       unit: 'ºC'
     },
     'so': {
