@@ -568,10 +568,11 @@ export class WMTSDataRetriever {
     if (animData.format == 'value_angle'){
       // Prepare url. Template uses the dataSet id in the layer info
       templateURL = templateURL.replace('/' + dataSet.id + '&', '/' + animData.layerNames[1] + '&');  //url = WMTSDataRetriever.setWMSParameter(url, 'LAYERS', animData.layerNames[1]);
-      templateURL = WMTSDataRetriever.setWMTSParameter(templateURL, 'style', 'range:-360/360,cmap:gray'); // url = WMTSDataRetriever.setWMSParameter(url, 'COLORSCALERANGE', String([-360,360]));
+      templateURL = WMTSDataRetriever.setWMTSParameter(templateURL, 'style', 'range:0/360,cmap:gray'); // url = WMTSDataRetriever.setWMSParameter(url, 'COLORSCALERANGE', String([-360,360]));
 
-      // Get value from URL
-      let value = await this.getValueAtPointFromURL(templateURL, [-360, 360], long, lat, tileMatrix);//this.getPreciseValueFromURL(url, [-360, 360]);
+      // Get value from URL // WARN, could it happen that it has to go from -360 to 360?
+      let value = await this.getValueAtPointFromURL(templateURL, [0, 360], long, lat, tileMatrix);//this.getPreciseValueFromURL(url, [-360, 360]);
+      value = 360 - value; // Inverted colormap! Darker is 0, white is 1
       return value;
     } 
     // East-North format
