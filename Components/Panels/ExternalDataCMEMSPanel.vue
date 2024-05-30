@@ -33,7 +33,7 @@
                 <span class="visually-hidden">Loading...</span>
               </div>
               <!-- Direction -->
-              <div v-else-if='dR.direction' :style="{'transform': 'rotate('+ (dd.value - 180 - 90) +'deg)'}" :title="dd.value + 'º'"><span>&#10140;</span></div>
+              <div v-else-if='dR.direction' :style="{'transform': 'rotate('+ (dd.value + 180 - 90) +'deg)'}" :title="dd.value + 'º'"><span>&#10140;</span></div>
               <!-- Image -->
               <span v-else-if='dR.imgURL'><img :src=dR.defURL :alt=dR.source :style="getImageStyle(dR, dd)"></span>
               <!-- SVG -->
@@ -325,7 +325,7 @@ export default {
           let layerName = rr.direction ? rr.layer : rr.name;
           // Icon row and custom SVG does not load data
           if (layerName !== undefined && rr.usesCustomSVG != true){
-            this.dataRetriever.getDataAtPoint(layerName, date.toISOString(), lat, long, 'd', rr.direction)
+            this.dataRetriever.getDataAtPoint(layerName, date.toISOString(), lat, long, 'h', rr.direction)
               .then(value => {
                 if (value == undefined){
                   rr.data[dIndex].value = 'x';
@@ -511,13 +511,13 @@ export default {
                 <circle r="10" cx="13" cy="13" fill="var(--lightBlue)" />
                 <polygon points="8, 4.5, 13, 0, 18, 4.5" fill="var(--lightBlue)" transform="rotate(${wDir + 180}, 13, 13)" />
                 
-                <circle r="4" cx="13" cy="13" fill="transparent" stroke="khaki" stroke-width="8" stroke-dasharray="calc(${wwshNorm}*8*3.142) calc(8*3.142)" transform="rotate(-${90 + wwshNorm*180 - wwDir + 180}, 13, 13)" />
+                <circle r="4" cx="13" cy="13" fill="transparent" stroke="khaki" stroke-width="8" stroke-dasharray="calc(${wwshNorm}*8*3.142) calc(8*3.142)" transform="rotate(-${90 + wwshNorm*180 - wwDir + 180 + 360}, 13, 13)" />
                 <polygon points="${13 - 4 * Math.min(1, wwshNorm*6)}, 6.5, 13, 2, ${13 + 4 * Math.min(1, wwshNorm*6)}, 6.5" fill="khaki" transform="rotate(${wwDir + 180}, 13, 13)" />
 
-                <circle r="2.5" cx="13" cy="13" fill="transparent" stroke="var(--blue)" stroke-width="5" stroke-dasharray="calc(${sw1Norm}*5*3.142) calc(5*3.142)" transform="rotate(-${90 + sw1Norm*180 - sw1Dir + 180}, 13, 13)" />
+                <circle r="2.5" cx="13" cy="13" fill="transparent" stroke="var(--blue)" stroke-width="5" stroke-dasharray="calc(${sw1Norm}*5*3.142) calc(5*3.142)" transform="rotate(-${90 + sw1Norm*180 - sw1Dir + 180 + 360}, 13, 13)" />
                 <polygon points="${13 - 3 * Math.min(1, sw1Norm*6)}, 9.5, 13, 6, ${13 + 3 * Math.min(1, sw1Norm*6)}, 9.5" fill="var(--blue)" transform="rotate(${sw1Dir + 180}, 13, 13)" />
 
-                <circle r="1.5" cx="13" cy="13" fill="transparent" stroke="var(--darkBlue)" stroke-width="3" stroke-dasharray="calc(${sw2Norm}*3*3.142) calc(3*3.142)" transform="rotate(-${90 + sw2Norm*180 - sw2Dir + 180}, 13, 13)" />
+                <circle r="1.5" cx="13" cy="13" fill="transparent" stroke="var(--darkBlue)" stroke-width="3" stroke-dasharray="calc(${sw2Norm}*3*3.142) calc(3*3.142)" transform="rotate(-${90 + sw2Norm*180 - sw2Dir + 180 + 360}, 13, 13)" />
 
                 
               </svg>
