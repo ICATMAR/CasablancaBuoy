@@ -189,22 +189,22 @@
 
 
 
-          {
-            name: "Sea current direction",
-            abbr: "Dir",
-            units: "m/s",
-            direction: true,
-            layer: "Sea surface velocity",
-            color: '#6164ff',//'#71c3eb',
-          },        {
-            name: "Sea surface velocity",
-            abbr: "Current",
-            icon: true,
-            units: "m/s",
-            range: [0, 3],
-            signRange: [0.25, 1],
-            color: '#6164ff',//'#71c3eb',
-          },
+          // {
+          //   name: "Sea current direction",
+          //   abbr: "Dir",
+          //   units: "m/s",
+          //   direction: true,
+          //   layer: "Sea surface velocity",
+          //   color: '#6164ff',//'#71c3eb',
+          // },        {
+          //   name: "Sea surface velocity",
+          //   abbr: "Current",
+          //   icon: true,
+          //   units: "m/s",
+          //   range: [0, 3],
+          //   signRange: [0.25, 1],
+          //   color: '#6164ff',//'#71c3eb',
+          // },
           
         ],
         currentDateHTML: '',
@@ -379,15 +379,15 @@
         this.getData(inputDate, lat, long);
       },
 
+
       fetchExternalData: function(){
         if (!this.isWidgetVisible)
           return
-
         let date = this.currentDate;
         this.updateTable(date, this.long, this.lat);
-
         return;
       },
+
       // Sends an event if all data values have been loaded and filled
       allPromisesFinished(){
         // Manually correct wind wave
