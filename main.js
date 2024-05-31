@@ -5,7 +5,7 @@ import en from '/CasablancaBuoy/lang/en.js';
 import es from '/CasablancaBuoy/lang/es.js';
 // Load classes
 // SceneManager
-import SceneManager from "/CasablancaBuoy/Components/SceneManager.js"
+import SceneManager from "/CasablancaBuoy/Assets/Scripts/SceneManager.js"
 window.SceneManager = SceneManager;
 // DataManager
 // import DataManager from "/CasablancaBuoy/data/DataManager.js"
