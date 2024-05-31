@@ -4,7 +4,7 @@
 
 
     <div>
-      <div v-for="dT in dataTypesToShow" style="display: flex; flex-direction: row; flex-wrap: nowrap;">
+      <div v-for="dT in dataTypesToShow" class="dataTypeContainer">
         <!-- Data name -->
         <span style="margin-right: 4px;">{{dT}}:</span>
         <!-- Data value -->
@@ -14,8 +14,9 @@
             <span class="visually-hidden">Loading...</span>
           </div>
           <!-- Direction -->
-          <div v-else-if='dataValues[dT].direction' 
-            :style="{'width': '20px', 'height': '20px', 'pointer-events': 'all', 'transform': 'rotate('+ (dataValues[dT].value - 180 - 90) +'deg)'}" 
+          <div v-else-if='dataValues[dT].direction'
+            class="directionDataValueContainer"
+            :style="{'transform': 'rotate('+ (dataValues[dT].value - 180 - 90) +'deg)'}" 
             :title="dataValues[dT].value.toFixed(2) + 'º'"><span>&#10140;</span>
           </div>
           <!-- Value -->
@@ -58,7 +59,7 @@
     name: 'widgetExternalData', // Caps, no -
     created() {
       // Create data retriever
-      this.dataRetriever = new WMSDataRetriever();
+      this.dataRetriever = new WMTSDataRetriever();
 
       // Create data object
       this.dataValues = {};
@@ -188,22 +189,22 @@
 
 
 
-          {
-            name: "Sea current direction",
-            abbr: "Dir",
-            units: "m/s",
-            direction: true,
-            layer: "Sea surface velocity",
-            color: '#6164ff',//'#71c3eb',
-          },        {
-            name: "Sea surface velocity",
-            abbr: "Current",
-            icon: true,
-            units: "m/s",
-            range: [0, 3],
-            signRange: [0.25, 1],
-            color: '#6164ff',//'#71c3eb',
-          },
+          // {
+          //   name: "Sea current direction",
+          //   abbr: "Dir",
+          //   units: "m/s",
+          //   direction: true,
+          //   layer: "Sea surface velocity",
+          //   color: '#6164ff',//'#71c3eb',
+          // },        {
+          //   name: "Sea surface velocity",
+          //   abbr: "Current",
+          //   icon: true,
+          //   units: "m/s",
+          //   range: [0, 3],
+          //   signRange: [0.25, 1],
+          //   color: '#6164ff',//'#71c3eb',
+          // },
           
         ],
         currentDateHTML: '',
@@ -378,15 +379,15 @@
         this.getData(inputDate, lat, long);
       },
 
+
       fetchExternalData: function(){
         if (!this.isWidgetVisible)
           return
-
         let date = this.currentDate;
         this.updateTable(date, this.long, this.lat);
-
         return;
       },
+
       // Sends an event if all data values have been loaded and filled
       allPromisesFinished(){
         // Manually correct wind wave
@@ -451,6 +452,22 @@
     border-radius: 10px;
 
     background:rgba(82, 181, 217, 0.5);
+  }
+
+  .dataTypeContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .directionDataValueContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    pointer-events: all;
   }
 
   .timeStringContainer {

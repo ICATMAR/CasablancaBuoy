@@ -5,15 +5,15 @@ import en from '/CasablancaBuoy/lang/en.js';
 import es from '/CasablancaBuoy/lang/es.js';
 // Load classes
 // SceneManager
-import SceneManager from "/CasablancaBuoy/Components/SceneManager.js"
+import SceneManager from "/CasablancaBuoy/Assets/Scripts/SceneManager.js"
 window.SceneManager = SceneManager;
 // DataManager
 // import DataManager from "/CasablancaBuoy/data/DataManager.js"
 // window.DataManager = DataManager;
 
 // WMS Data Retriever
-import WMSDataRetriever from '/CasablancaBuoy/data/WMSDataRetriever.js';
-window.WMSDataRetriever = WMSDataRetriever;
+import WMTSDataRetriever from '/CasablancaBuoy/Assets/Scripts/WMTSDataRetriever.js';
+window.WMTSDataRetriever = WMTSDataRetriever;
 
 // Declare translations
 const i18n = VueI18n.createI18n({

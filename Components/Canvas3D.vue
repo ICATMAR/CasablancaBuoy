@@ -89,6 +89,7 @@ export default {
 
 
     // ***** TIME BAR WITH DATA *****
+    // In Casablanca, this is only called in the initial load
     const updateData = (dataInTimestamp) => {
       // Ocean
       if (this.sceneManager.ocean){
