@@ -376,23 +376,27 @@ class SceneManager{
             let position = new THREE.Vector3();
             let normal = new THREE.Vector3();
             this.ocean.getNormalAndPositionAt(position, normal);
-            
-            // Exponential Moving Average (EMA) for position
-            let coef = 0.8; // TODO: SHOULD NOT DEPEND ON FRAMERATE!!
-            // dt from 16 to 40
-            coef = 0.95 - 0.4 * (1 - dt / 16); // Dependent on frame rate
-            
-            let casablancaBuoy = this.casablancaBuoy;
-            casablancaBuoy.root.position.x = casablancaBuoy.root.position.x * coef + (1 - coef) * position.x;
-            casablancaBuoy.root.position.y = casablancaBuoy.root.position.y * coef + (1 - coef) * position.y;
-            casablancaBuoy.root.position.z = casablancaBuoy.root.position.z * coef + (1 - coef) * position.z;
 
-            // EMA for rotation
-            normal.applyAxisAngle(new THREE.Vector3(1, 0, 0), 90 * Math.PI / 180)
-            let tempQuat = new THREE.Quaternion();
-            tempQuat.setFromUnitVectors(new THREE.Vector3(1, 0, 0), normal.normalize());
-            tempQuat.normalize();
-            casablancaBuoy.root.quaternion.slerp(tempQuat, 0.002);
+            if (!isNaN(position.x)){
+
+              // Exponential Moving Average (EMA) for position
+              let coef = 0.8; // TODO: SHOULD NOT DEPEND ON FRAMERATE!!
+              // dt from 16 to 40
+              coef = 0.95 - 0.4 * (1 - dt / 16); // Dependent on frame rate
+              
+              let casablancaBuoy = this.casablancaBuoy;
+              casablancaBuoy.root.position.x = casablancaBuoy.root.position.x * coef + (1 - coef) * position.x;
+              casablancaBuoy.root.position.y = casablancaBuoy.root.position.y * coef + (1 - coef) * position.y;
+              casablancaBuoy.root.position.z = casablancaBuoy.root.position.z * coef + (1 - coef) * position.z;
+
+              // EMA for rotation
+              normal.applyAxisAngle(new THREE.Vector3(1, 0, 0), 90 * Math.PI / 180)
+              let tempQuat = new THREE.Quaternion();
+              tempQuat.setFromUnitVectors(new THREE.Vector3(1, 0, 0), normal.normalize());
+              tempQuat.normalize();
+              casablancaBuoy.root.quaternion.slerp(tempQuat, 0.002);
+
+            }
           }
         }
       }
