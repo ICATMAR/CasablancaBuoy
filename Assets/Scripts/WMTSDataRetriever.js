@@ -632,17 +632,34 @@ export class WMTSDataRetriever {
     // Remove image from active requests
     this.activeRequests = this.activeRequests.filter( el => el.src != url); // Memory garbage? TODO?
 
-    if (mustBePrecise != true){
-      let value = await this.getNormValueFromImage(img, lon, lat, tileMatrix);
-      if (value == undefined) {
-        this.printWarn("No data at " + url);
-        return;
-      }
-      // Put in range of the data type (normValue * (max-min) + min)
-      value = value * (range[1] - range[0]) + range[0];
+    // Get normalized value from image according to lat long and tileMatrix
+    let value = await this.getNormValueFromImage(img, lon, lat, tileMatrix);
+    if (value == undefined) {
+      this.printWarn("No data at " + url);
+      return;
+    }
+    // Put in range of the data type (normValue * (max-min) + min)
+    value = value * (range[1] - range[0]) + range[0];
+
+    // Get precise value
+    if (mustBePrecise){
+      let quantStep = (range[1] - range[0]) / 255;
+      url = WMTSDataRetriever.setWMTSParameter(url, 'style', 'range:'+ (value - quantStep)+'/'+ (value + quantStep) +',cmap:gray');
+      // Get image with very small range
+      let imgPrec = await this.getTileFromURL(url);
+      // Remove image from active requests
+      this.activeRequests = this.activeRequests.filter( el => el.src != url); // Memory garbage? TODO?
+      // Get pixel value from small-range image
+      let valuePrec = await this.getNormValueFromImage(imgPrec, lon, lat, tileMatrix);
+      // Put in range (normValue * (max-min) + min)
+      valuePrec = valuePrec * (quantStep * 2) + value - quantStep;
+      // Return value
+      return valuePrec;
+    } 
+    // Get quantized value (255 steps of range)
+    else {
       return value;
     }
-    return 
   }
 
 

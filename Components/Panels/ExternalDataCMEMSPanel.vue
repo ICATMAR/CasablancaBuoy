@@ -326,7 +326,7 @@ export default {
           let layerName = rr.direction ? rr.layer : rr.name;
           // Icon row and custom SVG does not load data
           if (layerName !== undefined && rr.usesCustomSVG != true){
-            this.dataRetriever.getDataAtPoint(layerName, date.toISOString(), lat, long, 'h', rr.direction)
+            this.dataRetriever.getDataAtPoint(layerName, date.toISOString(), lat, long, 'h', rr.direction, true)
               .then(value => {
                 if (value == undefined){
                   rr.data[dIndex].value = 'x';
