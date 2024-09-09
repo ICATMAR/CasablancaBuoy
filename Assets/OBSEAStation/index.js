@@ -1,14 +1,14 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
-//import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js';
-import { GLTFLoader } from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
-import { FBXLoader } from 'https://threejs.org/examples/jsm/loaders/FBXLoader.js'
+import { OrbitControls } from '/CasablancaBuoy/lib/three.js/examples/jsm/controls/OrbitControls.js';
+//import { OBJLoader } from '/CasablancaBuoy/lib/three.js/examples/jsm/loaders/OBJLoader.js';
+import { GLTFLoader } from '/CasablancaBuoy/lib/three.js/examples/jsm/loaders/GLTFLoader.js';
+import { FBXLoader } from '/CasablancaBuoy/lib/three.js/examples/jsm/loaders/FBXLoader.js'
 import { RosaVentsEntity } from '/CasablancaBuoy/Assets/Orientation/RosaVentsEntity.js';
-// import { GUI } from 'https://threejs.org/examples/jsm/libs/lil-gui.module.min.js';
+// import { GUI } from '/CasablancaBuoy/lib/three.js/examples/jsm/libs/lil-gui.module.min.js';
 
 
 /* OCEAN
-https://threejs.org/examples/webgl_shaders_ocean.html
+/CasablancaBuoy/lib/three.js/examples/webgl_shaders_ocean.html
 https://29a.ch/slides/2012/webglwater/
 https://29a.ch/sandbox/2012/terrain/
 https://www.tamats.com/work/bwr/
