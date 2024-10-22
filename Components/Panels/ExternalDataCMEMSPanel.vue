@@ -68,10 +68,10 @@
           <div class="icon-str" style="background:khaki"></div><span>  {{ $t('Wind wave significant height') }}</span>
         </div>
         <div class="legendItem">
-          <div class="icon-str" style="background:var(--blue)"></div><span>  {{ $t('Primary swell wave significant height') }}</span>
+          <div class="icon-str" style="background:var(--darkBlue)"></div><span>  {{ $t('Primary swell wave significant height') }}</span>
         </div>
         <div class="legendItem">
-          <div class="icon-str" style="background:var(--darkBlue)"></div><span>  {{ $t('Secondary swell wave significant height') }}</span>
+          <div class="icon-str" style="background:var(--black)"></div><span>  {{ $t('Secondary swell wave significant height') }}</span>
         </div>
       </div>
 
@@ -515,10 +515,10 @@ export default {
                 <circle r="4" cx="13" cy="13" fill="transparent" stroke="khaki" stroke-width="8" stroke-dasharray="calc(${wwshNorm}*8*3.142) calc(8*3.142)" transform="rotate(-${90 + wwshNorm*180 - wwDir + 180 + 360}, 13, 13)" />
                 <polygon points="${13 - 4 * Math.min(1, wwshNorm*6)}, 6.5, 13, 2, ${13 + 4 * Math.min(1, wwshNorm*6)}, 6.5" fill="khaki" transform="rotate(${wwDir + 180}, 13, 13)" />
 
-                <circle r="2.5" cx="13" cy="13" fill="transparent" stroke="var(--blue)" stroke-width="5" stroke-dasharray="calc(${sw1Norm}*5*3.142) calc(5*3.142)" transform="rotate(-${90 + sw1Norm*180 - sw1Dir + 180 + 360}, 13, 13)" />
-                <polygon points="${13 - 3 * Math.min(1, sw1Norm*6)}, 9.5, 13, 6, ${13 + 3 * Math.min(1, sw1Norm*6)}, 9.5" fill="var(--blue)" transform="rotate(${sw1Dir + 180}, 13, 13)" />
+                <circle r="2.5" cx="13" cy="13" fill="transparent" stroke="var(--darkBlue)" stroke-width="5" stroke-dasharray="calc(${sw1Norm}*5*3.142) calc(5*3.142)" transform="rotate(-${90 + sw1Norm*180 - sw1Dir + 180 + 360}, 13, 13)" />
+                <polygon points="${13 - 3 * Math.min(1, sw1Norm*6)}, 9.5, 13, 6, ${13 + 3 * Math.min(1, sw1Norm*6)}, 9.5" fill="var(--darkBlue)" transform="rotate(${sw1Dir + 180}, 13, 13)" />
 
-                <circle r="1.5" cx="13" cy="13" fill="transparent" stroke="var(--darkBlue)" stroke-width="3" stroke-dasharray="calc(${sw2Norm}*3*3.142) calc(3*3.142)" transform="rotate(-${90 + sw2Norm*180 - sw2Dir + 180 + 360}, 13, 13)" />
+                <circle r="1.5" cx="13" cy="13" fill="transparent" stroke="black" stroke-width="3" stroke-dasharray="calc(${sw2Norm}*3*3.142) calc(3*3.142)" transform="rotate(-${90 + sw2Norm*180 - sw2Dir + 180 + 360}, 13, 13)" />
 
                 
               </svg>
