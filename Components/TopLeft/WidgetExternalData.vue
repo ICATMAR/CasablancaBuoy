@@ -59,7 +59,7 @@
     name: 'widgetExternalData', // Caps, no -
     created() {
       // Create data retriever
-      this.dataRetriever = new WMTSDataRetriever();
+      this.dataRetriever = window.WMTSDataRetriever;
 
       // Create data object
       this.dataValues = {};

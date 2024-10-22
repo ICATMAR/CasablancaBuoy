@@ -11,9 +11,12 @@ window.SceneManager = SceneManager;
 // import DataManager from "/CasablancaBuoy/data/DataManager.js"
 // window.DataManager = DataManager;
 
-// WMS Data Retriever
-import WMTSDataRetriever from '/CasablancaBuoy/Assets/Scripts/WMTSDataRetriever.js';
-window.WMTSDataRetriever = WMTSDataRetriever;
+// Import WMTSDataRetriever
+import WMTSDataRetrieverClass from './Assets/Scripts/WMTSDataRetriever.js';
+window.WMTSDataRetriever = new WMTSDataRetrieverClass();
+// Import tile manager
+import WMTSTileManagerClass from './Assets/Scripts/WMTSTileManager.js'
+window.WMTSTileManager = new WMTSTileManagerClass();
 
 // Declare translations
 const i18n = VueI18n.createI18n({

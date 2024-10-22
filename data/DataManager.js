@@ -13,7 +13,7 @@ class DataManager{
 
     // Constructor
     this.OBSEADataRetriever = new OBSEADataRetriever();
-    this.WMTSDataRetriever = new WMTSDataRetriever();
+    this.WMTSDataRetriever = window.WMTSDataRetriever;
 
     // TODO: files should only be loaded on demand (more than 20Mb of data, no need to download)
     //        - Load files on demand

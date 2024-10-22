@@ -110,7 +110,7 @@ export default {
   },
   created() {
     // Create data retriever
-    this.dataRetriever = new WMTSDataRetriever();
+    this.dataRetriever = window.WMTSDataRetriever;
 
     // Initialize date
     let date = new Date();
