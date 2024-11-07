@@ -18,7 +18,10 @@
 // https://brandenstrochinsky.blogspot.com/2016/06/water-effect.html
 // Screen space reflections (SSR)
 // https://www.youtube.com/watch?v=K2rs7K4y_sY&ab_channel=NullPointer
-// /CasablancaBuoy/lib/three.js/examples/?q=post#webgl_postprocessing_ssr
+// https://threejs.org/examples/?q=ssr#webgl_postprocessing_ssr
+// https://threejs.org/examples/jsm/shaders/SSRShader.js
+// Depth
+// https://discourse.threejs.org/t/get-depth-in-fragment-shader/1831
 // Mirror reflection
 // http://www.shiplab.hials.org/app/simulator/Elias/
 
@@ -61,7 +64,8 @@ export const OceanProjectedGridVertShader = /* glsl */ `
   varying vec3 v_Normal;
   varying mat3 v_TBN;
   varying vec4 v_OceanColor;
-
+  // SSR
+  varying float v_distToCam;
 
 
   // Gerstner Wave
@@ -211,10 +215,12 @@ export const OceanProjectedGridVertShader = /* glsl */ `
     // Model
     v_TBN = mat3(tangent, binormal, normal);
 
-
     // Screen space position
     //gl_Position = projectionMatrix * modelViewMatrix * vec4(modPos, 1.0);
     gl_Position = projectionMatrix * viewMatrix * vec4(modPos, 1.0);
+
+    // Depth from gl_Position
+    v_distToCam = gl_Position.z;
   }
   `;
 
@@ -236,6 +242,8 @@ export const OceanProjectedGridFragShader = /* glsl */`
   varying vec3 v_WorldPosition;
   varying vec3 v_Normal;
   varying mat3 v_TBN;
+
+  varying float v_distToCam;
 
   uniform sampler2D u_normalTexture;
   uniform float u_time;
@@ -373,5 +381,6 @@ export const OceanProjectedGridFragShader = /* glsl */`
     //gl_FragColor = vec4(normalize(v_WorldPosition), 1.0);
     //gl_FragColor = vec4((cameraPosition), 1.0);
     //gl_FragColor = vec4((normalTexel), 1.0);
+    gl_FragColor = vec4(vec3(v_distToCam / 255.0), 1.0);
   }
   `;
